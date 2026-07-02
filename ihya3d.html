@@ -17,10 +17,20 @@
   .pill{background:var(--panel);border-radius:14px;padding:7px 12px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;gap:7px;font-weight:800;color:var(--ink);font-size:14px}
   .pill small{font-weight:600;color:var(--muted);font-size:11px}
   .nur b{color:var(--gold)}
+  .nur small{color:var(--green);font-weight:800}
+  .streak{color:#c0491f}.streak b{color:#c0491f}
   /* semâ saati (güneş/ay kavsi) */
+  .iconbtn{pointer-events:auto;cursor:pointer;border:none;background:var(--panel);border-radius:14px;padding:8px 11px;box-shadow:0 4px 14px #0002;font-size:16px;line-height:1}
+  .toolbar{position:fixed;right:12px;top:88px;z-index:6;display:flex;flex-direction:column;gap:8px;pointer-events:none}
   .skyclock{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 4px 3px;border-radius:16px;background:var(--panel);box-shadow:0 4px 14px #0002}
   #skySvg{width:124px;height:auto;display:block;border-radius:12px}
   .vakitlbl{font-weight:800;color:var(--ink);font-size:12.5px;line-height:1;padding:1px 2px 2px}
+  @media (max-width:440px){
+    .top{gap:6px;padding:8px 9px}
+    .pill{padding:6px 9px;font-size:12.5px}
+    #skySvg{width:98px}
+    .toolbar{top:78px}
+  }
   .prog{flex:1;max-width:180px;height:9px;background:#ffffff88;border-radius:6px;overflow:hidden;box-shadow:0 2px 8px #0001}
   .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2f8f63,#5fb98a);transition:width .5s}
   /* joystick */
@@ -67,6 +77,15 @@
   .exOpt.wrong{border-color:#d9534f;background:#fbe4e3;color:#a3302c}
   .excite{font-size:12px;color:var(--muted);min-height:16px;margin:2px 0 8px;font-style:italic}
   .exresic{font-size:48px;text-align:center;margin:8px 0 2px}
+  /* ---- HAYIR ÇEŞMESİ ---- */
+  .hcard{display:flex;align-items:center;gap:11px;padding:11px 12px;margin-bottom:9px;border-radius:14px;background:#f3f7f3;border:1px solid #e3ece5}
+  .hic{font-size:26px;flex-shrink:0;width:34px;text-align:center}
+  .hbody{flex:1;min-width:0}
+  .hnm{font-size:15px;font-weight:800;color:var(--ink)}
+  .hcnt{font-size:11px;color:var(--muted);font-weight:700}
+  .href{font-size:11px;color:var(--muted);line-height:1.4;margin-top:3px}
+  .hbuy{flex-shrink:0;border:none;border-radius:12px;padding:10px 13px;font-weight:800;font-size:14px;cursor:pointer;background:linear-gradient(135deg,#e9c478,#d9a441);color:#33240a}
+  .hbuy.off{background:#dfe4df;color:#9aa;cursor:default}
   /* ---- ADIM ADIM ÖĞRETİM ---- */
   .gstep{background:#f3f7f3;border:1px solid #e3ece5;border-radius:16px;padding:20px 18px;margin:4px 0 14px;text-align:center;min-height:150px;display:flex;flex-direction:column;justify-content:center}
   .gic{font-size:44px;margin-bottom:8px}
@@ -116,8 +135,8 @@
 <canvas id="c"></canvas>
 
 <div class="top">
-  <div class="pill nur">✦ <b id="nur">0</b> <small>nûr</small></div>
-  <div class="prog"><i id="prog"></i></div>
+  <div class="pill nur">✦ <b id="nur">0</b> <small id="rank">Niyet</small></div>
+  <div class="pill streak" id="streakPill" style="display:none">🔥 <b>0</b></div>
   <div class="pill" id="cntPill">0/0</div>
   <div class="skyclock" id="skyclock" style="margin-left:auto">
     <svg id="skySvg" viewBox="0 0 140 62" xmlns="http://www.w3.org/2000/svg">
@@ -157,6 +176,11 @@
     </svg>
     <div class="vakitlbl" id="vakit">☀ Kuşluk</div>
   </div>
+</div>
+
+<div class="toolbar" id="toolbar">
+  <button class="iconbtn" id="muteBtn" title="Ses aç/kapat">🔊</button>
+  <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
 </div>
 
 <div id="prompt"></div>
@@ -213,6 +237,16 @@
   </div>
 </div>
 
+<div class="veil" id="hayir">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="exhead"><h3>🤲 Hayır Çeşmesi</h3><span class="exprog">Nûr: <b id="hayirNur">0</b></span></div>
+    <div class="sub" style="margin-bottom:10px">Nûrunu sadaka-i câriyeye dönüştür; dünya güzelleşir, ecri devam eder.</div>
+    <div id="hayirList"></div>
+    <button class="cl" id="hayirClose">Kapat</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <div id="banner"></div>
 
@@ -220,6 +254,8 @@
   <div class="crest">☾</div>
   <h1>Dünya İhyâ Edildi</h1>
   <div class="ay">"Elhamdülillâhi Rabbi'l-âlemîn"</div>
+
+  <div class="sec"><h3>İhyâ Künyeniz</h3><p id="endStats">—</p></div>
 
   <div class="sec"><h3>Niyetimiz</h3><p>Bu oyunu; ibadeti ve güzel ahlâkı sevdirmek, kendi nefsimizden başlayarak hâneyi, bahçeyi, mahalleyi, camiyi ve şehri Allah'ın rızâsıyla ihyâ etme şuurunu hatırlatmak niyetiyle yaptık. Unutma: gerçek ihyâ ekranda değil, hayattadır.</p></div>
 
@@ -448,12 +484,32 @@ function buildExam(islId){
 
 
 /* ============ STATE ============ */
-let S = { nur:0, done:{}, conquered:{}, learned:{}, lastDay:null };
+let S = { nur:0, done:{}, conquered:{}, learned:{}, lastDay:null, streak:0, streakDay:null, hayir:null };
 try{ const r=localStorage.getItem('ihya3d_v1'); if(r) S=Object.assign(S,JSON.parse(r)); }catch(e){}
 if(!S.conquered) S.conquered={};
-if(!S.learned) S.learned={};   // KALICI: bir dersi ilk kez adım adım öğrenince işaretlenir (günlük sıfırlamadan etkilenmez)
+if(!S.learned) S.learned={};
+if(!S.hayir) S.hayir={ agac:[], kandil:[], cesme:[], ilim:[] };   // KALICI: nûr ile yapılan sadaka-i câriye (konumlar)
+for(const k of ['agac','kandil','cesme','ilim']) if(!S.hayir[k]) S.hayir[k]=[];   // KALICI: bir dersi ilk kez adım adım öğrenince işaretlenir (günlük sıfırlamadan etkilenmez)
 const save=()=>{ try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){} };
 const today=()=>new Date().toISOString().slice(0,10);
+const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
+
+/* ---- NÛR RÜTBELERİ (biriken nûr'a anlam) ---- */
+const RANKS=[[0,'Niyet'],[60,'Tâlib'],[180,'Gayret Ehli'],[360,'İhyâ Yolcusu'],[600,'İhyâ Eri'],[1000,'İhyâ Ustası']];
+function rankIndex(n){ let i=0; for(let k=0;k<RANKS.length;k++){ if(n>=RANKS[k][0]) i=k; } return i; }
+function rankName(n){ return RANKS[rankIndex(n)][1]; }
+function addNur(n){ const b=rankIndex(S.nur); S.nur+=n; const a=rankIndex(S.nur);
+  if(a>b) setTimeout(()=>{ banner('🌟 Yeni rütbe: '+RANKS[a][1]); sndFanfare(); }, 550); }
+/* ---- İSTİKAMET (streak): ardışık gün günlük ibadeti tamamlama ---- */
+function checkStreak(){
+  if(!islandDone('ev')) return;          // günün ibadeti (Hâne) tamam mı
+  const t=today(); if(S.streakDay===t) return;   // bugün zaten sayıldı
+  S.streak = (S.streakDay===yesterday()) ? (S.streak+1) : 1;
+  S.streakDay=t;
+  const bonus=10+Math.min(60,S.streak*5);
+  addNur(bonus); save(); refreshHUD();
+  setTimeout(()=>toast('🔥 İstikamet '+S.streak+' gün · +'+bonus+' nûr'), 400);
+}
 // GÜNLÜK SIFIRLAMA: yeni günde görevler tekrar açılır; fethedilen adalar (conquered) kalıcı, nûr birikir.
 function rollDay(){
   const t=today();
@@ -523,7 +579,7 @@ function updateDayNight(dt){
   if(v!==lastVakit){ const prev=lastVakit; lastVakit=v; const el2=document.getElementById('vakit'); if(el2) el2.textContent=v[2]+' '+v[1]; if(prev) onVakitChange(v); }
   skyAcc+=dt; if(dt===0 || skyAcc>=0.15){ skyAcc=0; updateSkyWidget(); }
 }
-function onVakitChange(v){ rebuildEvQuests(v[1]); toast('🕌 '+v[1]+' vakti girdi'); }
+function onVakitChange(v){ rebuildEvQuests(v[1]); toast('🕌 '+v[1]+' vakti girdi'); sndVakit(); }
 
 /* ---- SEMÂ SAATİ: güneş/ay kavsi HUD widget'ı (Kur'an 10:5) ---- */
 let skyAcc=0, skyRefs=null;
@@ -705,9 +761,67 @@ function animateAtmosphere(dt,t){
       for(let i=0;i<fireflyData.length;i++){ const f=fireflyData[i];
         arr[i*3]=f.x+Math.sin(t*f.sp*0.5+f.ph)*0.5; arr[i*3+1]=f.y+Math.sin(t*f.sp+f.ph)*f.amp+0.15; arr[i*3+2]=f.z+Math.cos(t*f.sp*0.5+f.ph)*0.5; }
       a.needsUpdate=true; } }
+  // kandiller: geceleyin parla
+  for(const m of lanternCores) m.emissiveIntensity = 0.15 + nightF*1.3;
 }
 
-/* ============ MODEL LOADING ============ */
+/* ============ HAYIR ÇEŞMESİ — nûr ile sadaka-i câriye (dünya güzelleşir) ============ */
+const HAYIR=[
+  {id:'agac', ic:'🌳', nm:'Ağaç diktir',   cost:40,  max:10, ref:'Bir müslüman ağaç diker de ondan yenirse, bu onun için sadaka olur. (Buhârî, Hars 1)'},
+  {id:'kandil',ic:'🏮', nm:'Kandil yaktır', cost:60,  max:8,  ref:'Mallarını Allah yolunda harcayanların durumu, yedi başak veren bir tohum gibidir. (Bakara 2/261)'},
+  {id:'cesme', ic:'⛲', nm:'Çeşme yaptır',  cost:100, max:4,  ref:'Sadakanın en faziletlisi, (susayana) su ikram etmektir. (İbn Mâce, Edeb 8)'},
+  {id:'ilim',  ic:'📖', nm:'Mushaf vakfet', cost:140, max:4,  ref:'İnsan ölünce ameli kesilir; sadaka-i câriye, faydalı ilim ve hayırlı evlât müstesnâ. (Müslim, Vasiyyet 14)'},
+];
+let hayirGroups=[], lanternCores=[];
+function randomHayirSpot(){
+  const uis=WORLD.islands.filter(is=>isUnlocked(is.id)); const is=uis[Math.floor(Math.random()*uis.length)]||WORLD.islands[0];
+  const a=Math.random()*6.283, r=is.r*(0.35+Math.random()*0.45);
+  return { x:+(is.c[0]+Math.cos(a)*r).toFixed(2), z:+(is.c[1]+Math.sin(a)*r).toFixed(2) };
+}
+function makeLantern(){
+  const g=new THREE.Group();
+  const post=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.09,1.15,8), new THREE.MeshStandardMaterial({color:0x5a4632,roughness:1})); post.position.y=0.57; g.add(post);
+  const light=new THREE.Mesh(new THREE.IcosahedronGeometry(0.23,0), new THREE.MeshStandardMaterial({color:0xffe08a,emissive:0xffcf55,emissiveIntensity:0.3,roughness:0.5,metalness:0.1})); light.position.y=1.25; g.add(light);
+  const cap=new THREE.Mesh(new THREE.ConeGeometry(0.2,0.18,6), new THREE.MeshStandardMaterial({color:0x7a5a34,roughness:1})); cap.position.y=1.5; g.add(cap);
+  lanternCores.push(light.material); return g;
+}
+function addHayirMesh(id,p){
+  let g;
+  if(id==='agac'){ const t=instance('tree'); g=t.g; g.scale.setScalar(0.8+((Math.abs(p.x)*7)%1)*0.35); g.rotation.y=p.x*1.7; }
+  else if(id==='cesme'){ const t=instance('fountain'); g=t.g; g.scale.setScalar(1.05); }
+  else if(id==='ilim'){ const t=instance('rahle'); g=t.g; g.scale.setScalar(1.35); g.rotation.y=p.z*0.9; }
+  else { g=makeLantern(); }
+  g.position.set(p.x,0,p.z); scene.add(g); hayirGroups.push(g);
+}
+function applyHayir(){
+  for(const g of hayirGroups) scene.remove(g); hayirGroups=[]; lanternCores=[];
+  for(const h of HAYIR) for(const p of (S.hayir[h.id]||[])) addHayirMesh(h.id,p);
+}
+function donateHayir(id){
+  const def=HAYIR.find(h=>h.id===id); const arr=S.hayir[id];
+  if(arr.length>=def.max){ toast('✓ Bu hayırda azami sayıya ulaştın'); return; }
+  if(S.nur<def.cost){ toast('🔒 Yetersiz nûr — '+def.cost+' gerekli'); return; }
+  S.nur-=def.cost; const p=randomHayirSpot(); arr.push(p); addHayirMesh(id,p);
+  save(); refreshHUD(); renderHayir();
+  sndChime(); banner(def.ic+' Sadaka-i câriye'); toast('🤲 '+def.nm+' — kabul olsun');
+}
+function openHayir(){ audio(); renderHayir(); document.getElementById('hayir').classList.add('show'); }
+function closeHayir(){ document.getElementById('hayir').classList.remove('show'); }
+function renderHayir(){
+  document.getElementById('hayirNur').textContent=S.nur;
+  const w=document.getElementById('hayirList'); w.innerHTML='';
+  for(const h of HAYIR){
+    const have=(S.hayir[h.id]||[]).length, maxed=have>=h.max, poor=S.nur<h.cost;
+    const card=document.createElement('div'); card.className='hcard';
+    card.innerHTML='<div class="hic">'+h.ic+'</div>'+
+      '<div class="hbody"><div class="hnm">'+h.nm+' <span class="hcnt">'+have+'/'+h.max+'</span></div>'+
+      '<div class="href">'+h.ref+'</div></div>'+
+      '<button class="hbuy'+(maxed||poor?' off':'')+'">'+(maxed?'Tamam ✓':'✦ '+h.cost)+'</button>';
+    const btn=card.querySelector('.hbuy');
+    if(!maxed) btn.onclick=()=>donateHayir(h.id);
+    w.appendChild(card);
+  }
+}
 const loader=new GLTFLoader();
 const tpl={};
 const loadBar=document.getElementById('loadBar');
@@ -855,27 +969,46 @@ const promptEl=document.getElementById('prompt'), actBtn=document.getElementById
 let toastT;
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1800); }
 function banner(txt){ const b=document.getElementById('banner'); b.textContent=txt; b.classList.remove('show'); void b.offsetWidth; b.classList.add('show'); }
-function showEnd(){ document.getElementById('endscreen').classList.add('show'); }
+function showEnd(){
+  const st=document.getElementById('endStats');
+  if(st) st.innerHTML='Rütbe: <b>'+rankName(S.nur)+'</b> · Nûr: <b>'+S.nur+'</b>'+(S.streak>0?' · İstikamet: <b>'+S.streak+' gün 🔥</b>':'');
+  document.getElementById('endscreen').classList.add('show');
+}
 document.getElementById('endCont').onclick=()=>document.getElementById('endscreen').classList.remove('show');
 document.getElementById('endRestart').onclick=()=>{ localStorage.removeItem('ihya3d_v1'); location.reload(); };
 
 /* ---- SES (Web Audio ile sentez, harici dosya yok) ---- */
-let AC=null, ambientOn=false;
-function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(AC&&AC.state==='suspended') AC.resume(); return AC; }
-function beep(freq,t0,dur,type,gain){ if(!AC)return; const o=AC.createOscillator(),g=AC.createGain();
-  o.type=type||'sine'; o.frequency.value=freq; o.connect(g); g.connect(AC.destination);
+let AC=null, masterGain=null, ambientOn=false, muted=false;
+try{ muted=localStorage.getItem('ihya3d_mute')==='1'; }catch(e){}
+function audio(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)();
+    masterGain=AC.createGain(); masterGain.gain.value=muted?0:1; masterGain.connect(AC.destination); }catch(e){} }
+  if(AC&&AC.state==='suspended') AC.resume(); return AC; }
+function setMuted(m){ muted=m; try{ localStorage.setItem('ihya3d_mute', m?'1':'0'); }catch(e){}
+  if(masterGain) masterGain.gain.value=m?0:1;
+  const b=document.getElementById('muteBtn'); if(b) b.textContent=m?'🔇':'🔊'; }
+function beep(freq,t0,dur,type,gain){ if(!AC||muted)return; const o=AC.createOscillator(),g=AC.createGain();
+  o.type=type||'sine'; o.frequency.value=freq; o.connect(g); g.connect(masterGain||AC.destination);
   const t=AC.currentTime+t0; g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(gain||0.14,t+0.02);
   g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.start(t); o.stop(t+dur+0.05); }
 function sndChime(){ audio(); [659.25,830.6,987.77].forEach((f,i)=>beep(f,i*0.05,0.30,'sine',0.11)); }
 function sndFanfare(){ audio(); [523.25,659.25,783.99,1046.5].forEach((f,i)=>beep(f,i*0.11,0.45,'triangle',0.14)); beep(1318.5,0.46,0.75,'sine',0.09); }
+// vakit tonu: saygılı, tefekkür verici ney/çan motifi (Hicaz tetrakord) — ezan DEĞİL
+function sndVakit(){ audio(); const notes=[293.66,311.13,369.99,392.0];
+  notes.forEach((f,i)=>{ beep(f, i*0.4, 1.15, 'sine', 0.085); beep(f*2, i*0.4+0.02, 0.7, 'triangle', 0.02); });
+  beep(587.33, 1.7, 1.6, 'sine', 0.05); }
 function startAmbient(){ if(ambientOn||!audio())return; ambientOn=true; const ac=AC;
   const buf=ac.createBuffer(1,ac.sampleRate*2,ac.sampleRate), d=buf.getChannelData(0); let last=0;
   for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*3.0; }
   const src=ac.createBufferSource(); src.buffer=buf; src.loop=true;
   const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420;
-  const g=ac.createGain(); g.gain.value=0.05; src.connect(lp); lp.connect(g); g.connect(ac.destination); src.start();
-  (function chirp(){ if(!AC)return; const f=1700+Math.random()*1300; beep(f,0,0.08,'sine',0.035); beep(f*1.28,0.09,0.06,'sine',0.028);
-    setTimeout(chirp, 4500+Math.random()*8000); })();
+  const g=ac.createGain(); g.gain.value=0.05; src.connect(lp); lp.connect(g); g.connect(masterGain||ac.destination); src.start();
+  // gün/gece'ye göre: gündüz kuş cıvıltısı, gece cırcır böceği
+  (function amb(){ if(!AC)return;
+    if(isNight()){ const f=2350+Math.random()*450; for(let k=0;k<3;k++) beep(f,k*0.055,0.035,'square',0.011);
+      setTimeout(amb, 850+Math.random()*1300); }
+    else { const f=1700+Math.random()*1300; beep(f,0,0.08,'sine',0.035); beep(f*1.28,0.09,0.06,'sine',0.028);
+      setTimeout(amb, 4200+Math.random()*7500); }
+  })();
 }
 
 /* ---- KUTLAMA (parıltı patlaması) ---- */
@@ -951,7 +1084,7 @@ function doQuest(){
   if(!was && !questAvailable(curQ)){ const p=prereqOf(curQ); toast('🔒 Önce: '+(p?p.nm:'sıradaki adım')); return; }
   const islId=questIslandId(curQ);
   const islDoneBefore=islandDone(islId);
-  if(was){ delete S.done[curQ.id]; } else { S.done[curQ.id]=true; S.nur+=10; sndChime(); toast('+10 nûr ✦'); }
+  if(was){ delete S.done[curQ.id]; } else { S.done[curQ.id]=true; addNur(10); sndChime(); toast('+10 nûr ✦'); }
   const rec=interactables.find(r=>r.q.id===curQ.id);
   if(rec){ rec.done=!was;
     if(!was && curQ.model==='plot'){ /* fidan: parseli filizliye çevir */ swapPlot(rec); } }
@@ -959,6 +1092,7 @@ function doQuest(){
   const nowLessonsDone = !was && !islDoneBefore && islandDone(islId);
   save(); refreshHUD();
   applyIslandLock();
+  if(!was && islId==='ev') checkStreak();   // Hâne günlük ibadeti → istikamet zinciri
   if(nowLessonsDone && !S.conquered[islId]){
     sndFanfare(); const is=WORLD.islands.find(i=>i.id===islId);
     setTimeout(()=>toast('📝 '+(is?is.name:'')+' İmtihan Meydanı açıldı!'),700);
@@ -970,7 +1104,7 @@ function doQuest(){
 function passExam(islId){
   const before=WORLD.islands.map(i=>isUnlocked(i.id));
   const firstConquer=!S.conquered[islId];
-  S.conquered[islId]=true; S.nur+=30; save();
+  S.conquered[islId]=true; addNur(30); save();
   const after=WORLD.islands.map(i=>isUnlocked(i.id));
   applyIslandLock(); refreshHUD();
   WORLD.islands.forEach((is,idx)=>{ if(!before[idx]&&after[idx]) setTimeout(()=>toast('🔓 '+is.name+' açıldı!'),1900); });
@@ -1050,15 +1184,23 @@ document.getElementById('sSteps').onclick=()=>{ const q=curQ; closeSheet(); open
 document.getElementById('gNext').onclick=guideNext;
 document.getElementById('gPrev').onclick=guidePrev;
 document.getElementById('guide').addEventListener('click',e=>{ if(e.target.id==='guide') closeGuide(); });
+document.getElementById('muteBtn').onclick=()=>{ audio(); setMuted(!muted); };
+setMuted(muted);  // ilk ikon durumu (kayıtlı tercih)
+document.getElementById('hayirBtn').onclick=openHayir;
+document.getElementById('hayirClose').onclick=closeHayir;
+document.getElementById('hayir').addEventListener('click',e=>{ if(e.target.id==='hayir') closeHayir(); });
 actBtn.onclick=()=>{ if(!near) return;
   if(near.exam){ openExam(near.islId); return; }
   interact(near.q); };
 
 function refreshHUD(){
   document.getElementById('nur').textContent=S.nur;
+  const rk=document.getElementById('rank'); if(rk) rk.textContent=rankName(S.nur);
   const total=WORLD.islands.length, done=WORLD.islands.filter(i=>S.conquered[i.id]).length;
-  document.getElementById('prog').style.width=(done/total*100)+'%';
+  const pg=document.getElementById('prog'); if(pg) pg.style.width=(done/total*100)+'%';
   document.getElementById('cntPill').textContent=done+'/'+total+' ada';
+  const sp=document.getElementById('streakPill');
+  if(sp){ if(S.streak>0){ sp.style.display='flex'; sp.innerHTML='🔥 <b>'+S.streak+'</b>'; } else sp.style.display='none'; }
 }
 
 /* ============ LOOP ============ */
@@ -1141,7 +1283,9 @@ addEventListener('resize',resize); resize();
   setVakitQuests(vakitOf(gameTime)[1]);   // vakte göre ev ibadetlerini kur
   migrateConquered();               // eski kayıt: tamamlanmış adaları kalıcı fethe işle
   const newDay=rollDay();           // yeni günse görevleri sıfırla (fetihler kalır)
-  buildWorld(); refreshHUD(); applyIslandLock();
+  // istikamet: son tamamlanan gün ne bugün ne dün ise zincir kırılmış → sıfırla
+  if(S.streakDay && S.streakDay!==today() && S.streakDay!==yesterday()){ S.streak=0; save(); }
+  buildWorld(); applyHayir(); refreshHUD(); applyIslandLock();
   document.getElementById('load').style.display='none';
   if(newDay) setTimeout(()=>toast('🌅 Yeni gün — görevler yenilendi'),600);
   // oyun açıkken gece yarısını geçerse de sıfırla
@@ -1159,6 +1303,12 @@ addEventListener('resize',resize); resize();
     openGuideId:(id)=>{ const r=interactables.find(x=>x.q.id===id); if(r) openGuide(r.q); },
     guideState:()=>({idx:guideIdx, n:guideSteps.length, open:document.getElementById('guide').classList.contains('show')}),
     learnedMap:()=>Object.assign({},S.learned),
+    addNur:(n)=>{ addNur(n); save(); refreshHUD(); }, rank:()=>rankName(S.nur),
+    streakInfo:()=>({streak:S.streak, day:S.streakDay}), checkStreak:()=>checkStreak(),
+    setStreakDay:(d)=>{ S.streakDay=d; },
+    openHayir:()=>openHayir(), donate:(id)=>donateHayir(id),
+    hayirCounts:()=>({agac:S.hayir.agac.length,kandil:S.hayir.kandil.length,cesme:S.hayir.cesme.length,ilim:S.hayir.ilim.length}),
+    hayirMeshes:()=>hayirGroups.length,
     learn:(id)=>{ for(const q of islandQuests(id)) S.done[q.id]=true; interactables.forEach(r=>{ if(!r.exam) r.done=!!S.done[r.q.id]; }); save(); applyIslandLock(); refreshHUD(); } };
   tick();
 })();

@@ -23,8 +23,15 @@ Her görevde âyet/hadis delili vardır.
   (doğu→zirve→batı), gökyüzü rengi + yıldızlar + ufuk canlı değişir, altında vakit adı (Kur'an 10:5)
 - 🌌 Atmosfer: gece **yıldızlar** + adaların üzerinde salınan **nûr zerreleri**,
   gündüz güneşte süzülen **nûr tozları** (gün/gece'ye göre belirir-solar)
-- 🔊 Web Audio ile sentezlenmiş ses (çınlama, fanfar, ambient)
+- 🔊 Web Audio ile sentezlenmiş ses: görev çınlaması, fetih fanfarı, **vakit girince
+  tefekkür tınısı** (Hicaz motifi), gün/gece ambient (gündüz kuş, gece cırcır böceği),
+  HUD'da **ses aç/kapat** düğmesi (tercih kalıcı)
 - 🔁 Günlük görev sıfırlama (fetihler kalıcı kalır)
+- 📿 **İstikamet zinciri (streak)**: ardışık günlerde Hâne ibadetini tamamlama sayacı
+  (🔥, kaçırınca sıfırlanır, bonus nûr) + 🌟 **nûr rütbeleri** (Niyet → … → İhyâ Ustası)
+- 🤲 **Hayır Çeşmesi**: nûrunu sadaka-i câriyeye dönüştür (ağaç diktir, kandil yaktır,
+  çeşme yaptır, mushaf vakfet — her biri sahih delille); dünya kalıcı güzelleşir,
+  kandiller geceleyin yanar
 - 🏁 Bitiş ekranı (niyet, dua, künye)
 
 ## Dosyalar
