@@ -24,7 +24,9 @@
   .toolbar{position:fixed;right:12px;top:88px;z-index:6;display:flex;flex-direction:column;gap:8px;pointer-events:none}
   .skyclock{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 4px 3px;border-radius:16px;background:var(--panel);box-shadow:0 4px 14px #0002}
   #skySvg{width:124px;height:auto;display:block;border-radius:12px}
-  .vakitlbl{font-weight:800;color:var(--ink);font-size:12.5px;line-height:1;padding:1px 2px 2px}
+  .vakitlbl{font-weight:800;color:var(--ink);font-size:12.5px;line-height:1;padding:1px 2px 2px;border-radius:8px}
+  .vakitlbl.urgent{color:#fff;background:#d1442f;animation:vakiturgent 1s ease-in-out infinite}
+  @keyframes vakiturgent{0%,100%{background:#d1442f}50%{background:#f0764f}}
   @media (max-width:440px){
     .top{gap:6px;padding:8px 9px}
     .pill{padding:6px 9px;font-size:12.5px}
@@ -576,10 +578,29 @@ function updateDayNight(dt){
   sunMesh.position.set(px+Math.sin(az)*16, 5+el*24, pz-34); sunMesh.visible=el>-0.06;
   moonMesh.position.set(px-Math.sin(az)*16, 5-el*24, pz-34); moonMesh.visible=el<0.06;
   const v=vakitOf(gameTime);
-  if(v!==lastVakit){ const prev=lastVakit; lastVakit=v; const el2=document.getElementById('vakit'); if(el2) el2.textContent=v[2]+' '+v[1]; if(prev) onVakitChange(v); }
+  if(v!==lastVakit){ const prev=lastVakit; lastVakit=v; const el2=document.getElementById('vakit'); if(el2){ el2.textContent=v[2]+' '+v[1]; el2.classList.remove('urgent'); } vakitWarned=false; if(prev) onVakitChange(v); }
+  checkVakitWarning();
   skyAcc+=dt; if(dt===0 || skyAcc>=0.15){ skyAcc=0; updateSkyWidget(); }
 }
 function onVakitChange(v){ rebuildEvQuests(v[1]); toast('🕌 '+v[1]+' vakti girdi'); sndVakit(); }
+/* ---- NAMAZ VAKTİ ÇIKIYOR UYARISI ---- */
+const FARZ_VAKIT=['Fecir','Öğle','İkindi','Akşam','Yatsı'];
+const NAMAZ_LABEL={Fecir:'Sabah', Öğle:'Öğle', İkindi:'İkindi', Akşam:'Akşam', Yatsı:'Yatsı'};
+let vakitWarned=false;
+function checkVakitWarning(){
+  if(vakitWarned) return;
+  const v=vakitOf(gameTime), name=v[1];
+  if(!FARZ_VAKIT.includes(name)) return;
+  if(S.done['ev_namaz']) return;                       // bu vaktin namazı kılındı
+  const idx=VAKIT.indexOf(v), start=idx>0?VAKIT[idx-1][0]:0, end=v[0];
+  if((gameTime-start)/((end-start)||1) < 0.72) return; // vaktin son ~%28'i
+  vakitWarned=true;
+  const nm=NAMAZ_LABEL[name]||name;
+  toast('⏳ '+nm+' namazının vakti çıkmak üzere!');
+  banner('⏳ '+nm+' vakti çıkıyor');
+  const el=document.getElementById('vakit'); if(el) el.classList.add('urgent');
+  beep(880,0,0.16,'sine',0.075); beep(660,0.2,0.28,'sine',0.06);
+}
 
 /* ---- SEMÂ SAATİ: güneş/ay kavsi HUD widget'ı (Kur'an 10:5) ---- */
 let skyAcc=0, skyRefs=null;
@@ -1093,6 +1114,7 @@ function doQuest(){
   save(); refreshHUD();
   applyIslandLock();
   if(!was && islId==='ev') checkStreak();   // Hâne günlük ibadeti → istikamet zinciri
+  if(!was && curQ.id==='ev_namaz'){ const ev=document.getElementById('vakit'); if(ev) ev.classList.remove('urgent'); }
   if(nowLessonsDone && !S.conquered[islId]){
     sndFanfare(); const is=WORLD.islands.find(i=>i.id===islId);
     setTimeout(()=>toast('📝 '+(is?is.name:'')+' İmtihan Meydanı açıldı!'),700);
@@ -1309,6 +1331,7 @@ addEventListener('resize',resize); resize();
     openHayir:()=>openHayir(), donate:(id)=>donateHayir(id),
     hayirCounts:()=>({agac:S.hayir.agac.length,kandil:S.hayir.kandil.length,cesme:S.hayir.cesme.length,ilim:S.hayir.ilim.length}),
     hayirMeshes:()=>hayirGroups.length,
+    warnState:()=>({warned:vakitWarned, urgent:document.getElementById('vakit').classList.contains('urgent'), vakit:vakitOf(gameTime)[1]}),
     learn:(id)=>{ for(const q of islandQuests(id)) S.done[q.id]=true; interactables.forEach(r=>{ if(!r.exam) r.done=!!S.done[r.q.id]; }); save(); applyIslandLock(); refreshHUD(); } };
   tick();
 })();

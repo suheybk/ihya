@@ -19,6 +19,8 @@ Her görevde âyet/hadis delili vardır.
 - ↺ Sınavı geçemezsen "Tekrar Dene" ya da "Dersleri Tekrar Et" (dersler sıfırlanır, baştan öğrenilir)
 - 🔒 Kilit/fetih: bir ada sınavla fethedilmeden sonraki açılmaz (kilitli adalar silik + sisli)
 - ✨ "Ölü → diri": tamamlanan nesne griden renge döner; ada fethedilince kutlama
+- ⏳ **Namaz vakti çıkıyor uyarısı**: farz vaktin son diliminde namaz kılınmamışsa
+  uyarı (vakit göstergesi kırmızı yanıp söner + toast/banner + uyarı tonu)
 - 🌅 Gün/gece döngüsü ve **semâ saati** HUD: güneş/ay gökyüzü kavsinde doğar-batar
   (doğu→zirve→batı), gökyüzü rengi + yıldızlar + ufuk canlı değişir, altında vakit adı (Kur'an 10:5)
 - 🌌 Atmosfer: gece **yıldızlar** + adaların üzerinde salınan **nûr zerreleri**,
