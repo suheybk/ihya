@@ -9,10 +9,20 @@ Her görevde âyet/hadis delili vardır.
 ## Oynanış
 - 🕹️ Sanal joystick (mobil) / WASD (masaüstü) ile yürüyen karakter
 - ➡️ Soldan sağa doğrusal ada zinciri: **Hâne → Bahçe → Mahalle → Cami → Şehir**
-- 📿 Günlük ibadet sırası (tuvalet âdâbı → abdest → namaz → Kur'an → dua)
-- 🔒 Kilit/fetih: bir ada tamamlanmadan sonraki açılmaz (kilitli adalar silik + sisli)
+- 📿 Hâne'de SABİT günlük müfredat (tuvalet âdâbı → abdest → namaz → Kur'an → dua);
+  vakit değişince dersler **silinmez**, sadece "namaz" dersi o vaktin namazına göre güncellenir
+- 📖 **Adım adım öğretim**: abdest (10 adım) ve namaz (9 adım) ilk kez yapılırken fıkhen
+  sıralı rehber açılır (niyet, kıble, farzlar işaretli); öğrenilince kısa moda geçer,
+  "Adımları göster" ile tekrar izlenir
+- 📝 **İmtihan Meydanı**: her adanın sonunda, öğrenilenlerden çoktan seçmeli sınav
+  (🕌 Hadis Okulu / ⚖️ Fıkıh Okulu). Dersler meydanı açar; **sınavı geçmek adayı fetheder**
+- ↺ Sınavı geçemezsen "Tekrar Dene" ya da "Dersleri Tekrar Et" (dersler sıfırlanır, baştan öğrenilir)
+- 🔒 Kilit/fetih: bir ada sınavla fethedilmeden sonraki açılmaz (kilitli adalar silik + sisli)
 - ✨ "Ölü → diri": tamamlanan nesne griden renge döner; ada fethedilince kutlama
-- 🌅 Gün/gece döngüsü ve vakit göstergesi (Kur'an 10:5)
+- 🌅 Gün/gece döngüsü ve **semâ saati** HUD: güneş/ay gökyüzü kavsinde doğar-batar
+  (doğu→zirve→batı), gökyüzü rengi + yıldızlar + ufuk canlı değişir, altında vakit adı (Kur'an 10:5)
+- 🌌 Atmosfer: gece **yıldızlar** + adaların üzerinde salınan **nûr zerreleri**,
+  gündüz güneşte süzülen **nûr tozları** (gün/gece'ye göre belirir-solar)
 - 🔊 Web Audio ile sentezlenmiş ses (çınlama, fanfar, ambient)
 - 🔁 Günlük görev sıfırlama (fetihler kalıcı kalır)
 - 🏁 Bitiş ekranı (niyet, dua, künye)

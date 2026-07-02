@@ -17,6 +17,10 @@
   .pill{background:var(--panel);border-radius:14px;padding:7px 12px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;gap:7px;font-weight:800;color:var(--ink);font-size:14px}
   .pill small{font-weight:600;color:var(--muted);font-size:11px}
   .nur b{color:var(--gold)}
+  /* semâ saati (güneş/ay kavsi) */
+  .skyclock{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 4px 3px;border-radius:16px;background:var(--panel);box-shadow:0 4px 14px #0002}
+  #skySvg{width:124px;height:auto;display:block;border-radius:12px}
+  .vakitlbl{font-weight:800;color:var(--ink);font-size:12.5px;line-height:1;padding:1px 2px 2px}
   .prog{flex:1;max-width:180px;height:9px;background:#ffffff88;border-radius:6px;overflow:hidden;box-shadow:0 2px 8px #0001}
   .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2f8f63,#5fb98a);transition:width .5s}
   /* joystick */
@@ -49,6 +53,25 @@
   .ref .cite{font-size:11px;color:var(--muted);margin-top:5px}
   .do{width:100%;padding:14px;border:none;border-radius:14px;cursor:pointer;font-size:15px;font-weight:800;color:#fff;background:linear-gradient(135deg,#5fb98a,#2f8f63);margin-bottom:8px}
   .cl{width:100%;padding:12px;border:none;border-radius:12px;background:#eef2ef;color:var(--ink);font-weight:700;font-size:14px;cursor:pointer}
+  /* ---- İMTİHAN ---- */
+  .exhead{display:flex;align-items:baseline;justify-content:space-between;margin:2px 0 8px}
+  .exhead h3{margin:0;font-size:19px;color:var(--ink)}
+  .exprog{font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap}
+  .exschool{display:inline-block;font-size:11px;font-weight:800;color:#fff;padding:4px 11px;border-radius:11px;letter-spacing:.3px;margin-bottom:12px;box-shadow:0 3px 10px #0002}
+  .exq{font-size:16px;line-height:1.5;color:var(--ink);font-weight:700;margin:2px 0 13px}
+  .exopts{display:flex;flex-direction:column;gap:9px;margin-bottom:8px}
+  .exOpt{text-align:left;padding:13px 15px;border:2px solid #e3ece5;border-radius:13px;background:#f7faf8;font-size:15px;font-weight:600;color:#26352c;cursor:pointer;transition:.15s}
+  .exOpt:active{transform:scale(.99)}
+  .exOpt:disabled{cursor:default}
+  .exOpt.correct{border-color:#2f8f63;background:#dff3e7;color:#1d5f3f}
+  .exOpt.wrong{border-color:#d9534f;background:#fbe4e3;color:#a3302c}
+  .excite{font-size:12px;color:var(--muted);min-height:16px;margin:2px 0 8px;font-style:italic}
+  .exresic{font-size:48px;text-align:center;margin:8px 0 2px}
+  /* ---- ADIM ADIM ÖĞRETİM ---- */
+  .gstep{background:#f3f7f3;border:1px solid #e3ece5;border-radius:16px;padding:20px 18px;margin:4px 0 14px;text-align:center;min-height:150px;display:flex;flex-direction:column;justify-content:center}
+  .gic{font-size:44px;margin-bottom:8px}
+  .gtitle{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
+  .gdesc{font-size:15px;line-height:1.6;color:#26352c}
   .toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%) translateY(20px);background:#d9a441;color:#33240a;
     padding:11px 18px;border-radius:14px;font-weight:800;font-size:14px;box-shadow:0 8px 22px #0003;opacity:0;transition:.3s;z-index:30;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -96,7 +119,44 @@
   <div class="pill nur">✦ <b id="nur">0</b> <small>nûr</small></div>
   <div class="prog"><i id="prog"></i></div>
   <div class="pill" id="cntPill">0/0</div>
-  <div class="pill" id="vakit" style="margin-left:auto">☀ Kuşluk</div>
+  <div class="skyclock" id="skyclock" style="margin-left:auto">
+    <svg id="skySvg" viewBox="0 0 140 62" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" id="skyTop" stop-color="#9fd8ea"/>
+          <stop offset="1" id="skyBot" stop-color="#d7f0f5"/>
+        </linearGradient>
+        <radialGradient id="sunGlow"><stop offset="0" stop-color="#fff3c0" stop-opacity="0.9"/><stop offset="1" stop-color="#ffd23f" stop-opacity="0"/></radialGradient>
+        <clipPath id="skyClip"><rect x="0" y="0" width="140" height="62" rx="14"/></clipPath>
+      </defs>
+      <g clip-path="url(#skyClip)">
+        <rect x="0" y="0" width="140" height="62" fill="url(#skyGrad)"/>
+        <g id="stars" opacity="0" fill="#fff">
+          <circle cx="20" cy="12" r="0.9"/><circle cx="41" cy="22" r="0.7"/><circle cx="62" cy="9" r="1"/>
+          <circle cx="86" cy="18" r="0.8"/><circle cx="107" cy="11" r="0.9"/><circle cx="122" cy="26" r="0.7"/>
+          <circle cx="33" cy="34" r="0.7"/><circle cx="98" cy="33" r="0.7"/>
+        </g>
+        <path d="M30 52 A40 40 0 0 1 110 52" fill="none" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1" stroke-dasharray="1.6 3.2"/>
+        <rect id="ground" x="0" y="52" width="140" height="10" fill="#6fae57"/>
+        <line x1="0" y1="52" x2="140" y2="52" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1"/>
+        <g id="moonBody" opacity="0" transform="translate(110 52)">
+          <circle r="6.4" fill="#eaeef7"/>
+          <circle cx="-2" cy="-1.6" r="1.3" fill="#d3d9e6"/><circle cx="1.9" cy="1.7" r="1.7" fill="#d3d9e6"/><circle cx="2.6" cy="-2.1" r="0.9" fill="#d3d9e6"/>
+        </g>
+        <g id="sunBody" opacity="1" transform="translate(30 52)">
+          <circle r="13" fill="url(#sunGlow)"/>
+          <g stroke="#ffcf3f" stroke-width="1.5" stroke-linecap="round" opacity="0.9">
+            <line x1="8" y1="0" x2="11.5" y2="0"/><line x1="-8" y1="0" x2="-11.5" y2="0"/>
+            <line x1="0" y1="8" x2="0" y2="11.5"/><line x1="0" y1="-8" x2="0" y2="-11.5"/>
+            <line x1="5.7" y1="5.7" x2="8.1" y2="8.1"/><line x1="-5.7" y1="-5.7" x2="-8.1" y2="-8.1"/>
+            <line x1="5.7" y1="-5.7" x2="8.1" y2="-8.1"/><line x1="-5.7" y1="5.7" x2="-8.1" y2="8.1"/>
+          </g>
+          <circle id="sunCore" r="6.6" fill="#ffd23f"/>
+        </g>
+      </g>
+    </svg>
+    <div class="vakitlbl" id="vakit">☀ Kuşluk</div>
+  </div>
 </div>
 
 <div id="prompt"></div>
@@ -110,8 +170,46 @@
     <h3 id="sT">Görev</h3>
     <div class="sub" id="sS">Delil ve tavsiye</div>
     <div id="sRefs"></div>
+    <button class="cl" id="sSteps" style="display:none;margin-bottom:8px">📖 Adımları göster</button>
     <button class="do" id="sDo">Yaptım ✓</button>
     <button class="cl" id="sCl">Kapat</button>
+  </div>
+</div>
+
+<div class="veil" id="exam">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div id="exQuiz">
+      <div class="exhead"><h3 id="exTitle">İmtihan</h3><span class="exprog" id="exProg"></span></div>
+      <span class="exschool" id="exSchool"></span>
+      <div class="exq" id="exQ"></div>
+      <div class="exopts" id="exOpts"></div>
+      <div class="excite" id="exCite"></div>
+      <button class="do" id="exNext" style="display:none">Sıradaki ➤</button>
+    </div>
+    <div id="exResult" style="display:none">
+      <div class="exresic" id="exResIc">✦</div>
+      <h3 id="exResT" style="text-align:center;margin:2px 0 4px">Sonuç</h3>
+      <div class="sub" id="exResS" style="text-align:center"></div>
+      <button class="do" id="exResA">Devam</button>
+      <button class="cl" id="exResB" style="display:none;margin-top:8px">—</button>
+    </div>
+  </div>
+</div>
+
+<div class="veil" id="guide">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="exhead"><h3 id="gT">Öğren</h3><span class="exprog" id="gProg"></span></div>
+    <div class="gstep">
+      <div class="gic" id="gIc">💧</div>
+      <div class="gtitle" id="gTitle"></div>
+      <div class="gdesc" id="gDesc"></div>
+    </div>
+    <div style="display:flex;gap:9px">
+      <button class="cl" id="gPrev" style="flex:1;margin:0">◀ Geri</button>
+      <button class="do" id="gNext" style="flex:2;margin:0">Sonraki ▶</button>
+    </div>
   </div>
 </div>
 
@@ -205,55 +303,155 @@ const QUESTS = [
 ];
 const MODELS = ['player','prayer','rahle','book','door','tree','plot','plot_sprout','fountain','mosque','island_tile','bridge'];
 
-/* ===== HÂNE (ev) — VAKTE GÖRE DEĞİŞEN GÜNLÜK İBADET =====
-   Seccadeye gidince o vaktin namazı; vakit ilerleyince set yenilenir. */
+/* ===== HÂNE (ev) — SABİT GÜNLÜK ÖĞRENME MÜFREDATI =====
+   5 temel ders SABİTTİR (vakit değişince SİLİNMEZ): tuvalet âdâbı → abdest → namaz →
+   Kur'an → dua. Yalnız "namaz" dersi o vaktin namazına göre başlık/delil günceller.
+   (Eski hata: vakit değişince tuvalet-abdest kayboluyordu; artık kalıcı.) */
 const EVSLOTS=[[-4.5,0,0],[-2,0,2.6],[0.6,0,-2.6],[3,0,2.6],[5,0,-2.6]];
-const P=(model,ic,nm,rem,refs,rot,scale)=>({model,ic,nm,rem,refs,rot:rot||0,scale:scale||1.6});
-const VAKIT_SETS={
-  'Fecir':[
-    P('door','🚪','Tuvalet âdâbı','Girerken sol ayak + besmele; çıkarken sağ ayak + "gufrâneke".',[{tag:'Hadis',txt:'Peygamber tuvaletten çıkınca "Gufrâneke" derdi.',cite:'Tirmizî, Tahâret 5'}],1.57,1.0),
-    P('fountain','💧','Abdest al','Temizlik imanın yarısı; her uzuvla günahlar dökülür.',[{tag:'Hadis',txt:'Abdest alırken yıkanan uzuvlardan günahlar su ile dökülür.',cite:'Müslim, Tahâret 32'}],-0.3,1.1),
-    P('prayer','🌅','Sabah namazını kıl','Günü farzla aç; bereket fecirde başlar.',[{tag:'Hadis',txt:'İki rekât sabah sünneti, dünya ve içindeki her şeyden hayırlıdır.',cite:'Müslim, Müsâfirîn 96'}]),
-    P('book','🤲','Sabah dualarını oku','Güne zikirle gir; gönlün gün boyu korunsun.',[{tag:'Ayet',txt:'Kalpler ancak Allah\'ı anmakla huzura erer.',cite:'Ra\'d 13/28'}],0,2.2),
-  ],
-  'Kuşluk':[
-    P('prayer','☀️','Kuşluk (duhâ) namazı kıl','Güneş yükselince 2 rekât; günün şükür secdesi.',[{tag:'Hadis',txt:'Kuşluğun iki rekâtı her eklem için sadakaya yeter.',cite:'Müslim, Müsâfirîn 84'}]),
-    P('rahle','📖','Bir sayfa Kur\'an oku','Her gün bir damla; yıl boyunca derya olur.',[{tag:'Hadis',txt:'En hayırlınız Kur\'an\'ı öğrenen ve öğretendir.',cite:'Buhârî, Fedâilü\'l-Kur\'an 21'}],0,1.5),
-  ],
-  'Öğle':[
-    P('fountain','💧','Abdesti tazele','Abdest üstüne abdest, nûr üstüne nûrdur.',[{tag:'Hadis',txt:'Abdestli iken abdest alana on hasene yazılır.',cite:'İbn Mâce'}],-0.3,1.1),
-    P('prayer','🕌','Öğle namazını kıl','Gün ortasında Rabbine dur.',[{tag:'Ayet',txt:'Namazı dosdoğru kılın.',cite:'Bakara 2/43'}]),
-  ],
-  'İkindi':[
-    P('prayer','🕌','İkindi namazını kıl','Orta namazı koru; en çok tembellik edilen vakittir.',[{tag:'Ayet',txt:'Namazlara ve orta namaza devam edin.',cite:'Bakara 2/238'}]),
-    P('book','📿','İkindi zikri / istiğfar','Gün biterken tövbe tazele.',[{tag:'Hadis',txt:'İstiğfara devam edene Allah her sıkıntıdan çıkış verir.',cite:'Ebû Dâvûd'}],0,2.2),
-  ],
-  'Akşam':[
-    P('prayer','🌇','Akşam namazını kıl','Günü şükürle kapat.',[{tag:'Ayet',txt:'Güneşin kaymasından gecenin karanlığına kadar namaz kıl.',cite:'İsrâ 17/78'}]),
-    P('book','🤲','Akşam dualarını oku','Akşam-sabah zikirleri güne kalkandır.',[{tag:'Tavsiye',txt:'Âyetü\'l-Kürsî, İhlâs ve Muavvizeteyn oku.'}],0,2.2),
-  ],
-  'Yatsı':[
-    P('prayer','🌙','Yatsı namazını kıl','Geceyi namazla mühürle.',[{tag:'Hadis',txt:'Yatsıyı cemaatle kılan gecenin yarısını ihyâ etmiş gibidir.',cite:'Müslim'}]),
-    P('rahle','📖','Mülk sûresini oku','Uyumadan önce; kabir azabına siperdir.',[{tag:'Hadis',txt:'Mülk sûresi okuyanı kabir azabından korur.',cite:'Tirmizî'}],0,1.5),
-  ],
-  'Gece':[
-    P('prayer','🌌','Teheccüd namazı kıl','Gecenin sonu, duaların kabul vaktidir.',[{tag:'Ayet',txt:'Gecenin bir kısmında sana mahsus nafile olarak teheccüd kıl.',cite:'İsrâ 17/79'}]),
-    P('prayer','🤲','Vitir namazı kıl','Geceyi vitirle bitir.',[{tag:'Hadis',txt:'Vitir haktır; geceyi vitirle bitirin.',cite:'Ebû Dâvûd'}],0,1.4),
-    P('book','✨','Seherde istiğfar & tefekkür','Seher vakti istiğfar edenlerden ol.',[{tag:'Ayet',txt:'Onlar seher vakitlerinde istiğfar ederlerdi.',cite:'Zâriyât 51/18'}],0,2.2),
-  ],
+const L=(topic,model,ic,nm,rem,refs,rot,scale)=>({topic,model,ic,nm,rem,refs,rot:rot||0,scale:scale||1.6});
+// namaz dersi vakte göre değişir (içerik güncellenir, ders silinmez)
+const NAMAZ_BY_VAKIT={
+  'Fecir': {ic:'🌅',nm:'Sabah namazını kıl',rem:'Günü farzla aç; bereket fecirde başlar.',refs:[{tag:'Hadis',txt:'İki rekât sabah sünneti, dünya ve içindeki her şeyden hayırlıdır.',cite:'Müslim, Müsâfirîn 96'}]},
+  'Kuşluk':{ic:'☀️',nm:'Kuşluk (duhâ) namazı kıl',rem:'Güneş yükselince 2 rekât; günün şükür secdesi.',refs:[{tag:'Hadis',txt:'Kuşluğun iki rekâtı her eklem için sadakaya yeter.',cite:'Müslim, Müsâfirîn 84'}]},
+  'Öğle':  {ic:'🕌',nm:'Öğle namazını kıl',rem:'Gün ortasında Rabbine dur.',refs:[{tag:'Ayet',txt:'Namazı dosdoğru kılın.',cite:'Bakara 2/43'}]},
+  'İkindi':{ic:'🕌',nm:'İkindi namazını kıl',rem:'Orta namazı koru; en çok tembellik edilen vakittir.',refs:[{tag:'Ayet',txt:'Namazlara ve orta namaza devam edin.',cite:'Bakara 2/238'}]},
+  'Akşam': {ic:'🌇',nm:'Akşam namazını kıl',rem:'Günü şükürle kapat.',refs:[{tag:'Ayet',txt:'Güneşin kaymasından gecenin karanlığına kadar namaz kıl.',cite:'İsrâ 17/78'}]},
+  'Yatsı': {ic:'🌙',nm:'Yatsı namazını kıl',rem:'Geceyi namazla mühürle.',refs:[{tag:'Hadis',txt:'Yatsıyı cemaatle kılan gecenin yarısını ihyâ etmiş gibidir.',cite:'Müslim'}]},
+  'Gece':  {ic:'🌌',nm:'Teheccüd namazı kıl',rem:'Gecenin sonu, duaların kabul vaktidir.',refs:[{tag:'Ayet',txt:'Gecenin bir kısmında sana mahsus nafile olarak teheccüd kıl.',cite:'İsrâ 17/79'}]},
 };
+// ADIM ADIM ÖĞRETİM (ilk seferde açılır) — fıkhen sıralı
+const ABDEST_STEPS=[
+  {ic:'🤲',t:'1) Niyet',d:'"Niyet ettim Allah rızâsı için abdest almaya." Niyet kalpledir; dil ile söylemek müstehaptır.'},
+  {ic:'✨',t:'2) Besmele',d:'"Bismillâhirrahmânirrahîm" diyerek başla.'},
+  {ic:'✋',t:'3) Elleri yıka',d:'Bileklere kadar 3 kez; parmak aralarına da su ulaştır.'},
+  {ic:'💧',t:'4) Ağza su ver (mazmaza)',d:'Sağ elle 3 kez ağzına su alıp çalkala.'},
+  {ic:'👃',t:'5) Burna su çek (istinşâk)',d:'3 kez burnuna su çek, sol elle temizle.'},
+  {ic:'😊',t:'6) Yüzü yıka — FARZ',d:'Alın saç bitiminden çene altına, iki kulak arasını 3 kez yıka.'},
+  {ic:'💪',t:'7) Kolları yıka — FARZ',d:'Önce sağ, sonra sol kolu dirseklerle birlikte 3\'er kez.'},
+  {ic:'🧑',t:'8) Başı meshet — FARZ',d:'Islak elle başın (en az) dörtte birini bir kez meshet.'},
+  {ic:'👂',t:'9) Kulak & boyun',d:'Aynı ıslaklıkla kulakları içten-dıştan ve boynu meshet.'},
+  {ic:'🦶',t:'10) Ayakları yıka — FARZ',d:'Önce sağ, sonra sol ayağı topuklarla, parmak aralarıyla 3\'er kez. Sonunda Kelime-i Şehâdet oku.'},
+];
+const NAMAZ_STEPS=[
+  {ic:'🧭',t:'1) Kıbleye yönel',d:'Kâbe istikametine dön; temiz bir yere seccadeni ser.'},
+  {ic:'🤲',t:'2) Niyet',d:'"Niyet ettim Allah rızâsı için şu an kılınan namazın farzını kılmaya."'},
+  {ic:'☝️',t:'3) İftitah tekbiri',d:'Elleri kaldırıp "Allâhu ekber" diyerek başla, elleri bağla.'},
+  {ic:'📖',t:'4) Kıyam',d:'Sübhâneke, Eûzü-Besmele, Fâtiha ve bir sûre (zamm-ı sûre) oku.'},
+  {ic:'🙇',t:'5) Rükû',d:'"Allâhu ekber" ile eğil; "Sübhâne Rabbiye\'l-azîm" 3 kez.'},
+  {ic:'🕌',t:'6) Secde',d:'Yere kapan; "Sübhâne Rabbiye\'l-a\'lâ" 3 kez; iki secde yap.'},
+  {ic:'🔁',t:'7) İkinci rekât',d:'Kalk; Fâtiha + sûre, rükû ve iki secde ile ikinci rekâtı tamamla.'},
+  {ic:'🧎',t:'8) Ka\'de (oturuş)',d:'Ettehiyyâtü, Allâhümme salli-bârik ve Rabbenâ dualarını oku.'},
+  {ic:'🕊️',t:'9) Selâm',d:'Önce sağa, sonra sola "Es-selâmü aleyküm ve rahmetullâh" diyerek bitir.'},
+];
+function namazDers(vname){ const v=NAMAZ_BY_VAKIT[vname]||NAMAZ_BY_VAKIT['Kuşluk'];
+  return Object.assign(L('namaz','prayer',v.ic,v.nm,v.rem,v.refs), {steps:NAMAZ_STEPS}); }
+// SABİT müfredat (namaz slotu vakte göre doldurulur)
+function evCurriculum(vname){ return [
+  L('taharet','door','🚪','Tuvalet âdâbı','Girerken sol ayak + besmele; çıkarken sağ ayak + "gufrâneke".',[{tag:'Hadis',txt:'Peygamber tuvaletten çıkınca "Gufrâneke" derdi.',cite:'Tirmizî, Tahâret 5'}],1.57,1.0),
+  Object.assign(L('abdest','fountain','💧','Abdest al','Temizlik imanın yarısı; her uzuvla günahlar dökülür.',[{tag:'Hadis',txt:'Temizlik imanın yarısıdır.',cite:'Müslim, Tahâret 1'}],-0.3,1.1), {steps:ABDEST_STEPS}),
+  namazDers(vname),
+  L('quran','rahle','📖','Bir sayfa Kur\'an oku','Her gün bir damla; yıl boyunca derya olur.',[{tag:'Hadis',txt:'En hayırlınız Kur\'an\'ı öğrenen ve öğretendir.',cite:'Buhârî, Fedâilü\'l-Kur\'an 21'}],0,1.5),
+  L('dua','book','🤲','Sabah-akşam dualarını oku','Zikirle güne kalkan ör; gönlün gün boyu korunsun.',[{tag:'Ayet',txt:'Kalpler ancak Allah\'ı anmakla huzura erer.',cite:'Ra\'d 13/28'}],0,2.2),
+]; }
 let evQuests=[];
+// stable id: 'ev_<topic>' → vakit değişince done durumu KORUNUR, ders silinmez
 function setVakitQuests(vname){
-  const defs=VAKIT_SETS[vname]||VAKIT_SETS['Kuşluk'];
-  evQuests=defs.map((d,i)=>Object.assign({}, d, {id:'ev_'+vname+'_'+i, pos:EVSLOTS[i]||[0,0,0]}));
+  evQuests=evCurriculum(vname).map((d,i)=>Object.assign({}, d, {id:'ev_'+d.topic, pos:EVSLOTS[i]||[0,0,0]}));
 }
 function allQuests(){ return evQuests.concat(QUESTS); }
+function questTopic(q){ return q.topic || q.id; }
+
+/* ============ İMTİHAN MEYDANI — SORU BANKASI (Hadis Okulu 🕌 / Fıkıh Okulu ⚖️) ============
+   Her konu (topic) için sorular; okul rozeti s ile gösterilir. c = doğru şıkkın indeksi. */
+const QBANK={
+  taharet:[
+    {s:'Fıkıh',q:'Tuvalete girerken hangi ayakla girmek sünnettir?',o:['Sol ayak','Sağ ayak','Fark etmez'],c:0,cite:'Girerken sol, çıkarken sağ ayak (âdâb).'},
+    {s:'Hadis',q:'Peygamber (s.a.v.) tuvaletten çıkınca hangi duâyı okurdu?',o:['"Gufrâneke"','"Bismillah"','"Elhamdülillah"'],c:0,cite:'Tirmizî, Tahâret 5'},
+  ],
+  abdest:[
+    {s:'Fıkıh',q:'Abdestin farzlarından ilki hangisidir?',o:['Yüzü yıkamak','Ayakları yıkamak','Başı meshetmek'],c:0,cite:'Abdestin farzları: yüz, kollar, başın meshi, ayaklar.'},
+    {s:'Fıkıh',q:'Abdestte yüzü yıkadıktan sonra sıra hangisine gelir?',o:['Kolları (dirseklerle) yıkamak','Ayakları yıkamak','Başı meshetmek'],c:0,cite:'Sıra: yüz → kollar → baş meshi → ayaklar.'},
+    {s:'Hadis',q:'"Temizlik imanın ..." Hadisi nasıl tamamlanır?',o:['yarısıdır','şartıdır','tamamıdır'],c:0,cite:'Müslim, Tahâret 1'},
+  ],
+  namaz:[
+    {s:'Fıkıh',q:'Sabah namazının farzı kaç rekâttır?',o:['2','4','3'],c:0,cite:'Sabah: 2 sünnet + 2 farz.'},
+    {s:'Fıkıh',q:'Namaz hangi ibadetle bitirilir?',o:['Selâm vererek','Rükû ile','Tekbir ile'],c:0,cite:'Sağa ve sola selâm ile.'},
+    {s:'Hadis',q:'Kıyamet günü kulun ilk hesaba çekileceği amel hangisidir?',o:['Namaz','Oruç','Zekât'],c:0,cite:'Tirmizî, Salât 188'},
+  ],
+  quran:[
+    {s:'Hadis',q:'"Sizin en hayırlınız Kur\'an\'ı ..." Hadisin devamı?',o:['öğrenen ve öğretendir','çok okuyandır','ezberleyendir'],c:0,cite:'Buhârî, Fedâilü\'l-Kur\'an 21'},
+    {s:'Fıkıh',q:'Uyumadan önce okunması tavsiye edilen, kabir azabına siper sûre?',o:['Mülk','Kevser','Fil'],c:0,cite:'Tirmizî, Fedâilü\'l-Kur\'an 9'},
+  ],
+  dua:[
+    {s:'Ayet',q:'"Kalpler ancak ne ile huzura erer?" (Ra\'d 28)',o:['Allah\'ı anmakla','Mal ile','İlim ile'],c:0,cite:'Ra\'d 13/28'},
+    {s:'Fıkıh',q:'Sabah-akşam korunmak için okunan Muavvizeteyn hangi sûrelerdir?',o:['Felak ve Nâs','Fil ve Kureyş','İhlâs ve Kevser'],c:0,cite:'Felak-Nâs sûreleri.'},
+  ],
+  fidan:[
+    {s:'Hadis',q:'"Kıyamet kopsa bile elinizdeki ... dikin." Boşluğa ne gelir?',o:['Fidanı','Tohumu','Çiçeği'],c:0,cite:'Ahmed b. Hanbel'},
+    {s:'Hadis',q:'Bir müslümanın diktiği ağaçtan bir canlı yerse bu onun için ne olur?',o:['Sadaka','Borç','Vebal'],c:0,cite:'Buhârî, Hars 1'},
+  ],
+  canli:[
+    {s:'Hadis',q:'Susuz bir köpeğe su veren kişiye ne oldu?',o:['Allah onu bağışladı','Cezalandırıldı','Bir şey olmadı'],c:0,cite:'Buhârî, Şirb 9'},
+  ],
+  selam:[
+    {s:'Hadis',q:'"Birbirinizi sevmedikçe ... giremezsiniz." Nereye?',o:['Cennete','Camiye','Huzura'],c:0,cite:'Müslim, Îmân 93'},
+    {s:'Fıkıh',q:'Aranızda ne yayılırsa birbirinizi seversiniz (hadis)?',o:['Selâm','Mal','Söz'],c:0,cite:'Müslim, Îmân 93'},
+  ],
+  komsu:[
+    {s:'Hadis',q:'Cebrâil (a.s.) mirasçı kılacak sandıracak kadar kimin hakkını tavsiye etti?',o:['Komşu','Tüccar','Yolcu'],c:0,cite:'Buhârî, Edeb 28'},
+  ],
+  sadaka:[
+    {s:'Hadis',q:'"Sadaka maldan bir şey ..." Hadis nasıl biter?',o:['eksiltmez','götürür','saklar'],c:0,cite:'Müslim, Birr 69'},
+  ],
+  cemaat:[
+    {s:'Hadis',q:'Cemaatle namaz, tek başına kılınandan kaç derece faziletlidir?',o:['27','7','17'],c:0,cite:'Buhârî, Ezân 30'},
+    {s:'Fıkıh',q:'Cemaatin oluşması için en az kaç kişi gerekir?',o:['2 (imam + 1 kişi)','3 kişi','5 kişi'],c:0,cite:'İmam ve bir cemaat yeterlidir.'},
+  ],
+  ilim:[
+    {s:'Hadis',q:'İlim öğrenmek için yola çıkana Allah neyi kolaylaştırır?',o:['Cennetin yolunu','Zenginliği','Şöhreti'],c:0,cite:'Müslim, Zikir 38'},
+  ],
+  davet:[
+    {s:'Hadis',q:'Senin vesilenle bir kişinin hidayete ermesi neden hayırlıdır?',o:['Kızıl develerden (dünyadan)','Bir aylık ibadetten','Bir yıllık oruçtan'],c:0,cite:'Buhârî, Cihâd 102'},
+  ],
+  adalet:[
+    {s:'Ayet',q:'"Adaletli olun; bu, ...\'ya daha yakındır." (Mâide 8)',o:['Takvâ','Zenginlik','Şöhret'],c:0,cite:'Mâide 5/8'},
+  ],
+  emanet:[
+    {s:'Ayet',q:'"Allah size, emanetleri kime vermenizi emreder?" (Nisâ 58)',o:['Ehline','Zengine','Âlime'],c:0,cite:'Nisâ 4/58'},
+  ],
+  hayir:[
+    {s:'Hadis',q:'"İnsanların en hayırlısı kimdir?"',o:['İnsanlara en faydalı olan','En zengin olan','En âlim olan'],c:0,cite:'Taberânî, el-Mu\'cemü\'l-Evsat'},
+  ],
+};
+// bir adanın konuları (o adadaki derslerden türetilir)
+function islandTopics(id){ const t=[]; for(const q of islandQuests(id)){ const tp=questTopic(q); if(QBANK[tp]&&!t.includes(tp)) t.push(tp); } return t; }
+// ilk ada (öğrenme temeli) için sınavda mutlaka bulunması istenenler
+const EXAM_MUST={ ev:['abdest','namaz'] };
+const EXAM_N=3;   // sınavdaki soru sayısı (yeterince konu varsa)
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+// bir ada için sınav sorularını kur (okul karışık, şıklar karışık)
+function buildExam(islId){
+  const topics=islandTopics(islId);
+  const pool=[]; for(const tp of topics) for(const qq of (QBANK[tp]||[])) pool.push(Object.assign({topic:tp},qq));
+  const must=EXAM_MUST[islId]||[];
+  const chosen=[];
+  // önce zorunlu konulardan birer soru
+  for(const tp of must){ const cand=shuffle(pool.filter(p=>p.topic===tp)); if(cand[0]) chosen.push(cand[0]); }
+  // kalanları rastgele doldur
+  for(const p of shuffle(pool.slice())){ if(chosen.length>=EXAM_N) break; if(!chosen.includes(p)) chosen.push(p); }
+  // her soru için şıkları karıştır, doğru indeksi güncelle
+  return shuffle(chosen).slice(0,Math.max(1,Math.min(EXAM_N,chosen.length))).map(p=>{
+    const correct=p.o[p.c]; const opts=shuffle(p.o.slice());
+    return {s:p.s, q:p.q, o:opts, c:opts.indexOf(correct), cite:p.cite};
+  });
+}
 
 
 /* ============ STATE ============ */
-let S = { nur:0, done:{}, conquered:{}, lastDay:null };
+let S = { nur:0, done:{}, conquered:{}, learned:{}, lastDay:null };
 try{ const r=localStorage.getItem('ihya3d_v1'); if(r) S=Object.assign(S,JSON.parse(r)); }catch(e){}
 if(!S.conquered) S.conquered={};
+if(!S.learned) S.learned={};   // KALICI: bir dersi ilk kez adım adım öğrenince işaretlenir (günlük sıfırlamadan etkilenmez)
 const save=()=>{ try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){} };
 const today=()=>new Date().toISOString().slice(0,10);
 // GÜNLÜK SIFIRLAMA: yeni günde görevler tekrar açılır; fethedilen adalar (conquered) kalıcı, nûr birikir.
@@ -318,12 +516,47 @@ function updateDayNight(dt){
   const px=player?player.position.x:0, pz=player?player.position.z:0;
   sun.position.set(px+12,24,pz+8); sun.target.position.set(px,0,pz);
   const el=Math.sin((gameTime-0.25)*Math.PI*2), az=(gameTime-0.25)*Math.PI*2;
+  nightF=Math.max(0,Math.min(1,(-el)*1.6+0.05));   // gece yoğunluğu (atmosfer katmanları için)
   sunMesh.position.set(px+Math.sin(az)*16, 5+el*24, pz-34); sunMesh.visible=el>-0.06;
   moonMesh.position.set(px-Math.sin(az)*16, 5-el*24, pz-34); moonMesh.visible=el<0.06;
   const v=vakitOf(gameTime);
   if(v!==lastVakit){ const prev=lastVakit; lastVakit=v; const el2=document.getElementById('vakit'); if(el2) el2.textContent=v[2]+' '+v[1]; if(prev) onVakitChange(v); }
+  skyAcc+=dt; if(dt===0 || skyAcc>=0.15){ skyAcc=0; updateSkyWidget(); }
 }
 function onVakitChange(v){ rebuildEvQuests(v[1]); toast('🕌 '+v[1]+' vakti girdi'); }
+
+/* ---- SEMÂ SAATİ: güneş/ay kavsi HUD widget'ı (Kur'an 10:5) ---- */
+let skyAcc=0, skyRefs=null;
+const _WHITE=new THREE.Color(0xffffff), _GRND=new THREE.Color(0x6fae57), _SUNLO=new THREE.Color(0xff8a3d), _SUNHI=new THREE.Color(0xffd23f);
+const _hex=c=>'#'+c.getHexString();
+function initSkyWidget(){
+  const id=x=>document.getElementById(x);
+  skyRefs={ top:id('skyTop'), bot:id('skyBot'), stars:id('stars'), ground:id('ground'),
+    sun:id('sunBody'), moon:id('moonBody'), core:id('sunCore') };
+}
+function updateSkyWidget(){
+  if(!skyRefs) initSkyWidget();
+  if(!skyRefs || !skyRefs.top) return;
+  const t=gameTime, s=dnSample(t);
+  skyRefs.top.setAttribute('stop-color', _hex(s.sky));
+  skyRefs.bot.setAttribute('stop-color', _hex(s.sky.clone().lerp(_WHITE,0.38)));
+  skyRefs.ground.setAttribute('fill', _hex(_GRND.clone().multiplyScalar(0.45+0.6*Math.min(1,s.hemi))));
+  const el=Math.sin((t-0.25)*Math.PI*2);
+  skyRefs.stars.setAttribute('opacity', Math.max(0,Math.min(1,(-el)*1.6+0.05)).toFixed(2));
+  // yay üzerinde konum: doğu(sol) → batı(sağ), tepede zirve
+  const arc=fr=>{ fr=Math.max(0,Math.min(1,fr)); return [30+80*fr, 52-40*Math.sin(Math.PI*fr)]; };
+  const isDay = t>0.25 && t<0.75;
+  if(isDay){
+    const f=(t-0.25)/0.5, p=arc(f);
+    skyRefs.sun.setAttribute('transform',`translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})`);
+    skyRefs.sun.setAttribute('opacity','1'); skyRefs.moon.setAttribute('opacity','0');
+    skyRefs.core.setAttribute('fill', _hex(_SUNLO.clone().lerp(_SUNHI, Math.sin(Math.PI*f))));
+  } else {
+    const gm=(t>=0.75)?(t-0.75)/0.5:(t+0.25)/0.5, p=arc(gm);
+    skyRefs.moon.setAttribute('transform',`translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})`);
+    skyRefs.moon.setAttribute('opacity','1'); skyRefs.sun.setAttribute('opacity','0');
+  }
+}
 
 // ---- ADA DÜNYASI (yükseltili adalar + köprüler + kilit) ----
 const WORLD={
@@ -351,7 +584,7 @@ function islandQuests(id){ return allQuests().filter(q=>questIslandId(q)===id); 
 function islandDone(id){ const qs=islandQuests(id); return qs.length>0 && qs.every(q=>!!S.done[q.id]); }
 function isUnlocked(id){ const i=WORLD.islands.findIndex(o=>o.id===id); if(i<=0) return true; return !!S.conquered[WORLD.islands[i-1].id]; }
 // eski kayıt göçü: bugün tamamlanmış adaları kalıcı fethe işle
-function migrateConquered(){ for(const is of WORLD.islands){ if(islandDone(is.id)) S.conquered[is.id]=true; } }
+function migrateConquered(){ /* fetih artık İMTİHAN ile olur; ders tamamlama otomatik fetih vermez */ }
 function bridgeOpen(b){ return b.isl.every(id=>isUnlocked(id)); }
 // ada içinde görevler SIRAYLA yapılır (önce abdest sonra namaz vb.)
 function islandSeq(id){ return allQuests().filter(q=>questIslandId(q)===id); }
@@ -416,7 +649,62 @@ function applyIslandLock(){
   }
   for(const b of WORLD.bridges){ const open=bridgeOpen(b);
     (b.deco||[]).forEach(x=>x.m.material.color.copy(open?x.orig:x.gray)); }
-  for(const r of interactables){ const u=isUnlocked(questIslandId(r.q)); setAlive(r.meshes, u && r.done); }
+  for(const r of interactables){ if(r.exam) continue; const u=isUnlocked(questIslandId(r.q)); setAlive(r.meshes, u && r.done); }
+  updateExamNodes();
+}
+
+/* ============ ATMOSFER: yıldızlar + bulutlar + nûr zerreleri (gece) ============ */
+let starField=null, dayMotes=null, dayMoteData=[], fireflies=null, fireflyData=[], nightF=0;
+const WORLD_X0=-12, WORLD_X1=78;   // dünya x aralığı (adalar -8..72)
+// yumuşak yuvarlak nokta dokusu (kare-piksel yerine parıltılı zerre)
+function dotTexture(core){
+  const c=document.createElement('canvas'); c.width=c.height=32; const x=c.getContext('2d');
+  const gr=x.createRadialGradient(16,16,0,16,16,16);
+  gr.addColorStop(0,core); gr.addColorStop(0.35,core); gr.addColorStop(1,'rgba(255,255,255,0)');
+  x.fillStyle=gr; x.fillRect(0,0,32,32);
+  const tx=new THREE.CanvasTexture(c); tx.colorSpace=THREE.SRGBColorSpace; return tx;
+}
+function buildAtmosphere(){
+  const starTex=dotTexture('rgba(255,255,255,1)'), glowTex=dotTexture('rgba(255,240,190,1)');
+  // --- yıldızlar (üst yarıküre kabuğu, oyuncuyu takip eder) ---
+  const N=240, sp=new Float32Array(N*3);
+  for(let i=0;i<N;i++){ const th=Math.random()*Math.PI*2, ph=Math.acos(Math.random()*0.9), r=60+Math.random()*24;
+    sp[i*3]=Math.sin(ph)*Math.cos(th)*r; sp[i*3+1]=Math.cos(ph)*r*0.55+9; sp[i*3+2]=Math.sin(ph)*Math.sin(th)*r; }
+  const sg=new THREE.BufferGeometry(); sg.setAttribute('position',new THREE.BufferAttribute(sp,3));
+  starField=new THREE.Points(sg,new THREE.PointsMaterial({map:starTex,color:0xffffff,size:1.25,sizeAttenuation:true,transparent:true,opacity:0,depthWrite:false,fog:false}));
+  scene.add(starField);
+  // --- gündüz nûr tozları (güneşte süzülen yumuşak beyaz zerreler) ---
+  const D=34, dp=new Float32Array(D*3); dayMoteData=[];
+  for(let i=0;i<D;i++){ const x=WORLD_X0+Math.random()*(WORLD_X1-WORLD_X0), z=-6+Math.random()*12, y=1+Math.random()*4;
+    dp[i*3]=x; dp[i*3+1]=y; dp[i*3+2]=z; dayMoteData.push({x,y,z,ph:Math.random()*6.28,sp:0.3+Math.random()*0.5,amp:0.25+Math.random()*0.4}); }
+  const dg=new THREE.BufferGeometry(); dg.setAttribute('position',new THREE.BufferAttribute(dp,3));
+  dayMotes=new THREE.Points(dg,new THREE.PointsMaterial({map:starTex,color:0xffffff,size:0.5,sizeAttenuation:true,transparent:true,opacity:0,depthWrite:false,fog:false}));
+  scene.add(dayMotes);
+  // --- nûr zerreleri / ateşböcekleri (gece, adaların üzerinde) ---
+  const M=44, fp=new Float32Array(M*3); fireflyData=[];
+  for(let i=0;i<M;i++){ const x=WORLD_X0+Math.random()*(WORLD_X1-WORLD_X0), z=-6.5+Math.random()*13, y=0.5+Math.random()*2.4;
+    fp[i*3]=x; fp[i*3+1]=y; fp[i*3+2]=z; fireflyData.push({x,y,z,ph:Math.random()*6.28,sp:0.5+Math.random()*0.8,amp:0.2+Math.random()*0.3}); }
+  const fg=new THREE.BufferGeometry(); fg.setAttribute('position',new THREE.BufferAttribute(fp,3));
+  fireflies=new THREE.Points(fg,new THREE.PointsMaterial({map:glowTex,color:0xffe6a0,size:0.62,sizeAttenuation:true,transparent:true,opacity:0,depthWrite:false,fog:false,blending:THREE.AdditiveBlending}));
+  scene.add(fireflies);
+}
+function animateAtmosphere(dt,t){
+  const px=player?player.position.x:0, pz=player?player.position.z:0;
+  // yıldızlar: geceleyin belir, oyuncuyu takip et, yavaş dön
+  if(starField){ starField.material.opacity=nightF*0.9; starField.position.set(px,0,pz); starField.rotation.y+=dt*0.006; }
+  const dayF=1-nightF;
+  // gündüz nûr tozları: gündüz belir, yumuşak süzül
+  if(dayMotes){ dayMotes.material.opacity=dayF*0.5;
+    if(dayF>0.03){ const a=dayMotes.geometry.attributes.position, arr=a.array;
+      for(let i=0;i<dayMoteData.length;i++){ const f=dayMoteData[i];
+        arr[i*3]=f.x+Math.sin(t*f.sp*0.4+f.ph)*0.7; arr[i*3+1]=f.y+Math.sin(t*f.sp+f.ph)*f.amp; arr[i*3+2]=f.z+Math.cos(t*f.sp*0.4+f.ph)*0.7; }
+      a.needsUpdate=true; } }
+  // nûr zerreleri / ateşböcekleri: geceleyin salın
+  if(fireflies){ fireflies.material.opacity=nightF*0.95;
+    if(nightF>0.03){ const a=fireflies.geometry.attributes.position, arr=a.array;
+      for(let i=0;i<fireflyData.length;i++){ const f=fireflyData[i];
+        arr[i*3]=f.x+Math.sin(t*f.sp*0.5+f.ph)*0.5; arr[i*3+1]=f.y+Math.sin(t*f.sp+f.ph)*f.amp+0.15; arr[i*3+2]=f.z+Math.cos(t*f.sp*0.5+f.ph)*0.5; }
+      a.needsUpdate=true; } }
 }
 
 /* ============ MODEL LOADING ============ */
@@ -446,8 +734,42 @@ function instance(name){
 function setAlive(meshes,alive){ meshes.forEach(x=>x.m.material.color.copy(alive?x.orig:x.orig.clone().lerp(x.gray,0.8))); }
 
 /* ============ BUILD WORLD ============ */
-const interactables=[]; // {q, g, meshes, done}
+const interactables=[]; // {q, g, meshes, done}  (exam düğümleri: r.exam=true)
 let player, PP=null, walkPhase=0;
+
+/* ---- İMTİHAN MEYDANI düğümleri (prosedürel: kürsü + kandil + hâle) ---- */
+const EXAM_POS={ ev:[6.6,0,2.2], bahce:[20.5,0,2.5], mahalle:[32.5,0,4.3], cami:[53,0,-2.5], sehir:[65,0,4.3] };
+const examNodes=[]; // {islId, g, ped, pedMat, halo, haloMat, core, coreMat, rec}
+function examReady(islId){ return isUnlocked(islId) && islandDone(islId) && !S.conquered[islId]; }
+function makeExamNode(islId,pos){
+  const g=new THREE.Group(); g.position.set(pos[0],0,pos[2]);
+  const pedMat=new THREE.MeshStandardMaterial({color:0xbdb2a0,roughness:1});
+  const ped=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.72,0.9,12),pedMat); ped.position.y=0.45; g.add(ped);
+  const top=new THREE.Mesh(new THREE.CylinderGeometry(0.66,0.55,0.16,12),pedMat); top.position.y=0.98; g.add(top);
+  const coreMat=new THREE.MeshStandardMaterial({color:0xffd766,emissive:0xffcf55,emissiveIntensity:0.0,roughness:0.4,metalness:0.2});
+  const core=new THREE.Mesh(new THREE.IcosahedronGeometry(0.42,0),coreMat); core.position.y=1.7; g.add(core);
+  const haloMat=new THREE.MeshBasicMaterial({color:0xffe08a,transparent:true,opacity:0.85});
+  const halo=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.075,8,36),haloMat); halo.position.y=1.7; halo.rotation.x=Math.PI/2; g.add(halo);
+  scene.add(g);
+  const rec={ q:{id:'exam_'+islId, exam:true, islId, nm:'İmtihan Meydanı', ic:'📝', pos:pos}, g, meshes:[], exam:true, islId };
+  interactables.push(rec);
+  const node={islId,g,ped,pedMat,halo,haloMat,core,coreMat,rec}; examNodes.push(node); return node;
+}
+function buildExamNodes(){ for(const is of WORLD.islands){ if(EXAM_POS[is.id]) makeExamNode(is.id,EXAM_POS[is.id]); } updateExamNodes(); }
+function updateExamNodes(){
+  for(const n of examNodes){
+    const passed=!!S.conquered[n.islId], ready=examReady(n.islId), unlocked=isUnlocked(n.islId);
+    if(passed){ n.pedMat.color.setHex(0x9fbfa6); n.coreMat.color.setHex(0x8fe0a8); n.coreMat.emissive.setHex(0x3fae6a); n.coreMat.emissiveIntensity=0.5; n.haloMat.color.setHex(0x9fe0b0); n.haloMat.opacity=0.7; }
+    else if(ready){ n.pedMat.color.setHex(0xbdb2a0); n.coreMat.color.setHex(0xffd766); n.coreMat.emissive.setHex(0xffcf55); n.haloMat.color.setHex(0xffe08a); n.haloMat.opacity=0.9; }
+    else { const g=unlocked?0xa9a29a:0x8f8f8f; n.pedMat.color.setHex(g); n.coreMat.color.setHex(0x9a978f); n.coreMat.emissive.setHex(0x000000); n.coreMat.emissiveIntensity=0; n.haloMat.color.setHex(0xbdbdbd); n.haloMat.opacity=0.35; }
+    n.g.visible=unlocked; // kilitli ada içinde gizli
+  }
+}
+function animateExamNodes(dt,t){
+  for(const n of examNodes){ n.halo.rotation.z+=dt*0.8; n.core.rotation.y+=dt*0.6;
+    if(examReady(n.islId)){ const p=0.5+0.5*Math.sin(t*3); n.coreMat.emissiveIntensity=0.35+p*0.6; n.core.position.y=1.7+Math.sin(t*2)*0.06; }
+  }
+}
 function addInteractable(q){
   const it=instance(q.model);
   it.g.position.set(q.pos[0],0,q.pos[2]); it.g.rotation.y=q.rot||0; it.g.scale.setScalar(q.scale||1);
@@ -458,13 +780,14 @@ function addInteractable(q){
 }
 function rebuildEvQuests(vname){
   near=null;
-  for(let i=interactables.length-1;i>=0;i--){ if(questIslandId(interactables[i].q)==='ev'){ scene.remove(interactables[i].g); interactables.splice(i,1); } }
+  for(let i=interactables.length-1;i>=0;i--){ if(!interactables[i].exam && questIslandId(interactables[i].q)==='ev'){ scene.remove(interactables[i].g); interactables.splice(i,1); } }
   setVakitQuests(vname);
   for(const q of evQuests) addInteractable(q);
   applyIslandLock(); refreshHUD();
 }
 function buildWorld(){
   buildIslands();
+  buildAtmosphere();
   const islById=id=>WORLD.islands.find(i=>i.id===id);
   const islAt=(x,z)=>WORLD.islands.find(i=>Math.hypot(x-i.c[0],z-i.c[1])<i.r);
   // köprüler (WORLD.bridges hizasına)
@@ -493,6 +816,8 @@ function buildWorld(){
 
   // interactable quests
   for(const q of allQuests()) addInteractable(q);
+  // her adanın imtihan meydanı
+  buildExamNodes();
 
   // player
   const pl=instance('player');
@@ -586,34 +911,134 @@ function openSheet(q){
     d.innerHTML=`<div class="tag">${rf.tag}</div><div class="txt">${rf.txt}</div>${rf.cite?`<div class="cite">— ${rf.cite}</div>`:''}`; w.appendChild(d); });
   const done=!!S.done[q.id];
   const db=document.getElementById('sDo'); db.textContent=done?'Geri al ↺':'Yaptım ✓'; db.style.background=done?'#9aa':'linear-gradient(135deg,#5fb98a,#2f8f63)';
+  document.getElementById('sSteps').style.display = q.steps ? 'block' : 'none';
   document.getElementById('veil').classList.add('show');
 }
 function closeSheet(){ document.getElementById('veil').classList.remove('show'); }
+/* ---- ADIM ADIM ÖĞRETİM (abdest, namaz…) ---- */
+let guideQ=null, guideSteps=[], guideIdx=0;
+function interact(q){
+  if(!S.done[q.id] && !questAvailable(q)){ const p=prereqOf(q); toast('🔒 Önce: '+(p?p.nm:'sıradaki adım')); return; }
+  if(q.steps && !S.done[q.id] && !S.learned[q.id]){ openGuide(q); return; }  // ilk kez → adım adım öğret
+  openSheet(q);
+}
+function openGuide(q){ guideQ=q; guideSteps=q.steps||[]; guideIdx=0;
+  document.getElementById('gT').textContent=q.nm;
+  document.getElementById('guide').classList.add('show'); renderGuide(); }
+function closeGuide(){ document.getElementById('guide').classList.remove('show'); }
+function renderGuide(){
+  const s=guideSteps[guideIdx]||{};
+  document.getElementById('gProg').textContent='Adım '+(guideIdx+1)+' / '+guideSteps.length;
+  document.getElementById('gIc').textContent=s.ic||guideQ.ic;
+  document.getElementById('gTitle').textContent=s.t||'';
+  document.getElementById('gDesc').textContent=s.d||'';
+  document.getElementById('gPrev').style.visibility=guideIdx>0?'visible':'hidden';
+  document.getElementById('gNext').textContent=(guideIdx<guideSteps.length-1)?'Sonraki ▶':'Öğrendim ✓';
+}
+function guideNext(){
+  if(guideIdx<guideSteps.length-1){ guideIdx++; renderGuide(); beep(560+guideIdx*30,0,0.09,'sine',0.05); }
+  else { const q=guideQ; closeGuide(); finishLesson(q); }
+}
+function guidePrev(){ if(guideIdx>0){ guideIdx--; renderGuide(); } }
+function finishLesson(q){
+  const first=!S.learned[q.id]; S.learned[q.id]=true;
+  if(!S.done[q.id]){ curQ=q; doQuest(); }   // do-yolu: nûr, çınlama, meydan açılışı vb.
+  else save();
+  if(first){ sndChime(); setTimeout(()=>banner('📖 '+q.nm.replace(/ (al|kıl|oku).*/,'')+' öğrenildi'),300); }
+}
 function doQuest(){
   if(!curQ) return; const was=!!S.done[curQ.id];
   if(!was && !questAvailable(curQ)){ const p=prereqOf(curQ); toast('🔒 Önce: '+(p?p.nm:'sıradaki adım')); return; }
   const islId=questIslandId(curQ);
   const islDoneBefore=islandDone(islId);
-  const before=WORLD.islands.map(i=>isUnlocked(i.id));
   if(was){ delete S.done[curQ.id]; } else { S.done[curQ.id]=true; S.nur+=10; sndChime(); toast('+10 nûr ✦'); }
   const rec=interactables.find(r=>r.q.id===curQ.id);
   if(rec){ rec.done=!was;
     if(!was && curQ.model==='plot'){ /* fidan: parseli filizliye çevir */ swapPlot(rec); } }
-  // bu görevle ada tamamlandı mı → kalıcı fetih (günlük sıfırlamadan etkilenmez)
-  const nowDone = !was && !islDoneBefore && islandDone(islId);
-  const firstConquer = nowDone && !S.conquered[islId];
-  if(nowDone) S.conquered[islId]=true;
+  // dersler bitince ADA FETHEDİLMEZ — imtihan meydanı açılır (fetih sınavla olur)
+  const nowLessonsDone = !was && !islDoneBefore && islandDone(islId);
   save(); refreshHUD();
-  const after=WORLD.islands.map(i=>isUnlocked(i.id));
-  WORLD.islands.forEach((is,idx)=>{ if(!before[idx]&&after[idx]) setTimeout(()=>toast('🔓 '+is.name+' açıldı!'),1500); });
   applyIslandLock();
-  if(nowDone){
-    if(firstConquer){ celebrate(islId);
-      if(WORLD.islands.every(i=>S.conquered[i.id])){ setTimeout(()=>banner('☾ Dünya İhyâ Edildi ☾'),2900); setTimeout(showEnd,4700); } }
-    else { sndFanfare(); const is=WORLD.islands.find(i=>i.id===islId); toast('✓ '+(is?is.name:'')+' bugün de tamam'); }
+  if(nowLessonsDone && !S.conquered[islId]){
+    sndFanfare(); const is=WORLD.islands.find(i=>i.id===islId);
+    setTimeout(()=>toast('📝 '+(is?is.name:'')+' İmtihan Meydanı açıldı!'),700);
+    setTimeout(()=>banner('📝 İmtihana Hazırsın'),1200);
   }
   if(!was) closeSheet(); else openSheet(curQ);
 }
+/* ---- İMTİHAN sonucu: geçince fetih, kalınca dersler sıfırlanabilir ---- */
+function passExam(islId){
+  const before=WORLD.islands.map(i=>isUnlocked(i.id));
+  const firstConquer=!S.conquered[islId];
+  S.conquered[islId]=true; S.nur+=30; save();
+  const after=WORLD.islands.map(i=>isUnlocked(i.id));
+  applyIslandLock(); refreshHUD();
+  WORLD.islands.forEach((is,idx)=>{ if(!before[idx]&&after[idx]) setTimeout(()=>toast('🔓 '+is.name+' açıldı!'),1900); });
+  if(firstConquer){ celebrate(islId);
+    if(WORLD.islands.every(i=>S.conquered[i.id])){ setTimeout(()=>banner('☾ Dünya İhyâ Edildi ☾'),2900); setTimeout(showEnd,4700); } }
+  else { sndFanfare(); const is=WORLD.islands.find(i=>i.id===islId); toast('✓ '+(is?is.name:'')+' yine fethedildi'); }
+}
+function failExam(islId){
+  // "tekrar başa": o adanın dersleri sıfırlanır, tekrar öğrenilir
+  for(const q of islandQuests(islId)) delete S.done[q.id];
+  for(const r of interactables){ if(!r.exam && questIslandId(r.q)===islId) r.done=false; }
+  save(); applyIslandLock(); refreshHUD();
+}
+
+/* ---- İMTİHAN ARAYÜZÜ ---- */
+let examIslId=null, examQs=[], examIdx=0, examWrong=0, examLock=false;
+function sndBuzz(){ audio(); beep(180,0,0.16,'square',0.07); beep(120,0.11,0.22,'square',0.06); }
+function openExam(islId){
+  if(!examReady(islId)){
+    if(S.conquered[islId]) toast('✓ Bu ada zaten fethedildi'); else toast('🔒 Önce bu adadaki dersleri tamamla');
+    return;
+  }
+  examIslId=islId; examQs=buildExam(islId); examIdx=0; examWrong=0;
+  const is=WORLD.islands.find(i=>i.id===islId);
+  document.getElementById('exTitle').textContent=(is?is.name:'')+' İmtihanı';
+  document.getElementById('exQuiz').style.display='block';
+  document.getElementById('exResult').style.display='none';
+  document.getElementById('exam').classList.add('show');
+  renderExamQ();
+}
+function closeExam(){ document.getElementById('exam').classList.remove('show'); }
+function renderExamQ(){
+  examLock=false;
+  const q=examQs[examIdx];
+  document.getElementById('exProg').textContent='Soru '+(examIdx+1)+' / '+examQs.length;
+  const sc = q.s==='Fıkıh'?{t:'⚖️ Fıkıh Okulu',bg:'#3a6ea5'} : q.s==='Hadis'?{t:'🕌 Hadis Okulu',bg:'#2f8f63'} : {t:'📖 Âyet Meclisi',bg:'#9a6a2f'};
+  const badge=document.getElementById('exSchool'); badge.textContent=sc.t; badge.style.background=sc.bg;
+  document.getElementById('exQ').textContent=q.q;
+  document.getElementById('exCite').textContent='';
+  const wrap=document.getElementById('exOpts'); wrap.innerHTML='';
+  q.o.forEach((opt,i)=>{ const b=document.createElement('button'); b.className='exOpt'; b.textContent=opt; b.onclick=()=>answerExam(i,b); wrap.appendChild(b); });
+  document.getElementById('exNext').style.display='none';
+}
+function answerExam(i,btn){
+  if(examLock) return; examLock=true;
+  const q=examQs[examIdx];
+  const opts=document.querySelectorAll('#exOpts .exOpt');
+  opts.forEach((b,idx)=>{ b.disabled=true; if(idx===q.c) b.classList.add('correct'); });
+  if(i!==q.c){ btn.classList.add('wrong'); examWrong++; sndBuzz(); } else { sndChime(); }
+  document.getElementById('exCite').textContent='— '+q.cite;
+  const nb=document.getElementById('exNext'); nb.style.display='block';
+  nb.textContent=(examIdx<examQs.length-1)?'Sıradaki ➤':'Sonucu Gör';
+}
+function nextExam(){ if(examIdx<examQs.length-1){ examIdx++; renderExamQ(); } else finishExam(); }
+function finishExam(){
+  const passed=examWrong===0, total=examQs.length, correct=total-examWrong;
+  document.getElementById('exQuiz').style.display='none';
+  document.getElementById('exResult').style.display='block';
+  document.getElementById('exResIc').textContent=passed?'✦':'↺';
+  document.getElementById('exResT').textContent=passed?'İmtihanı Geçtin!':'Tekrar Öğrenelim';
+  document.getElementById('exResS').textContent='Doğru: '+correct+' / '+total+(passed?' — ada fethine hazır (+30 nûr)':' — eksik kaldı, konuları tekrar et.');
+  const a=document.getElementById('exResA'), b=document.getElementById('exResB');
+  if(passed){ sndFanfare(); a.textContent='Fethet ✦'; a.onclick=()=>{ const id=examIslId; closeExam(); passExam(id); }; b.style.display='none'; }
+  else { sndBuzz(); a.textContent='↺ Tekrar Dene'; a.onclick=()=>openExam(examIslId);
+    b.style.display='block'; b.textContent='📕 Dersleri Tekrar Et'; b.onclick=()=>{ const id=examIslId; closeExam(); failExam(id); toast('📕 Dersleri tekrar gözden geçir'); }; }
+}
+document.getElementById('exNext').onclick=nextExam;
+document.getElementById('exam').addEventListener('click',e=>{ if(e.target.id==='exam') closeExam(); });
 function swapPlot(rec){
   const ni=instance('plot_sprout'); ni.g.position.copy(rec.g.position); ni.g.rotation.copy(rec.g.rotation); ni.g.scale.copy(rec.g.scale);
   scene.remove(rec.g); scene.add(ni.g); rec.g=ni.g; rec.meshes=ni.meshes; setAlive(rec.meshes,true);
@@ -621,9 +1046,13 @@ function swapPlot(rec){
 document.getElementById('sDo').onclick=doQuest;
 document.getElementById('sCl').onclick=closeSheet;
 document.getElementById('veil').addEventListener('click',e=>{ if(e.target.id==='veil') closeSheet(); });
+document.getElementById('sSteps').onclick=()=>{ const q=curQ; closeSheet(); openGuide(q); };
+document.getElementById('gNext').onclick=guideNext;
+document.getElementById('gPrev').onclick=guidePrev;
+document.getElementById('guide').addEventListener('click',e=>{ if(e.target.id==='guide') closeGuide(); });
 actBtn.onclick=()=>{ if(!near) return;
-  if(!S.done[near.q.id] && !questAvailable(near.q)){ const p=prereqOf(near.q); toast('🔒 Önce: '+(p?p.nm:'sıradaki adım')); return; }
-  openSheet(near.q); };
+  if(near.exam){ openExam(near.islId); return; }
+  interact(near.q); };
 
 function refreshHUD(){
   document.getElementById('nur').textContent=S.nur;
@@ -676,14 +1105,17 @@ function tick(){
       if(dd<bd){ bd=dd; best=r; } }
     if(best!==near){ near=best;
       if(near){ actBtn.style.display='block';
-        actBtn.textContent = S.done[near.q.id] ? 'Bak ✓'
+        if(near.exam){ actBtn.textContent = S.conquered[near.islId] ? 'Meydan ✓' : (examReady(near.islId) ? '📝 İmtihana Gir' : '🔒 Önce dersler'); }
+        else actBtn.textContent = S.done[near.q.id] ? 'Bak ✓'
           : (questAvailable(near.q) ? 'Etkileşim '+near.q.ic : '🔒 Sırası değil'); }
       else { actBtn.style.display='none'; promptEl.style.display='none'; }
     }
     if(near){ // prompt position
       tmp.copy(near.g.position); tmp.y+=1.6; tmp.project(camera);
       promptEl.style.display='block';
-      promptEl.textContent=(!S.done[near.q.id]&&!questAvailable(near.q)?'🔒 ':'')+near.q.nm;
+      promptEl.textContent = near.exam
+        ? ((S.conquered[near.islId]?'✓ ':examReady(near.islId)?'📝 ':'🔒 ')+'İmtihan Meydanı')
+        : (!S.done[near.q.id]&&!questAvailable(near.q)?'🔒 ':'')+near.q.nm;
       promptEl.style.left=(tmp.x*0.5+0.5)*innerWidth+'px';
       promptEl.style.top=(-tmp.y*0.5+0.5)*innerHeight+'px';
     }
@@ -693,6 +1125,8 @@ function tick(){
   for(const r of interactables){ const on=!r.done && questAvailable(r.q);
     for(const x of r.meshes){ if(x.m.material.emissive){ x.m.material.emissive.setHex(on?0xffcf55:0x000000); x.m.material.emissiveIntensity=on?glow:0; } } }
   if(particles.length) updateParticles(dt);
+  if(examNodes.length) animateExamNodes(dt, clock.elapsedTime);
+  animateAtmosphere(dt, clock.elapsedTime);
   renderer.render(scene,camera);
   requestAnimationFrame(tick);
 }
@@ -716,7 +1150,16 @@ addEventListener('resize',resize); resize();
     test:(id)=>{ near=interactables.find(x=>x.q.id===id); openSheet(near.q); },
     doTest:()=>doQuest(),
     walk:(x,z)=>walkable(x,z), unlocked:(id)=>isUnlocked(id),
-    setTime:(t)=>{ gameTime=t; updateDayNight(0); } };
+    setTime:(t)=>{ gameTime=t; updateDayNight(0); },
+    // --- imtihan test yardımcıları ---
+    openExam:(id)=>openExam(id), examReady:(id)=>examReady(id), buildExam:(id)=>buildExam(id),
+    topics:(id)=>islandTopics(id),
+    examState:()=>({idx:examIdx, correct:examQs[examIdx]?examQs[examIdx].c:null, n:examQs.length, wrong:examWrong}),
+    interactId:(id)=>{ const r=interactables.find(x=>x.q.id===id); if(r) interact(r.q); },
+    openGuideId:(id)=>{ const r=interactables.find(x=>x.q.id===id); if(r) openGuide(r.q); },
+    guideState:()=>({idx:guideIdx, n:guideSteps.length, open:document.getElementById('guide').classList.contains('show')}),
+    learnedMap:()=>Object.assign({},S.learned),
+    learn:(id)=>{ for(const q of islandQuests(id)) S.done[q.id]=true; interactables.forEach(r=>{ if(!r.exam) r.done=!!S.done[r.q.id]; }); save(); applyIslandLock(); refreshHUD(); } };
   tick();
 })();
 </script>
