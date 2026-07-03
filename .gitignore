@@ -1,6 +1,9 @@
 # geliştirme / hata ayıklama render çıktıları
 models/_*.png
 
+# 3D model referans görselleri (büyük renderlar, yerelde kalsın — repoyu şişirmesin)
+models/*.glb.jpg
+
 # yedek blend
 *.blend1
 
