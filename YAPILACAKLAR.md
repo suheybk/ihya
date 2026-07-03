@@ -146,6 +146,18 @@ Bu oyun manipülasyonla değil, **anlamla** bağ kurar. Kırmızı çizgiler:
   ada+tabana sıkıştırır; makeAnimal etiketler, buildAnimals eski klonları temizler. Test: 13 kökü
   (300,777,-300)'e attım → groundNow 1 çağrıda hepsi ada içinde y=0. Teşhis: `__ihya3d.scanFlying()`.
 
+### Faz 11.4 — KARE Adalar + Terrain (2026-07-04, Suheyb)
+- [x] **Adalar dairesel→KARE**: `is.r`=yarı-genişlik (Chebyshev). Yardımcı `inSq(x,z,c,half)`.
+  Geometri: çim = alt-bölünmüş `PlaneGeometry(2r,2r,18,18)` (yumuşak dalgalı terrain, kenara doğru
+  düzleşir); toprak gövde = 4-kenar konik prizma (π/4 döndürülmüş, eksen-hizalı kare); sis = kutu.
+  Tüm clamp/walkable/spawn/dağıtım KAREYE çevrildi: islandOf/inIsland/updateAnimals/updateNpcs/
+  groundAnimals/pickAnimalTarget/pickNpcTarget/makeAnimal/decorateIsland. **Clamp artık görsel kareyle
+  tam eşleşir** → kenar belirsizliği bitti (kare köşeler yürünebilir; dairesel iken değildi).
+- [x] **Terrain**: `terrainH(x,z)` yumuşak sin/cos dalga (±0.14, dünya-koord süreklilik), kenar-fade;
+  kum kenar şeridi (kare plaj), dekorlar terrain yüksekliğine oturur. Daha gerçekçi/hoş görünüm.
+- [x] Test: köşe(7,7) walkable=true, köprü yolu ev→bahçe "11111111" kesintisiz, hayvan kare-clamp
+  13/13 y=0, gather/namaz/pazar/vakit-döngüsü regresyonsuz, konsol temiz.
+
 ## 📌 3D Modeller ✅ (2026-07-02)
 Prompt listesindeki **36 model** Blender'da üretilip `models/*.glb` olarak eklendi
 (hayvanlar, hurma/dut ağaçları, eşya/pickup, pazar, yapılar, Mescid-i Nebevî, NPC'ler).

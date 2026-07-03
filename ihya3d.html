@@ -229,7 +229,7 @@
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.3 (hayvan güvenlik-ağı)</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.4 (kare ada + terrain)</div>
 
 <div id="prompt"></div>
 <div id="joy"><div id="knob"></div></div>
@@ -824,8 +824,12 @@ for(let i=0;i<WORLD.islands.length-1;i++){
 const grassMat=new THREE.MeshStandardMaterial({color:0x8fce58,roughness:.95});
 const cliffMat=new THREE.MeshStandardMaterial({color:0xcf9a72,roughness:1});
 const GRASS0=new THREE.Color(0x8fce58), CLIFF0=new THREE.Color(0xcf9a72);
+// KARE ADALAR: is.r = yarı-genişlik (merkeze göre ±r, hem x hem z). Chebyshev (kare) mesafesi.
+function inSq(x,z,c,half){ return Math.abs(x-c[0])<half && Math.abs(z-c[1])<half; }
+// TERRAIN: yumuşak dalgalı yükseklik (dünya koordinatı → adalar arası süreklilik). Kenara doğru düzleşir.
+function terrainH(x,z){ return (Math.sin(x*0.55)*Math.cos(z*0.5) + Math.sin(x*0.31+1.7)*Math.cos(z*0.42+0.6))*0.085; }
 // --- kilit mantığı: bir ada, öncekinin tüm görevleri bitince açılır ---
-function islandOf(x,z){ for(const is of WORLD.islands){ if(Math.hypot(x-is.c[0],z-is.c[1])<is.r) return is.id; } return null; }
+function islandOf(x,z){ for(const is of WORLD.islands){ if(inSq(x,z,is.c,is.r)) return is.id; } return null; }
 function questIslandId(q){ return islandOf(q.pos[0],q.pos[2]); }
 function islandQuests(id){ return allQuests().filter(q=>questIslandId(q)===id); }
 function islandDone(id){ const qs=islandQuests(id); return qs.length>0 && qs.every(q=>!!S.done[q.id]); }
@@ -842,39 +846,47 @@ const WATER0=new THREE.Color(0x59bcd0);
 function wrapMesh(m){ return [{m, orig:m.material.color.clone(), gray:grayOf(m.material.color)}]; }
 function decorateIsland(is){
   const R=is.r, cx=is.c[0], cz=is.c[1], rnd=(a,b)=>a+Math.random()*(b-a);
-  // kıyı şeridi (açık kum halkası)
-  const ring=new THREE.Mesh(new THREE.TorusGeometry(R*0.98,0.34,7,48), new THREE.MeshStandardMaterial({color:0xe9dcab,roughness:1}));
-  ring.rotation.x=-Math.PI/2; ring.position.set(cx,-0.06,cz); scene.add(ring); is.deco.push(...wrapMesh(ring));
-  // çim öbekleri
-  for(let i=0;i<15;i++){ const a=Math.random()*6.283, rr=rnd(0.34,0.93)*R, x=cx+Math.cos(a)*rr, z=cz+Math.sin(a)*rr;
+  const sq=()=>rnd(-0.92,0.92)*R;                              // kare içi dağıtım
+  const hAt=(x,z)=>{ const lx=x-cx, lz=z-cz, edge=Math.max(0,Math.min(1,(R-Math.max(Math.abs(lx),Math.abs(lz)))/1.6)); return terrainH(x,z)*edge; };
+  // kum kenar şeridi (kare plaj): çimden biraz büyük düz kare, kenarda görünür
+  const sand=new THREE.Mesh(new THREE.BoxGeometry(R*2+0.5,0.14,R*2+0.5), new THREE.MeshStandardMaterial({color:0xe9dcab,roughness:1}));
+  sand.position.set(cx,-0.12,cz); scene.add(sand); is.deco.push(...wrapMesh(sand));
+  // çim öbekleri (terrain yüksekliğine oturur)
+  for(let i=0;i<16;i++){ const x=cx+sq(), z=cz+sq();
     const t=new THREE.Mesh(new THREE.ConeGeometry(0.11,rnd(0.22,0.42),5), new THREE.MeshStandardMaterial({color:i%3?0x6fb83e:0x58a230,roughness:1}));
-    t.position.set(x,0.12,z); scene.add(t); is.deco.push(...wrapMesh(t)); }
+    t.position.set(x,hAt(x,z)+0.12,z); scene.add(t); is.deco.push(...wrapMesh(t)); }
   // çiçekler
   const FC=[0xff7a6b,0xffd23f,0xf6f2e8,0xff9ec4];
-  for(let i=0;i<6;i++){ const a=Math.random()*6.283, rr=rnd(0.4,0.9)*R, x=cx+Math.cos(a)*rr, z=cz+Math.sin(a)*rr;
+  for(let i=0;i<7;i++){ const x=cx+sq(), z=cz+sq();
     const f=new THREE.Mesh(new THREE.SphereGeometry(0.09,7,6), new THREE.MeshStandardMaterial({color:FC[i%FC.length],roughness:.8}));
-    f.scale.y=0.55; f.position.set(x,0.16,z); scene.add(f); is.deco.push(...wrapMesh(f)); }
+    f.scale.y=0.55; f.position.set(x,hAt(x,z)+0.16,z); scene.add(f); is.deco.push(...wrapMesh(f)); }
   // çakıl taşları
-  for(let i=0;i<5;i++){ const a=Math.random()*6.283, rr=rnd(0.5,0.95)*R, x=cx+Math.cos(a)*rr, z=cz+Math.sin(a)*rr;
+  for(let i=0;i<6;i++){ const x=cx+sq(), z=cz+sq();
     const p=new THREE.Mesh(new THREE.IcosahedronGeometry(rnd(0.12,0.22),0), new THREE.MeshStandardMaterial({color:0xb9b0a4,roughness:1}));
-    p.scale.y=0.6; p.position.set(x,0.05,z); p.rotation.set(Math.random(),Math.random(),0); scene.add(p); is.deco.push(...wrapMesh(p)); }
+    p.scale.y=0.6; p.position.set(x,hAt(x,z)+0.05,z); p.rotation.set(Math.random(),Math.random(),0); scene.add(p); is.deco.push(...wrapMesh(p)); }
 }
 function buildIslands(){
   waterMesh=new THREE.Mesh(new THREE.CircleGeometry(110,12),new THREE.MeshStandardMaterial({color:WATER0.clone(),roughness:.25,metalness:.12}));
   waterMesh.rotation.x=-Math.PI/2; waterMesh.position.y=-1.6; scene.add(waterMesh);
   for(const is of WORLD.islands){
     is.gMat=grassMat.clone(); is.cMat=cliffMat.clone(); is.deco=[];
-    const top=new THREE.Mesh(new THREE.CylinderGeometry(is.r,is.r,0.5,46),is.gMat);
-    top.position.set(is.c[0],-0.25,is.c[1]); scene.add(top);   // çim yüzeyi tam y=0 (tüm nesneler taban üstünde)
-    const cliff=new THREE.Mesh(new THREE.CylinderGeometry(is.r*0.98,is.r*0.78,2.4,46),is.cMat);
-    cliff.position.set(is.c[0],-1.4,is.c[1]); scene.add(cliff);
+    // KARE terrain yüzeyi: alt-bölünmüş düzlem + yumuşak dalga (kenara doğru düzleşir, çim y=0 civarı)
+    const R=is.r, seg=18, gGeo=new THREE.PlaneGeometry(R*2,R*2,seg,seg), gp=gGeo.attributes.position;
+    for(let vi=0; vi<gp.count; vi++){ const lx=gp.getX(vi), ly=gp.getY(vi), wx=is.c[0]+lx, wz=is.c[1]-ly;
+      const edge=Math.max(0, Math.min(1, (R-Math.max(Math.abs(lx),Math.abs(ly)))/1.6));   // kenarda 0, içeride 1
+      gp.setZ(vi, terrainH(wx,wz)*edge); }
+    gGeo.computeVertexNormals();
+    const top=new THREE.Mesh(gGeo,is.gMat); top.rotation.x=-Math.PI/2; top.position.set(is.c[0],0,is.c[1]); scene.add(top);
+    // KARE toprak gövde (hafif konik): 4-kenar prizma, PI/4 döndürülür → yüzler eksene hizalı (çimle aynı kare)
+    const cliff=new THREE.Mesh(new THREE.CylinderGeometry(R*1.386,R*1.103,2.6,4),is.cMat);
+    cliff.rotation.y=Math.PI/4; cliff.position.set(is.c[0],-1.3,is.c[1]); scene.add(cliff);   // üst y≈0, alt y=-2.6
     decorateIsland(is);
-    const mist=new THREE.Mesh(new THREE.SphereGeometry(is.r*1.02,20,12),
-      new THREE.MeshStandardMaterial({color:0xe8eff3,transparent:true,opacity:0.55,depthWrite:false,roughness:1}));
-    mist.scale.y=0.5; mist.position.set(is.c[0],0.7,is.c[1]); scene.add(mist); is.mist=mist;
+    const mist=new THREE.Mesh(new THREE.BoxGeometry(R*2.1,1.4,R*2.1),
+      new THREE.MeshStandardMaterial({color:0xe8eff3,transparent:true,opacity:0.5,depthWrite:false,roughness:1}));
+    mist.position.set(is.c[0],0.7,is.c[1]); scene.add(mist); is.mist=mist;
   }
 }
-function inIsland(x,z,margin){ for(const is of WORLD.islands){ if(isUnlocked(is.id) && Math.hypot(x-is.c[0],z-is.c[1]) < is.r-margin) return true; } return false; }
+function inIsland(x,z,margin){ for(const is of WORLD.islands){ if(isUnlocked(is.id) && inSq(x,z,is.c,is.r-margin)) return true; } return false; }
 function onBridge(x,z){
   for(const b of WORLD.bridges){
     if(!bridgeOpen(b)) continue;
@@ -966,11 +978,11 @@ WORLD.islands.forEach((is,i)=>{
 });
 let animals=[];
 function animalReady(def){ const t=S.gather[def.id]; return !t || Date.now()>=t; }
-function pickAnimalTarget(an){ const is=an.is; const a=Math.random()*6.283, r=Math.random()*is.r*0.42; an.tx=is.c[0]+Math.cos(a)*r; an.tz=is.c[1]+Math.sin(a)*r; }
+function pickAnimalTarget(an){ const is=an.is, R=(is.r-2.0)*0.9; an.tx=is.c[0]+(Math.random()*2-1)*R; an.tz=is.c[1]+(Math.random()*2-1)*R; }
 function makeAnimal(def){
   const is=WORLD.islands.find(i=>i.id===def.islId);
   const it=instance(def.model);
-  const a0=Math.random()*6.283, r0=Math.random()*is.r*0.4, x=is.c[0]+Math.cos(a0)*r0, z=is.c[1]+Math.sin(a0)*r0;
+  const R0=(is.r-2.0)*0.85, x=is.c[0]+(Math.random()*2-1)*R0, z=is.c[1]+(Math.random()*2-1)*R0;
   it.g.position.set(x,0,z); it.g.scale.setScalar(def.scale); it.g.rotation.y=Math.random()*6.28;
   it.g.userData.anIsl=def.islId;   // güvenlik ağı etiketi (groundAnimals her kare bunları tabana/adaya sıkıştırır)
   scene.add(it.g);
@@ -994,8 +1006,10 @@ function groundAnimals(){
   const ch=scene.children;
   for(let i=0;i<ch.length;i++){ const g=ch[i]; const uid=g.userData&&g.userData.anIsl; if(uid==null) continue;
     const isl=WORLD.islands.find(x=>x.id===uid); if(!isl) continue;
-    const c=isl.c, rmax=(isl.r||8)-2.5, ddx=g.position.x-c[0], ddz=g.position.z-c[1], dd=ddx*ddx+ddz*ddz;
-    if(!(dd<=rmax*rmax)){ const dl=Math.sqrt(dd)||1, k=(rmax*0.85)/dl; g.position.x=c[0]+ddx*k; g.position.z=c[1]+ddz*k; }
+    const c=isl.c, rmax=(isl.r||8)-2.0, px=g.position.x, pz=g.position.z;
+    const nx=isFinite(px)?Math.max(c[0]-rmax,Math.min(c[0]+rmax,px)):c[0];   // KARE sınır
+    const nz=isFinite(pz)?Math.max(c[1]-rmax,Math.min(c[1]+rmax,pz)):c[1];
+    if(nx!==px) g.position.x=nx; if(nz!==pz) g.position.z=nz;
     if(!(g.position.y>=0 && g.position.y<=0.1)) g.position.y=0;   // uçamaz/batamaz
   }
 }
@@ -1004,11 +1018,12 @@ function restLegs(L){ if(L){ setLeg(L.FL,0); setLeg(L.FR,0); setLeg(L.BL,0); set
 function updateAnimals(dt){
   for(const an of animals){
     const g=an.rec.g;
-    const isl=an.is||{c:[0,0],r:8}, c=isl.c, rmax=(isl.r||8)-2.5;   // KENDİ adası (geçersizse ev'e düş)
-    // KOŞULSUZ SINIR: her kare ada içine sıkıştır — NaN/geçersiz konum da (!(<=)) sıkıştırılır → kaçış imkânsız
-    { const ddx=g.position.x-c[0], ddz=g.position.z-c[1], dd=ddx*ddx+ddz*ddz;
-      if(!(dd<=rmax*rmax)){ const dl=Math.sqrt(dd)||1, k=(rmax*0.85)/dl;
-        g.position.x=c[0]+ddx*k; g.position.z=c[1]+ddz*k; an.tx=g.position.x; an.tz=g.position.z; an.pause=Math.min(an.pause,0.2); } }
+    const isl=an.is||{c:[0,0],r:8}, c=isl.c, rmax=(isl.r||8)-2.0;   // KENDİ karesi (geçersizse ev'e düş)
+    // KOŞULSUZ KARE SINIR: her kare x/z'yi [c-rmax,c+rmax]'e sıkıştır — NaN → merkeze → kaçış imkânsız
+    { const px=g.position.x, pz=g.position.z;
+      const nx=isFinite(px)?Math.max(c[0]-rmax,Math.min(c[0]+rmax,px)):c[0];
+      const nz=isFinite(pz)?Math.max(c[1]-rmax,Math.min(c[1]+rmax,pz)):c[1];
+      if(nx!==px||nz!==pz){ g.position.x=nx; g.position.z=nz; an.tx=nx; an.tz=nz; an.pause=Math.min(an.pause,0.2); } }
     // Y'yi TABANA kilitle: uçamaz/batamaz (yalnız ufak adım bob'u serbest). NaN/yüksek/negatif → 0
     if(!(g.position.y>=0 && g.position.y<=0.1)) g.position.y=0;
     if(!g.visible) continue;
@@ -1017,8 +1032,8 @@ function updateAnimals(dt){
     const dx=an.tx-g.position.x, dz=an.tz-g.position.z, d=Math.hypot(dx,dz);
     if(d<0.3){ an.pause=1.5+Math.random()*3.5; pickAnimalTarget(an); restLegs(L); continue; }
     const nx=g.position.x+dx/d*an.spd*dt, nz=g.position.z+dz/d*an.spd*dt;
-    // yeni konum KENDİ adasının içinde mi (tam konum) — değilse dön, yeni hedef seç
-    if((nx-c[0])**2+(nz-c[1])**2 < rmax*rmax){ g.position.x=nx; g.position.z=nz; }
+    // yeni konum KENDİ karesinin içinde mi — değilse dön, yeni hedef seç
+    if(inSq(nx,nz,c,rmax)){ g.position.x=nx; g.position.z=nz; }
     else { an.pause=0.3+Math.random()*0.8; pickAnimalTarget(an); restLegs(L); continue; }
     g.rotation.y=Math.atan2(dx,dz)+Math.PI;   // baş öne gelsin (model başı +Y=-Z) — geri geri gitmesin
     an.ph+=dt*8; g.position.y=Math.abs(Math.sin(an.ph))*0.04;
@@ -1617,10 +1632,10 @@ function npcRest(g,k){ g.position.y*=0.85; g.rotation.x+=-g.rotation.x*k; g.rota
 function updateNpcs(dt){
   for(const n of npcWander){
     const rec=n.rec, g=rec.g;
-    const isl=n.is||{c:[0,0],r:8}, c=isl.c, rmax=(isl.r||8)-1.6;   // KENDİ adası (geçersizse ev'e düş)
-    // KOŞULSUZ SINIR: her kare ada içine sıkıştır — NaN/geçersiz de → eve ışınla → kaçış imkânsız
-    { const ddx=g.position.x-c[0], ddz=g.position.z-c[1], dd=ddx*ddx+ddz*ddz;
-      if(!(dd<=rmax*rmax)){ g.position.x=n.hx; g.position.z=n.hz; pickNpcTarget(n); n.pause=Math.min(n.pause,0.2); } }
+    const isl=n.is||{c:[0,0],r:8}, c=isl.c, rmax=(isl.r||8)-1.4;   // KENDİ karesi (geçersizse ev'e düş)
+    // KOŞULSUZ KARE SINIR: kare dışına/NaN'a çıkarsa eve ışınla → kaçış imkânsız
+    { const px=g.position.x, pz=g.position.z;
+      if(!(isFinite(px)&&isFinite(pz)&&inSq(px,pz,c,rmax))){ g.position.x=n.hx; g.position.z=n.hz; pickNpcTarget(n); n.pause=Math.min(n.pause,0.2); } }
     if(!(g.position.y>=0 && g.position.y<=0.1)) g.position.y=0;   // Y tabana kilit: NPC uçamaz/batamaz
     if(!g.visible) continue;
     if(near===rec){ // oyuncu yanındayken dur ve ona dön (etkileşim için)
@@ -1631,7 +1646,7 @@ function updateNpcs(dt){
     const dx=n.tx-g.position.x, dz=n.tz-g.position.z, d=Math.hypot(dx,dz);
     if(d<0.25){ n.pause=1.8+Math.random()*3.8; pickNpcTarget(n); continue; }
     const nx=g.position.x+dx/d*n.spd*dt, nz=g.position.z+dz/d*n.spd*dt;
-    if((nx-c[0])**2+(nz-c[1])**2 < rmax*rmax){ g.position.x=nx; g.position.z=nz; }
+    if(inSq(nx,nz,c,rmax)){ g.position.x=nx; g.position.z=nz; }
     else { n.pause=0.5+Math.random()*1.0; pickNpcTarget(n); }
     g.rotation.y=Math.atan2(dx,dz)+Math.PI;   // baş öne (model başı -Z)
     n.ph+=dt*7; const w=Math.sin(n.ph);
@@ -2501,7 +2516,7 @@ function resize(){ renderer.setSize(innerWidth,innerHeight,false); camera.aspect
 addEventListener('resize',resize); resize();
 
 /* ============ BOOT ============ */
-console.log('%cİHYA sürüm: Faz 11.3 — hayvan güvenlik-ağı (groundAnimals) + orphan temizliği','color:#8fce58;font-weight:bold');
+console.log('%cİHYA sürüm: Faz 11.4 — KARE adalar + terrain (dalgalı) + kare clamp','color:#8fce58;font-weight:bold');
 (async()=>{
   let n=0;
   for(const m of MODELS){ await load(m); loadBar.style.width=(++n/MODELS.length*100)+'%'; }
