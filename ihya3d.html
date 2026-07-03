@@ -229,7 +229,7 @@
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.4 (kare ada + terrain)</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.5 (kenar-dönüş + merkez spawn)</div>
 
 <div id="prompt"></div>
 <div id="joy"><div id="knob"></div></div>
@@ -978,11 +978,11 @@ WORLD.islands.forEach((is,i)=>{
 });
 let animals=[];
 function animalReady(def){ const t=S.gather[def.id]; return !t || Date.now()>=t; }
-function pickAnimalTarget(an){ const is=an.is, R=(is.r-2.0)*0.9; an.tx=is.c[0]+(Math.random()*2-1)*R; an.tz=is.c[1]+(Math.random()*2-1)*R; }
+function pickAnimalTarget(an){ const is=an.is, R=((is.r||8)-2.8)*0.9; an.tx=is.c[0]+(Math.random()*2-1)*R; an.tz=is.c[1]+(Math.random()*2-1)*R; }
 function makeAnimal(def){
   const is=WORLD.islands.find(i=>i.id===def.islId);
   const it=instance(def.model);
-  const R0=(is.r-2.0)*0.85, x=is.c[0]+(Math.random()*2-1)*R0, z=is.c[1]+(Math.random()*2-1)*R0;
+  const R0=(is.r-3.0)*0.6, x=is.c[0]+(Math.random()*2-1)*R0, z=is.c[1]+(Math.random()*2-1)*R0;   // merkeze yakın, kesin ada içi
   it.g.position.set(x,0,z); it.g.scale.setScalar(def.scale); it.g.rotation.y=Math.random()*6.28;
   it.g.userData.anIsl=def.islId;   // güvenlik ağı etiketi (groundAnimals her kare bunları tabana/adaya sıkıştırır)
   scene.add(it.g);
@@ -1029,12 +1029,15 @@ function updateAnimals(dt){
     if(!g.visible) continue;
     const L=an.legs;
     if(an.pause>0){ an.pause-=dt; g.position.y*=0.85; restLegs(L); continue; }
+    // KENARA YAKLAŞINCA GERİ DÖN (Suheyb'in çözümü): dolaşma sınırına (kenardan 2.8 içeride) değince
+    // içeriye doğru YENİ yön seç → hayvan hiçbir zaman kenara/suya varmaz, doğal dolaşır
+    const roam=(an.is.r||8)-2.8;
+    if(Math.abs(g.position.x-c[0])>roam || Math.abs(g.position.z-c[1])>roam){
+      pickAnimalTarget(an); restLegs(L); an.pause=0.12+Math.random()*0.25; continue; }
     const dx=an.tx-g.position.x, dz=an.tz-g.position.z, d=Math.hypot(dx,dz);
-    if(d<0.3){ an.pause=1.5+Math.random()*3.5; pickAnimalTarget(an); restLegs(L); continue; }
+    if(d<0.4){ an.pause=1.2+Math.random()*3.2; pickAnimalTarget(an); restLegs(L); continue; }
     const nx=g.position.x+dx/d*an.spd*dt, nz=g.position.z+dz/d*an.spd*dt;
-    // yeni konum KENDİ karesinin içinde mi — değilse dön, yeni hedef seç
-    if(inSq(nx,nz,c,rmax)){ g.position.x=nx; g.position.z=nz; }
-    else { an.pause=0.3+Math.random()*0.8; pickAnimalTarget(an); restLegs(L); continue; }
+    g.position.x=nx; g.position.z=nz;   // hedef zaten iç bölgede; üstteki kare-clamp backstop
     g.rotation.y=Math.atan2(dx,dz)+Math.PI;   // baş öne gelsin (model başı +Y=-Z) — geri geri gitmesin
     an.ph+=dt*8; g.position.y=Math.abs(Math.sin(an.ph))*0.04;
     // tırıs: çapraz bacak çiftleri karşı fazda salınır (FL+BR / FR+BL)
@@ -2516,7 +2519,7 @@ function resize(){ renderer.setSize(innerWidth,innerHeight,false); camera.aspect
 addEventListener('resize',resize); resize();
 
 /* ============ BOOT ============ */
-console.log('%cİHYA sürüm: Faz 11.4 — KARE adalar + terrain (dalgalı) + kare clamp','color:#8fce58;font-weight:bold');
+console.log('%cİHYA sürüm: Faz 11.5 — hayvan kenar-dönüş (steering) + merkez spawn','color:#8fce58;font-weight:bold');
 (async()=>{
   let n=0;
   for(const m of MODELS){ await load(m); loadBar.style.width=(++n/MODELS.length*100)+'%'; }

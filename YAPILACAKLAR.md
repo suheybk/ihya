@@ -158,6 +158,14 @@ Bu oyun manipülasyonla değil, **anlamla** bağ kurar. Kırmızı çizgiler:
 - [x] Test: köşe(7,7) walkable=true, köprü yolu ev→bahçe "11111111" kesintisiz, hayvan kare-clamp
   13/13 y=0, gather/namaz/pazar/vakit-döngüsü regresyonsuz, konsol temiz.
 
+### Faz 11.5 — Hayvan kenar-dönüş (steering) + merkez spawn (2026-07-04, Suheyb)
+- [x] **Kenar-dönüş davranışı** (Suheyb'in çözümü): hayvanlar artık kenara yaklaşınca (kendi
+  karesinin kenarından 2.8 birim içeride) **geri dönüp içeriye doğru yeni yön** seçer. Hedefler
+  iç bölgeden seçilir ((r−2.8)·0.9). Hard-clamp backstop kalır. Doğal dolaşım + kesin kenar koruması.
+- [x] **Merkez spawn**: makeAnimal artık (r−3)·0.6 → hayvanlar merkeze yakın (kesin ada içi) doğar.
+- [x] Test: 1000 karede hiçbir hayvan kenarı geçmedi (worstOverEdge=0), spawn max 2.5 birim merkezden,
+  scanFlyingAnimals=0. Kod kanıtlı doğru; kullanıcının 11.4'te gördüğü kenar-hayvanı steering ile bitti.
+
 ## 📌 3D Modeller ✅ (2026-07-02)
 Prompt listesindeki **36 model** Blender'da üretilip `models/*.glb` olarak eklendi
 (hayvanlar, hurma/dut ağaçları, eşya/pickup, pazar, yapılar, Mescid-i Nebevî, NPC'ler).
