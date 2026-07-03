@@ -166,6 +166,18 @@ Bu oyun manipülasyonla değil, **anlamla** bağ kurar. Kırmızı çizgiler:
 - [x] Test: 1000 karede hiçbir hayvan kenarı geçmedi (worstOverEdge=0), spawn max 2.5 birim merkezden,
   scanFlyingAnimals=0. Kod kanıtlı doğru; kullanıcının 11.4'te gördüğü kenar-hayvanı steering ile bitti.
 
+### Faz 11.6 — Hayvan kaçınma bölgeleri + Tuvalet/Abdest ihtiyacı (2026-07-04, Suheyb)
+- [x] **Hayvan kaçınma**: hayvanlar Mescid'e ([49,-4.4], kare ±2.6) ve **serili seccadeye** (±1.35)
+  giremez. `animalAvoid(x,z)` + `pushOutOfAvoid` (KARE/Chebyshev itme — en büyük eksende dışarı).
+  updateAnimals: adım bölgeye giriyorsa dön; içindeyse dışarı it + yeni hedef; pickAnimalTarget
+  bölge-dışı hedef seçer. Test: cami hayvanı 800 karede mescide 0 kez girdi; seccade üstüne
+  zorlanan hayvan 300 karede 0 kez seccadede kaldı.
+- [x] **Tuvalet ihtiyacı → Abdest tazeleme**: açlık/susuzluk gibi `S.toilet` (0-100, ~24dk dolar,
+  TOILET_RATE 0.07). HUD'da 🚻 barı; toolbar 🚿 abdestBtn (>25'te). Tıkla → `refreshWudu()`:
+  "tuvalet âdâbı" toast (sol/sağ ayak, gufrâneke) + **ABDEST_STEPS 10 detaylı hareket** kılavuzu
+  (openGuide callback'li, finishLesson'a düşmez) → tamamlanınca S.toilet=0 + 2 nûr (temizlik şükrü,
+  "Temizlik imanın yarısıdır" Müslim). openGuide(q,onDone) callback desteği + guideNext çift-tetik guard.
+
 ## 📌 3D Modeller ✅ (2026-07-02)
 Prompt listesindeki **36 model** Blender'da üretilip `models/*.glb` olarak eklendi
 (hayvanlar, hurma/dut ağaçları, eşya/pickup, pazar, yapılar, Mescid-i Nebevî, NPC'ler).

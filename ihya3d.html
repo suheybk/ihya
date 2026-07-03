@@ -215,6 +215,7 @@
 <div id="needs" style="display:none">
   <div class="need"><span>💧</span><div class="nbar"><i id="thirstBar"></i></div></div>
   <div class="need"><span>🍞</span><div class="nbar"><i id="hungerBar"></i></div></div>
+  <div class="need"><span>🚻</span><div class="nbar"><i id="toiletBar"></i></div></div>
 </div>
 
 <div class="toolbar" id="toolbar">
@@ -222,6 +223,7 @@
   <button class="iconbtn" id="fastBtn" title="Oruç" style="display:none">🌙</button>
   <button class="iconbtn" id="drinkBtn" title="Su iç" style="display:none">🥤</button>
   <button class="iconbtn" id="eatBtn" title="Yemek ye" style="display:none">🍽️</button>
+  <button class="iconbtn" id="abdestBtn" title="Tuvalet — abdest tazele" style="display:none">🚿</button>
   <button class="iconbtn" id="ezberBtn" title="Ezber Defteri (sûre & dua)" style="display:none">📖</button>
   <button class="iconbtn" id="kibleBtn" title="Kıble (Mekke yönü)">🧭</button>
   <button class="iconbtn" id="invBtn" title="Dağarcık (envanter)">🎒</button>
@@ -229,7 +231,7 @@
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.5 (kenar-dönüş + merkez spawn)</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.6 (hayvan kaçınma + tuvalet/abdest)</div>
 
 <div id="prompt"></div>
 <div id="joy"><div id="knob"></div></div>
@@ -633,6 +635,7 @@ if(typeof S.mosqueFullDay!=='number') S.mosqueFullDay=-1;
 if(S.mosqueUnlocked===undefined) S.mosqueUnlocked=false; // imam/cemaat sohbeti açıldı mı (KALICI)
 if(typeof S.thirst!=='number') S.thirst=0;   // susuzluk 0..100 (0=tok, oyuncu lehine yavaş biriker)
 if(typeof S.hunger!=='number') S.hunger=0;   // açlık 0..100
+if(typeof S.toilet!=='number') S.toilet=0;   // tuvalet ihtiyacı 0..100 → giderince abdest tazelenir
 if(!S.memorized) S.memorized={};   // KALICI: çocuk ezberi (sûre/dua id → true)
 const save=()=>{ try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){} };
 const today=()=>new Date().toISOString().slice(0,10);
@@ -978,7 +981,24 @@ WORLD.islands.forEach((is,i)=>{
 });
 let animals=[];
 function animalReady(def){ const t=S.gather[def.id]; return !t || Date.now()>=t; }
-function pickAnimalTarget(an){ const is=an.is, R=((is.r||8)-2.8)*0.9; an.tx=is.c[0]+(Math.random()*2-1)*R; an.tz=is.c[1]+(Math.random()*2-1)*R; }
+// Hayvanların GİREMEYECEĞİ yerler: Mescid + serili seccade (kutu bölgeler)
+const MESCID_AVOID={x:49,z:-4.4,r:2.6};
+function animalAvoid(x,z){
+  if(Math.abs(x-MESCID_AVOID.x)<MESCID_AVOID.r && Math.abs(z-MESCID_AVOID.z)<MESCID_AVOID.r) return true;
+  if(S.laidSeccade){ const s=S.laidSeccade; if(Math.abs(x-s.x)<1.35 && Math.abs(z-s.z)<1.35) return true; }
+  return false;
+}
+function pushOutOfAvoid(an){ const g=an.rec.g; let zx,zz,rr;
+  if(Math.abs(g.position.x-MESCID_AVOID.x)<MESCID_AVOID.r && Math.abs(g.position.z-MESCID_AVOID.z)<MESCID_AVOID.r){ zx=MESCID_AVOID.x; zz=MESCID_AVOID.z; rr=MESCID_AVOID.r+0.5; }
+  else if(S.laidSeccade){ zx=S.laidSeccade.x; zz=S.laidSeccade.z; rr=1.6; } else return;
+  const dx=g.position.x-zx, dz=g.position.z-zz;
+  // KARE bölge: en büyük eksende Chebyshev mesafesi rr olacak şekilde dışarı it
+  if(Math.abs(dx)>=Math.abs(dz)) g.position.x=zx+(dx>=0?rr:-rr);
+  else g.position.z=zz+(dz>=0?rr:-rr); }
+function pickAnimalTarget(an){ const is=an.is, R=((is.r||8)-2.8)*0.9;
+  for(let t=0;t<6;t++){ const tx=is.c[0]+(Math.random()*2-1)*R, tz=is.c[1]+(Math.random()*2-1)*R;
+    if(!animalAvoid(tx,tz)){ an.tx=tx; an.tz=tz; return; } }   // Mescid/seccade dışı hedef
+  an.tx=is.c[0]; an.tz=is.c[1]; }
 function makeAnimal(def){
   const is=WORLD.islands.find(i=>i.id===def.islId);
   const it=instance(def.model);
@@ -1034,10 +1054,13 @@ function updateAnimals(dt){
     const roam=(an.is.r||8)-2.8;
     if(Math.abs(g.position.x-c[0])>roam || Math.abs(g.position.z-c[1])>roam){
       pickAnimalTarget(an); restLegs(L); an.pause=0.12+Math.random()*0.25; continue; }
+    // Mescid/seccade bölgesindeyse (ör. seccade üstüne serildi) → dışarı it, yeni hedef
+    if(animalAvoid(g.position.x,g.position.z)){ pushOutOfAvoid(an); pickAnimalTarget(an); restLegs(L); an.pause=0.2; continue; }
     const dx=an.tx-g.position.x, dz=an.tz-g.position.z, d=Math.hypot(dx,dz);
     if(d<0.4){ an.pause=1.2+Math.random()*3.2; pickAnimalTarget(an); restLegs(L); continue; }
     const nx=g.position.x+dx/d*an.spd*dt, nz=g.position.z+dz/d*an.spd*dt;
-    g.position.x=nx; g.position.z=nz;   // hedef zaten iç bölgede; üstteki kare-clamp backstop
+    if(animalAvoid(nx,nz)){ pickAnimalTarget(an); restLegs(L); an.pause=0.15; continue; }   // adım Mescid/seccade'ye giriyor → dön
+    g.position.x=nx; g.position.z=nz;   // hedef zaten iç bölgede + engelsiz; üstteki kare-clamp backstop
     g.rotation.y=Math.atan2(dx,dz)+Math.PI;   // baş öne gelsin (model başı +Y=-Z) — geri geri gitmesin
     an.ph+=dt*8; g.position.y=Math.abs(Math.sin(an.ph))*0.04;
     // tırıs: çapraz bacak çiftleri karşı fazda salınır (FL+BR / FR+BL)
@@ -1374,31 +1397,36 @@ function doFast(){
 }
 
 /* ============ SU/YEMEK İHTİYACI (Faz 9) — nazik, cezalandırmayan (şükür + empati) ============ */
-const THIRST_RATE=0.14, HUNGER_RATE=0.095;   // /sn (susuzluk ~12dk, açlık ~18dk dolar)
-let needsAcc=0, thirstWarned=false, hungerWarned=false;
-function fastingAbstain(){ return fastPhase()==='fasting'; }   // oruçluyken yeme/içme yok (iftara kadar)
+const THIRST_RATE=0.14, HUNGER_RATE=0.095, TOILET_RATE=0.07;   // /sn (susuzluk ~12dk, açlık ~18dk, tuvalet ~24dk dolar)
+let needsAcc=0, thirstWarned=false, hungerWarned=false, toiletWarned=false;
+function fastingAbstain(){ return fastPhase()==='fasting'; }   // oruçluyken yeme/içme yok (iftara kadar) — tuvalet/abdest serbest
 function updateNeeds(dt){
   S.thirst=Math.min(100, S.thirst + THIRST_RATE*dt);
   S.hunger=Math.min(100, S.hunger + HUNGER_RATE*dt);
+  S.toilet=Math.min(100, (S.toilet||0) + TOILET_RATE*dt);
   if(S.thirst>70 && !thirstWarned && !fastingAbstain()){ thirstWarned=true; toast('💧 Susadın — kuyudan su çek, sonra 🥤 ile iç'); }
   if(S.thirst<50) thirstWarned=false;
   if(S.hunger>72 && !hungerWarned && !fastingAbstain()){ hungerWarned=true; toast('🍞 Karnın acıktı — hurma/ekmek topla, 🍽️ ile ye'); }
   if(S.hunger<50) hungerWarned=false;
+  if(S.toilet>70 && !toiletWarned){ toiletWarned=true; toast('🚻 Tuvalet ihtiyacın var — giderince abdestin bozulur, 🚿 ile abdest tazele'); }
+  if(S.toilet<50) toiletWarned=false;
   needsAcc+=dt; if(needsAcc>=0.4){ needsAcc=0; updateNeedsHud(); }
 }
 function updateNeedsHud(){
   const nd=document.getElementById('needs'); if(!nd) return;
-  nd.style.display=(S.thirst>18||S.hunger>18)?'flex':'none';
-  const tb=document.getElementById('thirstBar'), hb=document.getElementById('hungerBar');
+  nd.style.display=(S.thirst>18||S.hunger>18||(S.toilet||0)>18)?'flex':'none';
+  const tb=document.getElementById('thirstBar'), hb=document.getElementById('hungerBar'), ob=document.getElementById('toiletBar');
   if(tb){ tb.style.width=S.thirst.toFixed(0)+'%'; tb.style.background=S.thirst>75?'#e05a5a':(S.thirst>45?'#e0a23e':'#4aa3d8'); }
   if(hb){ hb.style.width=S.hunger.toFixed(0)+'%'; hb.style.background=S.hunger>75?'#e05a5a':(S.hunger>45?'#e0a23e':'#c98a3a'); }
+  if(ob){ const tv=S.toilet||0; ob.style.width=tv.toFixed(0)+'%'; ob.style.background=tv>75?'#e05a5a':(tv>45?'#e0a23e':'#7fb0a0'); }
   updateNeedBtns();
 }
 function foodItem(){ for(const k of FOOD){ if((S.inv[k]||0)>0) return k; } return null; }
 function updateNeedBtns(){
-  const db=document.getElementById('drinkBtn'), eb=document.getElementById('eatBtn'), ab=fastingAbstain();
+  const db=document.getElementById('drinkBtn'), eb=document.getElementById('eatBtn'), pb=document.getElementById('abdestBtn'), ab=fastingAbstain();
   if(db){ const on=!ab && S.thirst>25 && (S.inv.su||0)>0; db.style.display=on?'block':'none'; db.classList.toggle('ready', on&&S.thirst>65); }
   if(eb){ const on=!ab && S.hunger>25 && !!foodItem(); eb.style.display=on?'block':'none'; eb.classList.toggle('ready', on&&S.hunger>65); }
+  if(pb){ const on=(S.toilet||0)>25; pb.style.display=on?'block':'none'; pb.classList.toggle('ready', on&&(S.toilet||0)>65); }
 }
 function drink(){
   if(fastingAbstain()){ toast('🤍 Oruçlusun — iftara kadar sabret (Akşam)'); return; }
@@ -1413,6 +1441,16 @@ function eat(){
   S.inv[k]--; if(S.inv[k]<=0) delete S.inv[k];
   S.hunger=Math.max(0,S.hunger-50); addNur(1); save(); refreshHUD(); if(typeof renderInv==='function') renderInv(); sndChime();
   toast('🍞 '+GOODS[k].nm+' yedin — bismillah, elhamdülillah (+1 nûr şükür)');
+}
+// TUVALET → ABDEST TAZELEME: ihtiyacı gider, abdest bozulur, detaylı abdest hareketlerini göster
+function refreshWudu(){
+  if((S.toilet||0)<=1){ toast('🚻 Şimdilik tuvalet ihtiyacın yok'); return; }
+  toast('🚻 Tuvalet âdâbı: girerken sol ayak+besmele, çıkarken sağ ayak+"gufrâneke". Abdestin bozuldu — tazele.');
+  openGuide({nm:'Abdest Tazele', ic:'💧', steps:ABDEST_STEPS}, ()=>{
+    S.toilet=0; toiletWarned=false;
+    addNur(2); save(); refreshHUD(); updateNeedsHud(); sndChime();
+    setTimeout(()=>{ banner('💧 Abdest tazelendi'); toast('Abdestini tazeledin — "Temizlik imanın yarısıdır." (Müslim) +2 nûr şükür'); },250);
+  });
 }
 
 /* ============ ÇOCUK SÛRE-DUA EZBERİ (Faz 9) — adım adım + sırala testi ============ */
@@ -2221,7 +2259,8 @@ function interact(q){
   if(q.steps && !S.done[q.id] && !S.learned[q.id]){ openGuide(q); return; }  // ilk kez → adım adım öğret
   openSheet(q);
 }
-function openGuide(q){ guideQ=q; guideSteps=q.steps||[]; guideIdx=0;
+let guideDone=null;   // özel tamamlama callback'i (abdest tazeleme gibi) — yoksa finishLesson
+function openGuide(q, onDone){ guideQ=q; guideSteps=q.steps||[]; guideIdx=0; guideDone=onDone||null;
   document.getElementById('gT').textContent=q.nm;
   document.getElementById('guide').classList.add('show'); renderGuide(); }
 function closeGuide(){ document.getElementById('guide').classList.remove('show'); }
@@ -2235,8 +2274,9 @@ function renderGuide(){
   document.getElementById('gNext').textContent=(guideIdx<guideSteps.length-1)?'Sonraki ▶':'Öğrendim ✓';
 }
 function guideNext(){
+  if(!document.getElementById('guide').classList.contains('show')) return;   // kapandıysa çift-tetikleme yok
   if(guideIdx<guideSteps.length-1){ guideIdx++; renderGuide(); beep(560+guideIdx*30,0,0.09,'sine',0.05); }
-  else { const q=guideQ; closeGuide(); finishLesson(q); }
+  else { const q=guideQ, cb=guideDone; guideDone=null; closeGuide(); if(cb) cb(q); else finishLesson(q); }
 }
 function guidePrev(){ if(guideIdx>0){ guideIdx--; renderGuide(); } }
 function finishLesson(q){
@@ -2372,6 +2412,7 @@ document.getElementById('kibleBtn').onclick=()=>showQibla(false);
 document.getElementById('fastBtn').onclick=doFast;
 document.getElementById('drinkBtn').onclick=drink;
 document.getElementById('eatBtn').onclick=eat;
+document.getElementById('abdestBtn').onclick=refreshWudu;
 document.getElementById('ezberBtn').onclick=openEzber;
 document.getElementById('ezberClose').onclick=closeEzber;
 document.getElementById('ezber').addEventListener('click',e=>{ if(e.target.id==='ezber') closeEzber(); });
@@ -2519,7 +2560,7 @@ function resize(){ renderer.setSize(innerWidth,innerHeight,false); camera.aspect
 addEventListener('resize',resize); resize();
 
 /* ============ BOOT ============ */
-console.log('%cİHYA sürüm: Faz 11.5 — hayvan kenar-dönüş (steering) + merkez spawn','color:#8fce58;font-weight:bold');
+console.log('%cİHYA sürüm: Faz 11.6 — hayvan Mescid/seccade kaçınma + tuvalet/abdest tazeleme','color:#8fce58;font-weight:bold');
 (async()=>{
   let n=0;
   for(const m of MODELS){ await load(m); loadBar.style.width=(++n/MODELS.length*100)+'%'; }
@@ -2592,10 +2633,13 @@ console.log('%cİHYA sürüm: Faz 11.5 — hayvan kenar-dönüş (steering) + me
     dayNum:()=>S.dayNum, setDayNum:(n)=>{ S.dayNum=n; save(); },
     fastPhase:()=>fastPhase(), doFast:()=>doFast(),
     fastState:()=>({niyet:S.fastNiyet, done:S.fastDone, day:S.dayNum, dow:dow(), fastingDay:isFastingDay(), mukellef:orucMukellef(), btn:document.getElementById('fastBtn').style.display}),
-    needs:()=>({thirst:+S.thirst.toFixed(1), hunger:+S.hunger.toFixed(1), su:S.inv.su||0, food:foodItem(), drinkBtn:document.getElementById('drinkBtn').style.display, eatBtn:document.getElementById('eatBtn').style.display}),
-    setNeeds:(t,h)=>{ S.thirst=t; S.hunger=h; updateNeedsHud(); return {thirst:S.thirst,hunger:S.hunger}; },
-    stepNeeds:(sec)=>{ updateNeeds(sec); return {thirst:+S.thirst.toFixed(1),hunger:+S.hunger.toFixed(1)}; },
+    needs:()=>({thirst:+S.thirst.toFixed(1), hunger:+S.hunger.toFixed(1), toilet:+(S.toilet||0).toFixed(1), su:S.inv.su||0, food:foodItem(), drinkBtn:document.getElementById('drinkBtn').style.display, eatBtn:document.getElementById('eatBtn').style.display, abdestBtn:document.getElementById('abdestBtn').style.display}),
+    setNeeds:(t,h,to)=>{ S.thirst=t; S.hunger=h; if(to!=null)S.toilet=to; updateNeedsHud(); return {thirst:S.thirst,hunger:S.hunger,toilet:S.toilet}; },
+    stepNeeds:(sec)=>{ updateNeeds(sec); return {thirst:+S.thirst.toFixed(1),hunger:+S.hunger.toFixed(1),toilet:+(S.toilet||0).toFixed(1)}; },
     drinkT:()=>drink(), eatT:()=>eat(),
+    setToilet:(v)=>{ S.toilet=v; updateNeedsHud(); return S.toilet; }, refreshWudu:()=>refreshWudu(),
+    abdestBtnDisp:()=>document.getElementById('abdestBtn').style.display,
+    animalAvoid:(x,z)=>animalAvoid(x,z), mescidAvoid:()=>MESCID_AVOID,
     openEzber:()=>openEzber(), ezOpen:(id)=>window.__ezOpen(id), ezStep:(d)=>window.__ezStep(d), ezPick:(i)=>window.__ezPick(i),
     memorized:()=>Object.assign({},S.memorized), ezberBtnDisp:()=>document.getElementById('ezberBtn').style.display,
     npcs:()=>npcNodes.map(r=>({id:r.def.id,isl:r.def.islId,ready:r.muahat?true:npcReady(r.def),vis:r.g.visible,mesh:r.meshes.length,pos:[Math.round(r.g.position.x*10)/10,Math.round(r.g.position.z*10)/10]})),
