@@ -21,6 +21,8 @@
   .streak{color:#c0491f}.streak b{color:#c0491f}
   /* semâ saati (güneş/ay kavsi) */
   .iconbtn{pointer-events:auto;cursor:pointer;border:none;background:var(--panel);border-radius:14px;padding:8px 11px;box-shadow:0 4px 14px #0002;font-size:16px;line-height:1}
+  .iconbtn.ready{background:linear-gradient(135deg,#ffd27a,#f0a63e);box-shadow:0 0 15px #ffcf6f,0 4px 14px #0003;animation:fastpulse 1.1s ease-in-out infinite}
+  @keyframes fastpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
   .toolbar{position:fixed;right:12px;top:88px;z-index:6;display:flex;flex-direction:column;gap:8px;pointer-events:none}
   .woolhint{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:6;pointer-events:auto;cursor:default;
     display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:800;
@@ -196,6 +198,7 @@
 
 <div class="toolbar" id="toolbar">
   <button class="iconbtn" id="prayBtn" title="Namaz kıl (seccadeni ser)" style="display:none">🧎</button>
+  <button class="iconbtn" id="fastBtn" title="Oruç" style="display:none">🌙</button>
   <button class="iconbtn" id="invBtn" title="Dağarcık (envanter)">🎒</button>
   <button class="iconbtn" id="muteBtn" title="Ses aç/kapat">🔊</button>
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
@@ -579,6 +582,8 @@ if(S.introSeen===undefined) S.introSeen=false;  // Medine hikâye girişi göste
 if(S.muahat===undefined) S.muahat=false;  // KALICI: Ensâr-Muhâcir muâhât kardeşliği kuruldu mu (hikâye)
 if(typeof S.dayNum!=='number') S.dayNum=0;      // oyun-içi gün sayacı (döngü-tabanlı; Cumartesi başlar)
 if(typeof S.streakDay!=='number') S.streakDay=-1;  // istikamet artık gün-sayacına (dayNum) bağlı
+if(typeof S.fastNiyet!=='number') S.fastNiyet=-1;  // oruç niyeti yapılan gün (dayNum) — Pazartesi/Perşembe sünnet
+if(typeof S.fastDone!=='number') S.fastDone=-1;    // orucun iftarla tamamlandığı gün (dayNum)
 const save=()=>{ try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){} };
 const today=()=>new Date().toISOString().slice(0,10);
 const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
@@ -606,7 +611,9 @@ function onNewDay(){
   interactables.forEach(r=>{ if(!r.exam&&!r.gather&&!r.animal&&!r.npc&&!r.muahat&&!r.market&&!r.mosque&&!r.seccadePickup) r.done=false; });
   applyIslandLock(); refreshHUD();
   toast('🌙 Yeni gün doğdu — '+dayName());
-  if(isFriday()) setTimeout(()=>{ banner('🕌 Bugün Cuma'); toast('Öğle vakti gelince Mescid\'ye git, Cuma\'yı cemaatle kıl 🕌'); },1300);
+  if(isFriday()) setTimeout(()=>{ banner('🕌 Bugün Cuma'); toast('Öğle vakti gelince Mescid\'e git, Cuma\'yı cemaatle kıl 🕌'); },1300);
+  if(isFastingDay() && orucMukellef()) setTimeout(()=>{ banner('🌙 Bugün '+dayName()); toast('Sünnet oruç günü — gece/öğleden önce niyet et, Akşam iftar (🌙 düğmesi)'); },1300);
+  updateFastBtn();
 }
 
 /* ============ THREE SETUP ============ */
@@ -684,6 +691,9 @@ function onVakitChange(v){
     setTimeout(()=>toast(cuma?'🕌 Cuma namazı henüz kılınmadı — Mescide git':'🧎 '+(NAMAZ_LABEL[v[1]]||v[1])+' namazı henüz kılınmadı'),1100);
   }
   if(v[1]==='Öğle' && isFriday() && cumaActive()){ setTimeout(()=>{ banner('🕌 Bugün Cuma — Mescide Git'); toast('Cuma namazı vakti: Cami adasına geç, mescide gir, cemaatle kıl 🕌'); sndVakit(); },1900); }
+  // oruç: iftar hatırlatması (Akşam) + buton güncelle
+  if(v[1]==='Akşam' && S.fastNiyet===(S.dayNum||0) && S.fastDone!==(S.dayNum||0)) setTimeout(()=>toast('🌅 Akşam oldu — iftar vakti, orucunu aç (🌅)'),1300);
+  updateFastBtn();
 }
 /* ---- NAMAZ VAKTİ ÇIKIYOR UYARISI ---- */
 const FARZ_VAKIT=['Fecir','Öğle','İkindi','Akşam','Yatsı'];
@@ -1034,7 +1044,7 @@ function prayNamaz(){
   }
   const vn=vakitOf(gameTime)[1];
   // Cuma günü öğle: seccadede/evde kılınmaz — SADECE camide (Mescid)
-  if(vn==='Öğle' && isFriday() && cumaActive()){ toast('🕌 Cuma günü öğle namazı sadece camide kılınır — Mescid\'ye git'); return; }
+  if(vn==='Öğle' && isFriday() && cumaActive()){ toast('🕌 Cuma günü öğle namazı sadece camide kılınır — Mescid\'e git'); return; }
   // kerahat vakti: namaz mekruh
   if(isKerahat(gameTime)){ toast('🕗 Kerahat vakti (güneş doğuş/tepe/batış) — namaz mekruh, biraz bekle'); return; }
   laySeccade(); playAction(1.4);   // seccade serilir (açılma animasyonu), artık yerde
@@ -1089,7 +1099,7 @@ function enterMosque(){
   const ab=document.getElementById('act'); if(ab) ab.style.display='none';
   const pe=document.getElementById('prompt'); if(pe) pe.style.display='none';
   document.getElementById('mosque').classList.add('show');
-  mosqueFade(); renderMosque(); sndVakit(); banner('🕌 Mescid\'ye girdin');
+  mosqueFade(); renderMosque(); sndVakit(); banner('🕌 Mescid\'e girdin');
 }
 function exitMosque(){
   mosqueMode=false; if(mosqueGroup) mosqueGroup.visible=false;
@@ -1141,6 +1151,39 @@ window.__mosqueAct=function(kind){
   save(); refreshHUD(); applyIslandLock(); renderMosque();
 };
 function updateSeccadeBtn(){ const b=document.getElementById('prayBtn'); if(b) b.style.display=S.hasSeccade?'block':'none'; }
+
+/* ============ ORUÇ (Faz 8) — Pazartesi/Perşembe sünnet orucu ============ */
+function isFastingDay(){ const d=dow(); return d===1 || d===4; }   // Pazartesi / Perşembe
+function orucMukellef(){ return !S.profile.set || isAdult(); }     // çocuk oruçla mükellef değil
+function fastPhase(){
+  if(!isFastingDay() || !orucMukellef()) return 'none';
+  const d=S.dayNum||0;
+  if(S.fastDone===d) return 'done';
+  const t=gameTime;
+  if(S.fastNiyet===d) return (t>=0.68) ? 'iftar' : 'fasting';       // Akşam (0.68) → iftar
+  return (t<0.45) ? 'niyet' : 'missed';                             // öğleden önce nafile oruca niyet edilebilir
+}
+function updateFastBtn(){
+  const b=document.getElementById('fastBtn'); if(!b) return;
+  const p=fastPhase();
+  if(p==='none'||p==='done'||p==='missed'){ b.style.display='none'; b.classList.remove('ready'); return; }
+  b.style.display='block';
+  if(p==='niyet'){ b.textContent='🌙'; b.title='Oruca niyet et'; b.classList.remove('ready'); }
+  else if(p==='fasting'){ b.textContent='🤍'; b.title='Oruçlusun — iftar Akşam'; b.classList.remove('ready'); }
+  else if(p==='iftar'){ b.textContent='🌅'; b.title='İftar et'; b.classList.add('ready'); }
+}
+function doFast(){
+  const p=fastPhase(), d=S.dayNum||0;
+  if(p==='none'){ toast('🌙 Bugün sünnet oruç günü değil (Pazartesi/Perşembe)'); return; }
+  if(p==='niyet'){ S.fastNiyet=d; save(); updateFastBtn(); sndChime();
+    banner('🌙 Oruca niyet ettin');
+    setTimeout(()=>toast('Niyet ettin — Fecir\'de oruç başlar, Akşam iftar edersin. Rasûlullah ﷺ Pazartesi-Perşembe oruç tutar; "ameller o günlerde arz olunur, oruçlu olmayı severim." (Tirmizî)'),300); return; }
+  if(p==='fasting'){ toast('🤍 Oruçlusun — Akşam iftar edeceksin. "Oruç bir kalkandır." (Buhârî)'); return; }
+  if(p==='iftar'){ S.fastDone=d; addNur(25); save(); refreshHUD(); updateFastBtn(); sndFanfare();
+    banner('🌅 İftar — orucun kabul olsun');
+    setTimeout(()=>toast('İftar ettin. "Oruçlunun iki sevinci: iftar ve Rabbine kavuşma." (Buhârî) — +25 nûr'),300); return; }
+  if(p==='missed'){ toast('🌙 Bu günün niyet vakti geçti — oruca öğleden önce niyet edilir'); return; }
+}
 // yün → seccade küçük ipucu (köşede)
 function updateWoolHint(){
   const el=document.getElementById('woolHint'); if(!el) return;
@@ -1765,7 +1808,7 @@ function interact(q){
   if(!S.done[q.id] && !questAvailable(q)){ const p=prereqOf(q); toast('🔒 Önce: '+(p?p.nm:'sıradaki adım')); return; }
   // Cuma günü öğle: namaz evde kılınmaz — sadece camide
   if(q.id==='ev_namaz' && !S.done[q.id] && vakitOf(gameTime)[1]==='Öğle' && isFriday() && cumaActive()){
-    toast('🕌 Cuma günü öğle namazı evde değil, camide kılınır — Mescid\'ye git'); return; }
+    toast('🕌 Cuma günü öğle namazı evde değil, camide kılınır — Mescid\'e git'); return; }
   if(q.steps && !S.done[q.id] && !S.learned[q.id]){ openGuide(q); return; }  // ilk kez → adım adım öğret
   openSheet(q);
 }
@@ -1916,6 +1959,7 @@ document.getElementById('invBtn').onclick=openInv;
 document.getElementById('invClose').onclick=closeInv;
 document.getElementById('inv').addEventListener('click',e=>{ if(e.target.id==='inv') closeInv(); });
 document.getElementById('prayBtn').onclick=prayNamaz;
+document.getElementById('fastBtn').onclick=doFast;
 document.getElementById('woolHint').onclick=()=>{ if((S.inv.yun||0)>=SECCADE_YUN && !S.hasSeccade && !S.laidSeccade) craftSeccade(); };
 document.getElementById('mktClose').onclick=closeMarket;
 document.getElementById('market').addEventListener('click',e=>{ if(e.target.id==='market') closeMarket(); });
@@ -1939,6 +1983,7 @@ function refreshHUD(){
   const sp=document.getElementById('streakPill');
   if(sp){ if(S.streak>0){ sp.style.display='flex'; sp.innerHTML='🔥 <b>'+S.streak+'</b>'; } else sp.style.display='none'; }
   if(typeof updateWoolHint==='function') updateWoolHint();
+  if(typeof updateFastBtn==='function') updateFastBtn();
 }
 
 /* ============ LOOP ============ */
@@ -2015,7 +2060,7 @@ function tick(){
       promptEl.textContent = near.seccadePickup
         ? '🧎 Seccadeni al'
         : near.mosque
-        ? '🕌 Mescid\'ye gir'
+        ? '🕌 Mescid\'e gir'
         : near.muahat
         ? ('🤝 '+near.q.nm)
         : near.npc
@@ -2059,7 +2104,7 @@ addEventListener('resize',resize); resize();
   // istikamet: son tamamlanan gün ne bu gün ne dün ise (dayNum) zincir kırılmış → sıfırla
   if(S.streakDay>=0 && S.streakDay < (S.dayNum||0)-1){ S.streak=0; save(); }
   buildWorld(); applyHayir(); refreshHUD(); applyIslandLock();
-  updateSeccadeBtn(); checkZekat(); updateWoolHint();
+  updateSeccadeBtn(); checkZekat(); updateWoolHint(); updateFastBtn();
   if(S.laidSeccade) placeLaidSeccade(S.laidSeccade.x, S.laidSeccade.z, S.laidSeccade.ry, false);  // önceki serili seccade yerinde kalsın
   document.getElementById('load').style.display='none';
   if(!S.introSeen){ S.introSeen=true; save();
@@ -2109,6 +2154,8 @@ addEventListener('resize',resize); resize();
     mosqueState:()=>({mode:mosqueMode, cumaDone:S.cumaDone, sat:S.mosqueSat, interiorNodes:mosqueGroup?mosqueGroup.children.length:0}),
     obstacles:()=>OBSTACLES.length, blocked:(x,z)=>blocked(x,z),
     dayNum:()=>S.dayNum, setDayNum:(n)=>{ S.dayNum=n; save(); },
+    fastPhase:()=>fastPhase(), doFast:()=>doFast(),
+    fastState:()=>({niyet:S.fastNiyet, done:S.fastDone, day:S.dayNum, dow:dow(), fastingDay:isFastingDay(), mukellef:orucMukellef(), btn:document.getElementById('fastBtn').style.display}),
     npcs:()=>npcNodes.map(r=>({id:r.def.id,isl:r.def.islId,ready:r.muahat?true:npcReady(r.def),vis:r.g.visible,mesh:r.meshes.length,pos:[Math.round(r.g.position.x*10)/10,Math.round(r.g.position.z*10)/10]})),
     giveNpc:(id)=>{ const r=npcNodes.find(x=>x.def.id===id); if(r) doGiveHayir(r); return r?{food:foodCount()}:null; },
     stepNpcs:(n)=>{ for(let i=0;i<(n||20);i++) updateNpcs(0.05); return npcWander.map(w=>[w.rec.def.id,Math.round(w.rec.g.position.x*10)/10,Math.round(w.rec.g.position.z*10)/10]); },

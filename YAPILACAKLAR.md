@@ -86,7 +86,14 @@ Bu oyun manipülasyonla değil, **anlamla** bağ kurar. Kırmızı çizgiler:
 - [x] **Cuma günü öğle: sadece camide** (seccade + ev namazı bloke). Camiye gir → **Cuma namazı + hutbe** (+30), diğer vakit **cemaat namazı** (+12), her vakit **sessizce otur/imamı dinle** (+3)
 - [x] **Mescide giriş**: kamera iç mekâna zoom + gerçek 3B iç mekân (mihrap, kandiller, imam, cemaat safları), fade geçiş
 - [x] **Çarpışma**: ağaç/bina/pazar katı engel — etrafından dolan, etkileşimle mescide gir
-- [x] **Hayvan yok-olma fix** (`frustumCulled=false`) + hayvan/NPC ada içinde kalır (margin sıkılaştırıldı)
+- [x] **Hayvan yok-olma fix** (`frustumCulled=false`) + hayvan/NPC ada içinde kalır (kendi adasına tam-konum kısıtı + self-heal)
+- [x] Rötuş (Suheyb geri bildirimi): bina **jenerik `mosque`** (Mescid-i Nebevî sonra); "Mescid" ismi; deve/hayvan ada-dışı kaçış kesin çözüldü
+
+### Faz 8 — Oruç (2026-07-03)
+- [x] **Pazartesi/Perşembe sünnet orucu**: niyet (gece/öğleden önce) → gündüz oruç → **Akşam iftar** (+25 nûr), takvim/vakit sistemine bağlı
+- [x] Toolbar'da bağlamsal **🌙/🤍/🌅 oruç düğmesi** (niyet/oruçlu/iftar), iftar parıltılı; oruç günü değilse gizli
+- [x] Delil: "ameller Pazartesi-Perşembe arz olunur, oruçlu olmayı severim" (Tirmizî), "oruç kalkandır" (Buhârî), iftar sevinci (Buhârî)
+- [x] Mükellefiyet: yetişkine (bâliğ) özel; çocukta gizli (çocuk sûre-dua odaklı kalır)
 
 ## 📌 3D Modeller ✅ (2026-07-02)
 Prompt listesindeki **36 model** Blender'da üretilip `models/*.glb` olarak eklendi
