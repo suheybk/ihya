@@ -1111,7 +1111,7 @@ const NPC_DEFS=[
 let npcNodes=[], npcWander=[];
 function npcReady(def){ const t=S.gather['npc_'+def.id]; return !t || Date.now()>=t; }
 function makeNpc(def){
-  const it=instance(def.model); it.g.position.set(def.pos[0],0,def.pos[2]); it.g.rotation.y=Math.PI; it.g.scale.setScalar(def.scale||1); scene.add(it.g);
+  const it=instance(def.model); it.g.position.set(def.pos[0],0,def.pos[2]); it.g.rotation.order='YXZ'; it.g.rotation.y=Math.PI; it.g.scale.setScalar(def.scale||1); scene.add(it.g);
   const rec={ q:{id:'npc_'+def.id, npc:true, def, pos:def.pos.slice(), nm:def.nm, ic:def.ic}, g:it.g, meshes:it.meshes, npc:true, def, islId:def.islId };
   interactables.push(rec); npcNodes.push(rec);
   const is=WORLD.islands.find(i=>i.id===def.islId);
@@ -1121,21 +1121,27 @@ function makeNpc(def){
 function buildNpcs(){ npcNodes=[]; npcWander=[]; for(const d of NPC_DEFS) makeNpc(d); makeMuahat(); }
 // NPC'ler evlerinin/köşelerinin çevresinde nazikçe dolaşır (Medine sokakları canlansın)
 function pickNpcTarget(n){ const a=Math.random()*6.283, r=0.8+Math.random()*n.range; n.tx=n.hx+Math.cos(a)*r; n.tz=n.hz+Math.sin(a)*r; }
+// cübbeli figüre yakışan yürüyüş: adım zıplaması + yana salınım (waddle) + hafif öne eğilme.
+// dururken/etkileşimde tilt'ler 0'a döner. (bacaklar cübbe altında gizli → uzuv ayrımı yerine gövde animasyonu)
+function npcRest(g,k){ g.position.y*=0.85; g.rotation.x+=-g.rotation.x*k; g.rotation.z+=-g.rotation.z*k; }
 function updateNpcs(dt){
   for(const n of npcWander){
     const rec=n.rec, g=rec.g; if(!g.visible) continue;
     if(near===rec){ // oyuncu yanındayken dur ve ona dön (etkileşim için)
       g.rotation.y=Math.atan2(player.position.x-g.position.x, player.position.z-g.position.z);
-      g.position.y*=0.85; rec.q.pos[0]=g.position.x; rec.q.pos[2]=g.position.z; continue;
+      npcRest(g,0.2); rec.q.pos[0]=g.position.x; rec.q.pos[2]=g.position.z; continue;
     }
-    if(n.pause>0){ n.pause-=dt; g.position.y*=0.85; continue; }
+    if(n.pause>0){ n.pause-=dt; npcRest(g,0.15); continue; }
     const dx=n.tx-g.position.x, dz=n.tz-g.position.z, d=Math.hypot(dx,dz);
     if(d<0.25){ n.pause=1.8+Math.random()*3.8; pickNpcTarget(n); continue; }
     const nx=g.position.x+dx/d*n.spd*dt, nz=g.position.z+dz/d*n.spd*dt;
     if(inIsland(nx,g.position.z,0.8)) g.position.x=nx;
     if(inIsland(g.position.x,nz,0.8)) g.position.z=nz;
     g.rotation.y=Math.atan2(dx,dz)+Math.PI;   // baş öne (model başı -Z)
-    n.ph+=dt*7; g.position.y=Math.abs(Math.sin(n.ph))*0.035;
+    n.ph+=dt*7; const w=Math.sin(n.ph);
+    g.position.y=Math.abs(w)*0.045;                    // adım zıplaması
+    g.rotation.z=w*0.055;                              // yana salınım (waddle, facing'e göre)
+    g.rotation.x=0.05+Math.abs(Math.cos(n.ph))*0.025;  // hafif öne eğilme + tempo
     rec.q.pos[0]=g.position.x; rec.q.pos[2]=g.position.z;
   }
 }
@@ -1161,7 +1167,7 @@ const MUAHAT={ id:'muahat', model:'neighbor', islId:'mahalle', pos:[29,0,3.6], s
   nm:'Muâhât — Kardeşlik Ahdi', ic:'🤝' };
 let muahatRec=null;
 function makeMuahat(){
-  const it=instance(MUAHAT.model); it.g.position.set(MUAHAT.pos[0],0,MUAHAT.pos[2]); it.g.rotation.y=Math.PI; it.g.scale.setScalar(MUAHAT.scale); scene.add(it.g);
+  const it=instance(MUAHAT.model); it.g.position.set(MUAHAT.pos[0],0,MUAHAT.pos[2]); it.g.rotation.order='YXZ'; it.g.rotation.y=Math.PI; it.g.scale.setScalar(MUAHAT.scale); scene.add(it.g);
   muahatRec={ q:{id:'muahat', muahat:true, pos:MUAHAT.pos.slice(), nm:MUAHAT.nm, ic:MUAHAT.ic}, g:it.g, meshes:it.meshes, muahat:true, def:MUAHAT, islId:'mahalle' };
   interactables.push(muahatRec); npcNodes.push(muahatRec);
   const is=WORLD.islands.find(i=>i.id==='mahalle');

@@ -71,6 +71,7 @@ Bu oyun manipülasyonla değil, **anlamla** bağ kurar. Kırmızı çizgiler:
 
 ### Faz 6 — NPC'ler, Ses, Cila
 - [x] NPC'ler evleri/köşeleri çevresinde nazikçe **dolaşır** (yetim/komşu/misafir + muâhât); oyuncu yaklaşınca durup ona döner
+- [x] NPC **yürüyüş animasyonu**: cübbeli figüre yakışan adım zıplaması + yana salınım (waddle) + öne eğilme (YXZ Euler, facing-farkında); dururken sıfırlanır — bacaklar cübbe altında olduğundan uzuv ayrımı yerine gövde animasyonu
 - [x] **Muâhât** (Ensâr–Muhâcir kardeşliği) hikâye görevi: ilk kez sîret + nûr, sonrası selâm; mahalle kilitliyse guard
 - [x] **Hayvan sesleri** (koyun/keçi/deve, perde kayışı + vibrato) ve **pazar uğultusu** (Sûk yakınında bandpass gürültü + insan uğultusu) — yakınlığa göre çalar
 - [x] Ada açılınca kısa **sîret/hikâye** satırı (Hicret → hurmalık → muâhât → mescid → sûk akışı)
