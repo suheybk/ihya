@@ -70,9 +70,12 @@ Bu oyun manipülasyonla değil, **anlamla** bağ kurar. Kırmızı çizgiler:
 - [ ] **Mescid-i Nebevî** modeli (kerpiç + hurma direkleri) mevcut jenerik camiyle değişir
 
 ### Faz 6 — NPC'ler, Ses, Cila
-- [ ] NPC'ler: yetim çocuk, komşu (ensâr), tüccar, çoban, muhâcir — basit dolaşan karakterler
-- [ ] Hayvan sesleri (koyun/deve), pazar uğultusu ambient
-- [ ] Genel denge ve sadelik gözden geçirmesi (bağımlılık ilkelerine sadâkat)
+- [x] NPC'ler evleri/köşeleri çevresinde nazikçe **dolaşır** (yetim/komşu/misafir + muâhât); oyuncu yaklaşınca durup ona döner
+- [x] **Muâhât** (Ensâr–Muhâcir kardeşliği) hikâye görevi: ilk kez sîret + nûr, sonrası selâm; mahalle kilitliyse guard
+- [x] **Hayvan sesleri** (koyun/keçi/deve, perde kayışı + vibrato) ve **pazar uğultusu** (Sûk yakınında bandpass gürültü + insan uğultusu) — yakınlığa göre çalar
+- [x] Ada açılınca kısa **sîret/hikâye** satırı (Hicret → hurmalık → muâhât → mescid → sûk akışı)
+- [x] Sadelik ilkelerine sadâkat: yapay sayaç yok, sesler nazik, hikâye anlam odaklı
+- [ ] (İLERİDE — Blender) Hayvan/deve **yürüme animasyonu**: uzuv-ayrımlı re-export + prosedürel bacak salınımı
 
 ## 📌 3D Modeller ✅ (2026-07-02)
 Prompt listesindeki **36 model** Blender'da üretilip `models/*.glb` olarak eklendi

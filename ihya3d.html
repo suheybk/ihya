@@ -564,6 +564,7 @@ if(S.hasSeccade===undefined) S.hasSeccade=false;  // yünden örülen seccade (y
 if(S.laidSeccade===undefined) S.laidSeccade=null;  // yere serili seccade {x,z,ry} — alınmazsa kalır
 if(!S.profile) S.profile={ set:false, ageGroup:null, gender:null, quran:null };  // kişisel mükellefiyet profili
 if(S.introSeen===undefined) S.introSeen=false;  // Medine hikâye girişi gösterildi mi   // KALICI: bir dersi ilk kez adım adım öğrenince işaretlenir (günlük sıfırlamadan etkilenmez)
+if(S.muahat===undefined) S.muahat=false;  // KALICI: Ensâr-Muhâcir muâhât kardeşliği kuruldu mu (hikâye)
 const save=()=>{ try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){} };
 const today=()=>new Date().toISOString().slice(0,10);
 const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
@@ -802,7 +803,7 @@ function applyIslandLock(){
   }
   for(const b of WORLD.bridges){ const open=bridgeOpen(b);
     (b.deco||[]).forEach(x=>x.m.material.color.copy(open?x.orig:x.gray)); }
-  for(const r of interactables){ if(r.exam||r.gather||r.animal||r.market||r.npc||r.seccadePickup) continue; const u=isUnlocked(questIslandId(r.q)); setAlive(r.meshes, u && r.done); }
+  for(const r of interactables){ if(r.exam||r.gather||r.animal||r.market||r.npc||r.muahat||r.seccadePickup) continue; const u=isUnlocked(questIslandId(r.q)); setAlive(r.meshes, u && r.done); }
   updateExamNodes();
   for(const rec of gatherNodes){ rec.g.visible=isUnlocked(rec.def.islId); }
   for(const an of animals){ an.rec.g.visible=isUnlocked(an.def.islId); }
@@ -1098,14 +1099,37 @@ const NPC_DEFS=[
   {id:'misafir1', model:'traveler', islId:'sehir',   pos:[63,0,-4.6], need:2, nur:14, cd:28000, scale:1.0,
    nm:'Misafiri ağırla',    ic:'🧳', ref:'"Allah\'a ve âhiret gününe iman eden misafirine ikram etsin." (Buhârî, Edeb 85)'},
 ];
-let npcNodes=[];
+let npcNodes=[], npcWander=[];
 function npcReady(def){ const t=S.gather['npc_'+def.id]; return !t || Date.now()>=t; }
 function makeNpc(def){
   const it=instance(def.model); it.g.position.set(def.pos[0],0,def.pos[2]); it.g.rotation.y=Math.PI; it.g.scale.setScalar(def.scale||1); scene.add(it.g);
-  const rec={ q:{id:'npc_'+def.id, npc:true, def, pos:def.pos, nm:def.nm, ic:def.ic}, g:it.g, meshes:it.meshes, npc:true, def, islId:def.islId };
-  interactables.push(rec); npcNodes.push(rec); return rec;
+  const rec={ q:{id:'npc_'+def.id, npc:true, def, pos:def.pos.slice(), nm:def.nm, ic:def.ic}, g:it.g, meshes:it.meshes, npc:true, def, islId:def.islId };
+  interactables.push(rec); npcNodes.push(rec);
+  const is=WORLD.islands.find(i=>i.id===def.islId);
+  npcWander.push({rec, is, hx:def.pos[0], hz:def.pos[2], tx:def.pos[0], tz:def.pos[2], range:def.range||2.4, spd:def.spd||0.8, pause:1+Math.random()*3, ph:Math.random()*6.28});
+  return rec;
 }
-function buildNpcs(){ npcNodes=[]; for(const d of NPC_DEFS) makeNpc(d); }
+function buildNpcs(){ npcNodes=[]; npcWander=[]; for(const d of NPC_DEFS) makeNpc(d); makeMuahat(); }
+// NPC'ler evlerinin/köşelerinin çevresinde nazikçe dolaşır (Medine sokakları canlansın)
+function pickNpcTarget(n){ const a=Math.random()*6.283, r=0.8+Math.random()*n.range; n.tx=n.hx+Math.cos(a)*r; n.tz=n.hz+Math.sin(a)*r; }
+function updateNpcs(dt){
+  for(const n of npcWander){
+    const rec=n.rec, g=rec.g; if(!g.visible) continue;
+    if(near===rec){ // oyuncu yanındayken dur ve ona dön (etkileşim için)
+      g.rotation.y=Math.atan2(player.position.x-g.position.x, player.position.z-g.position.z);
+      g.position.y*=0.85; rec.q.pos[0]=g.position.x; rec.q.pos[2]=g.position.z; continue;
+    }
+    if(n.pause>0){ n.pause-=dt; g.position.y*=0.85; continue; }
+    const dx=n.tx-g.position.x, dz=n.tz-g.position.z, d=Math.hypot(dx,dz);
+    if(d<0.25){ n.pause=1.8+Math.random()*3.8; pickNpcTarget(n); continue; }
+    const nx=g.position.x+dx/d*n.spd*dt, nz=g.position.z+dz/d*n.spd*dt;
+    if(inIsland(nx,g.position.z,0.8)) g.position.x=nx;
+    if(inIsland(g.position.x,nz,0.8)) g.position.z=nz;
+    g.rotation.y=Math.atan2(dx,dz)+Math.PI;   // baş öne (model başı -Z)
+    n.ph+=dt*7; g.position.y=Math.abs(Math.sin(n.ph))*0.035;
+    rec.q.pos[0]=g.position.x; rec.q.pos[2]=g.position.z;
+  }
+}
 function doGiveHayir(rec){
   const def=rec.def, item=def.needItem;
   if(!isUnlocked(def.islId)){ toast('🔒 Burası henüz açılmadı'); return; }
@@ -1120,6 +1144,35 @@ function doGiveHayir(rec){
   banner(def.ic+' Hayrın kabul olsun');
   toast('+'+def.nur+' nûr — '+def.nm+' (−'+def.need+' '+(item?GOODS[item].ic+' '+GOODS[item].nm:'yiyecek')+')');
   setTimeout(()=>toast(def.ref),1500);
+}
+
+/* ============ MUÂHÂT — Ensâr-Muhâcir kardeşliği (Faz 6: hikâye) ============ */
+// Medine'nin kalbi: Rasûlullah ﷺ her muhâciri bir ensâr ile kardeş ilân etti.
+const MUAHAT={ id:'muahat', model:'neighbor', islId:'mahalle', pos:[29,0,3.6], scale:1.06,
+  nm:'Muâhât — Kardeşlik Ahdi', ic:'🤝' };
+let muahatRec=null;
+function makeMuahat(){
+  const it=instance(MUAHAT.model); it.g.position.set(MUAHAT.pos[0],0,MUAHAT.pos[2]); it.g.rotation.y=Math.PI; it.g.scale.setScalar(MUAHAT.scale); scene.add(it.g);
+  muahatRec={ q:{id:'muahat', muahat:true, pos:MUAHAT.pos.slice(), nm:MUAHAT.nm, ic:MUAHAT.ic}, g:it.g, meshes:it.meshes, muahat:true, def:MUAHAT, islId:'mahalle' };
+  interactables.push(muahatRec); npcNodes.push(muahatRec);
+  const is=WORLD.islands.find(i=>i.id==='mahalle');
+  npcWander.push({rec:muahatRec, is, hx:MUAHAT.pos[0], hz:MUAHAT.pos[2], tx:MUAHAT.pos[0], tz:MUAHAT.pos[2], range:2.0, spd:0.7, pause:1+Math.random()*3, ph:Math.random()*6.28});
+  return muahatRec;
+}
+function doMuahat(rec){
+  if(!isUnlocked('mahalle')){ toast('🔒 Burası henüz açılmadı'); return; }
+  rec.g.rotation.y=Math.atan2(player.position.x-rec.g.position.x, player.position.z-rec.g.position.z);
+  facePlayer(rec.g.position); playAction();
+  if(!S.muahat){
+    S.muahat=true; addNur(25); save(); refreshHUD(); sndFanfare();
+    banner('🤝 Muâhât — Kardeşlik Ahdi');
+    setTimeout(()=>toast('Rasûlullah ﷺ Medine\'de her muhâciri bir ensâr ile kardeş ilân etti; ensâr, malını ve evini gönülden paylaştı.'),1500);
+    setTimeout(()=>toast('Sa\'d b. Rebî\', malının yarısını Abdurrahman b. Avf\'a teklif etti. O ise "Bana pazarın yolunu göster" dedi — kesb-i helâli seçti. (Buhârî, Menâkıbü\'l-Ensâr 3)'),4400);
+    setTimeout(()=>banner('✦ +25 nûr — Ensâr kardeşin oldu'),7600);
+    return;
+  }
+  sndChime();
+  toast('🤝 Ensâr kardeşin seni selâmlıyor: "Rızkını pazarda helâlden ara, kazancından infak et — kardeşlik paylaşmaktır."');
 }
 function startProfile(){
   S.profile={ set:true, ageGroup:profSel.ageGroup, gender:profSel.gender, quran:profSel.quran };
@@ -1471,6 +1524,40 @@ function startAmbient(){ if(ambientOn||!audio())return; ambientOn=true; const ac
       setTimeout(amb, 4200+Math.random()*7500); }
   })();
 }
+/* ---- Faz 6: hayvan sesleri + pazar uğultusu (yakınlığa göre) ---- */
+// perde kayışı + hafif vibrato ile "canlı" ses (hayvan böğürtüsü)
+function voice(f0,f1,dur,type,gain,vib){ if(!audio()||muted)return; const t=AC.currentTime;
+  const o=AC.createOscillator(), g=AC.createGain(); o.type=type||'sawtooth';
+  o.frequency.setValueAtTime(f0,t); o.frequency.linearRampToValueAtTime(f1,t+dur);
+  if(vib){ const lfo=AC.createOscillator(), la=AC.createGain(); lfo.frequency.value=vib; la.gain.value=f0*0.03; lfo.connect(la); la.connect(o.frequency); lfo.start(t); lfo.stop(t+dur+0.05); }
+  g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(gain||0.05,t+0.05);
+  g.gain.setValueAtTime(gain||0.05,t+dur*0.6); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g); g.connect(masterGain||AC.destination); o.start(t); o.stop(t+dur+0.05); }
+function sndSheep(){ voice(372,300,0.55,'sawtooth',0.045,11); }
+function sndGoat(){  voice(510,432,0.40,'square',  0.034,14); }
+function sndCamel(){ voice(150,108,0.95,'sawtooth',0.05,7); }
+function sndMarket(){ if(!audio()||muted)return; const ac=AC, t=ac.currentTime;
+  const buf=ac.createBuffer(1,Math.floor(ac.sampleRate*0.9),ac.sampleRate), d=buf.getChannelData(0); let last=0;
+  for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; last=(last+0.03*w)/1.03; d[i]=last*2.4; }
+  const src=ac.createBufferSource(); src.buffer=buf;
+  const bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=520; bp.Q.value=0.8;
+  const g=ac.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.04,t+0.2); g.gain.linearRampToValueAtTime(0.0001,t+0.85);
+  src.connect(bp); bp.connect(g); g.connect(masterGain||ac.destination); src.start(t);
+  if(Math.random()<0.5) voice(180+Math.random()*60,158,0.5,'sawtooth',0.02,5); }   // hafif insan uğultusu
+let sceneAmbAcc=0, sceneAmbNext=2.6;
+function updateSceneAmbient(dt){
+  if(!ambientOn||muted||!player) return;
+  sceneAmbAcc+=dt; if(sceneAmbAcc<sceneAmbNext) return;
+  sceneAmbAcc=0; sceneAmbNext=2.4+Math.random()*3.4;
+  const px=player.position.x, pz=player.position.z;
+  // pazar uğultusu (Sûk yakınında)
+  if(marketRec && marketRec.g.visible){ const dM=Math.hypot(px-MARKET_POS.pos[0],pz-MARKET_POS.pos[2]);
+    if(dM<9 && Math.random()<0.6){ sndMarket(); return; } }
+  // en yakın görünür hayvanın sesi
+  let best=null,bd=8.5;
+  for(const an of animals){ const g=an.rec.g; if(!g.visible) continue; const dd=Math.hypot(px-g.position.x,pz-g.position.z); if(dd<bd){ bd=dd; best=an; } }
+  if(best && Math.random()<0.7){ const m=best.def.model; if(m==='sheep') sndSheep(); else if(m==='goat') sndGoat(); else sndCamel(); }
+}
 
 /* ---- KUTLAMA (parıltı patlaması) ---- */
 const particles=[];
@@ -1563,13 +1650,21 @@ function doQuest(){
   if(!was) closeSheet(); else openSheet(curQ);
 }
 /* ---- İMTİHAN sonucu: geçince fetih, kalınca dersler sıfırlanabilir ---- */
+// Faz 6: ada açılınca kısa sîret/hikâye satırı (Hicret → Medine kuruluşu akışı)
+const STORY={
+  bahce:'🌱 Muhâcirler Medine\'nin çorak toprağını hurmalıklarla şenlendirdi — çalış, hasat et, kesb-i helâlle geçin.',
+  mahalle:'🤝 Ensâr, muhâcir kardeşlerini evlerine aldı. Mahallede muâhât kardeşini bul (🤝), komşuyu ve yetimi gözet.',
+  cami:'🕌 Mescid-i Nebevî yükseldi; Suffa ehli ilimle meşgul. İlmini artır, cemaate koş.',
+  sehir:'🏙️ Medine bir şehir oldu: Sûk kuruldu, adalet yayıldı. Helâlinden kazan, kazancından infak et.',
+};
 function passExam(islId){
   const before=WORLD.islands.map(i=>isUnlocked(i.id));
   const firstConquer=!S.conquered[islId];
   S.conquered[islId]=true; addNur(30); save();
   const after=WORLD.islands.map(i=>isUnlocked(i.id));
   applyIslandLock(); refreshHUD();
-  WORLD.islands.forEach((is,idx)=>{ if(!before[idx]&&after[idx]) setTimeout(()=>toast('🔓 '+is.name+' açıldı!'),1900); });
+  WORLD.islands.forEach((is,idx)=>{ if(!before[idx]&&after[idx]){ setTimeout(()=>toast('🔓 '+is.name+' açıldı!'),1900);
+    if(STORY[is.id]) setTimeout(()=>toast(STORY[is.id]),3400); } });
   if(firstConquer){ celebrate(islId);
     if(WORLD.islands.every(i=>S.conquered[i.id])){ setTimeout(()=>banner('☾ Dünya İhyâ Edildi ☾'),2900); setTimeout(showEnd,4700); } }
   else { sndFanfare(); const is=WORLD.islands.find(i=>i.id===islId); toast('✓ '+(is?is.name:'')+' yine fethedildi'); }
@@ -1660,6 +1755,7 @@ document.getElementById('mktClose').onclick=closeMarket;
 document.getElementById('market').addEventListener('click',e=>{ if(e.target.id==='market') closeMarket(); });
 actBtn.onclick=()=>{ if(!near) return;
   if(near.seccadePickup){ pickupSeccade(); return; }
+  if(near.muahat){ doMuahat(near); return; }
   if(near.npc){ doGiveHayir(near); return; }
   if(near.market){ openMarket(); return; }
   if(near.animal){ doTend(near); return; }
@@ -1732,6 +1828,7 @@ function tick(){
     if(best!==near){ near=best;
       if(near){ actBtn.style.display='block';
         if(near.seccadePickup){ actBtn.textContent='🧎 Seccadeni al'; }
+        else if(near.muahat){ actBtn.textContent = S.muahat ? '🤝 Selâm ver' : '🤝 Kardeş ol'; }
         else if(near.npc){ actBtn.textContent = npcReady(near.def) ? (near.q.ic+' Ver') : '🙏 Verdin'; }
         else if(near.market){ actBtn.textContent='🛒 Pazar'; }
         else if(near.animal){ actBtn.textContent = animalReady(near.def) ? (near.q.ic+' '+near.def.label) : '🐑 Dinleniyor'; }
@@ -1746,6 +1843,8 @@ function tick(){
       promptEl.style.display='block';
       promptEl.textContent = near.seccadePickup
         ? '🧎 Seccadeni al'
+        : near.muahat
+        ? ('🤝 '+near.q.nm)
         : near.npc
         ? (near.q.ic+' '+near.q.nm+(npcReady(near.def)?'':' — verdin'))
         : near.market
@@ -1763,12 +1862,14 @@ function tick(){
   }
   // sıradaki yapılabilir görev parıldasın (yol gösterir)
   const glow=0.28+0.22*Math.sin(clock.elapsedTime*3);
-  for(const r of interactables){ if(r.gather||r.animal||r.market||r.npc||r.seccadePickup) continue; const on=!r.done && questAvailable(r.q);
+  for(const r of interactables){ if(r.gather||r.animal||r.market||r.npc||r.muahat||r.seccadePickup) continue; const on=!r.done && questAvailable(r.q);
     for(const x of r.meshes){ if(x.m.material.emissive){ x.m.material.emissive.setHex(on?0xffcf55:0x000000); x.m.material.emissiveIntensity=on?glow:0; } } }
   if(particles.length) updateParticles(dt);
   if(examNodes.length) animateExamNodes(dt, clock.elapsedTime);
   animateAtmosphere(dt, clock.elapsedTime);
   if(animals.length) updateAnimals(dt);
+  if(npcWander.length) updateNpcs(dt);
+  updateSceneAmbient(dt);
   renderer.render(scene,camera);
   requestAnimationFrame(tick);
 }
@@ -1832,8 +1933,14 @@ addEventListener('resize',resize); resize();
     openMarket:()=>{ marketRec&&(marketRec.g.visible=true); document.getElementById('market').classList.add('show'); renderMarket(); },
     sell:(k,all)=>sellGood(k,all), dirhem:()=>S.dirhem||0, prices:()=>PRICES,
     marketBuilt:()=>!!marketRec,
-    npcs:()=>npcNodes.map(r=>({id:r.def.id,isl:r.def.islId,ready:npcReady(r.def),vis:r.g.visible,mesh:r.meshes.length})),
+    npcs:()=>npcNodes.map(r=>({id:r.def.id,isl:r.def.islId,ready:r.muahat?true:npcReady(r.def),vis:r.g.visible,mesh:r.meshes.length,pos:[Math.round(r.g.position.x*10)/10,Math.round(r.g.position.z*10)/10]})),
     giveNpc:(id)=>{ const r=npcNodes.find(x=>x.def.id===id); if(r) doGiveHayir(r); return r?{food:foodCount()}:null; },
+    stepNpcs:(n)=>{ for(let i=0;i<(n||20);i++) updateNpcs(0.05); return npcWander.map(w=>[w.rec.def.id,Math.round(w.rec.g.position.x*10)/10,Math.round(w.rec.g.position.z*10)/10]); },
+    muahat:()=>({done:S.muahat, node:!!muahatRec, vis:muahatRec?muahatRec.g.visible:false}),
+    applyLock:()=>{ applyIslandLock(); return WORLD.islands.map(i=>[i.id,isUnlocked(i.id)]); },
+    teleport:(x,z)=>{ if(player){ player.position.x=x; player.position.z=z; } return player?[player.position.x,player.position.z]:null; },
+    doMuahat:()=>{ if(muahatRec) doMuahat(muahatRec); return S.muahat; },
+    sndTest:(w)=>{ ({sheep:sndSheep,goat:sndGoat,camel:sndCamel,market:sndMarket})[w]&&({sheep:sndSheep,goat:sndGoat,camel:sndCamel,market:sndMarket})[w](); },
     setDirhem:(n)=>{ S.dirhem=n; save(); refreshHUD(); }, donateHayir:(id)=>donateHayir(id),
     setProfile:(age,gen,q)=>{ profSel={ageGroup:age,gender:gen,quran:q}; startProfile(); return Object.assign({},S.profile); },
     profile:()=>Object.assign({},S.profile),
