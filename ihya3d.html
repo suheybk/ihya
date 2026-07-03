@@ -359,7 +359,9 @@ const QUESTS = [
 ];
 const MODELS = ['player','prayer','rahle','book','door','tree','plot','plot_sprout','fountain','mosque','island_tile','bridge',
   // Medine — hasat/toplama (Faz 1)
-  'date_palm','date_palm_bare','mulberry_tree','mulberry_tree_bare','item_date','item_mulberry'];
+  'date_palm','date_palm_bare','mulberry_tree','mulberry_tree_bare','item_date','item_mulberry',
+  // Medine — çobanlık (Faz 2)
+  'sheep','goat','camel'];
 
 /* ===== HÂNE (ev) — SABİT GÜNLÜK ÖĞRENME MÜFREDATI =====
    5 temel ders SABİTTİR (vakit değişince SİLİNMEZ): tuvalet âdâbı → abdest → namaz →
@@ -756,9 +758,10 @@ function applyIslandLock(){
   }
   for(const b of WORLD.bridges){ const open=bridgeOpen(b);
     (b.deco||[]).forEach(x=>x.m.material.color.copy(open?x.orig:x.gray)); }
-  for(const r of interactables){ if(r.exam||r.gather) continue; const u=isUnlocked(questIslandId(r.q)); setAlive(r.meshes, u && r.done); }
+  for(const r of interactables){ if(r.exam||r.gather||r.animal) continue; const u=isUnlocked(questIslandId(r.q)); setAlive(r.meshes, u && r.done); }
   updateExamNodes();
   for(const rec of gatherNodes){ rec.g.visible=isUnlocked(rec.def.islId); }
+  for(const an of animals){ an.rec.g.visible=isUnlocked(an.def.islId); }
 }
 
 /* ============ HASAT / TOPLAMA (Faz 1) — kesb-i helâl ============ */
@@ -800,6 +803,52 @@ function updateGatherRegrow(){
   for(const rec of gatherNodes){
     if(rec.bareNow && nodeReady(rec.def)){ swapGatherModel(rec,true); banner(GOODS[rec.def.item].ic+' Ağaç yeniden verdi'); }
   }
+}
+
+/* ============ ÇOBANLIK (Faz 2) — dolaşan hayvanlar ============ */
+const ANIMAL_DEFS=[
+  {id:'sheep1', model:'sheep', islId:'bahce', produce:'yun', ic:'🧶', label:'Yün kırp', amount:1, cd:24000, scale:1.1, spd:1.0},
+  {id:'sheep2', model:'sheep', islId:'bahce', produce:'yun', ic:'🧶', label:'Yün kırp', amount:1, cd:24000, scale:0.95, spd:1.15},
+  {id:'goat1',  model:'goat',  islId:'bahce', produce:'sut', ic:'🥛', label:'Süt sağ',  amount:1, cd:20000, scale:1.0, spd:1.35},
+  {id:'camel1', model:'camel', islId:'bahce', produce:'sut', ic:'🥛', label:'Süt sağ',  amount:2, cd:30000, scale:0.9, spd:0.8},
+];
+let animals=[];
+function animalReady(def){ const t=S.gather[def.id]; return !t || Date.now()>=t; }
+function pickAnimalTarget(an){ const is=an.is; const a=Math.random()*6.283, r=Math.random()*is.r*0.55; an.tx=is.c[0]+Math.cos(a)*r; an.tz=is.c[1]+Math.sin(a)*r; }
+function makeAnimal(def){
+  const is=WORLD.islands.find(i=>i.id===def.islId);
+  const it=instance(def.model);
+  const a0=Math.random()*6.283, r0=Math.random()*is.r*0.45, x=is.c[0]+Math.cos(a0)*r0, z=is.c[1]+Math.sin(a0)*r0;
+  it.g.position.set(x,0,z); it.g.scale.setScalar(def.scale); it.g.rotation.y=Math.random()*6.28;
+  scene.add(it.g);
+  const rec={ q:{id:'anim_'+def.id, animal:true, def, pos:[x,0,z], nm:def.label, ic:def.ic}, g:it.g, meshes:it.meshes, animal:true, def, islId:def.islId };
+  interactables.push(rec);
+  const an={rec, def, is, tx:x, tz:z, pause:Math.random()*3, ph:Math.random()*6.28, spd:def.spd};
+  animals.push(an); return an;
+}
+function buildAnimals(){ animals=[]; for(const d of ANIMAL_DEFS) makeAnimal(d); }
+function updateAnimals(dt){
+  for(const an of animals){
+    const g=an.rec.g; if(!g.visible) continue;
+    if(an.pause>0){ an.pause-=dt; g.position.y*=0.85; continue; }
+    const dx=an.tx-g.position.x, dz=an.tz-g.position.z, d=Math.hypot(dx,dz);
+    if(d<0.3){ an.pause=1.5+Math.random()*3.5; pickAnimalTarget(an); continue; }
+    const nx=g.position.x+dx/d*an.spd*dt, nz=g.position.z+dz/d*an.spd*dt;
+    if(inIsland(nx,g.position.z,0.7)) g.position.x=nx;
+    if(inIsland(g.position.x,nz,0.7)) g.position.z=nz;
+    g.rotation.y=Math.atan2(dx,dz);
+    an.ph+=dt*8; g.position.y=Math.abs(Math.sin(an.ph))*0.04;
+    an.rec.q.pos[0]=g.position.x; an.rec.q.pos[2]=g.position.z;
+  }
+}
+function doTend(rec){
+  const def=rec.def;
+  if(!isUnlocked(def.islId)){ toast('🔒 Burası henüz açılmadı'); return; }
+  if(!animalReady(def)){ const s=Math.max(1,Math.ceil((S.gather[def.id]-Date.now())/1000)); toast('🐑 Dinleniyor… '+s+' sn'); return; }
+  invAdd(def.produce, def.amount);
+  S.gather[def.id]=Date.now()+def.cd;
+  save(); refreshHUD(); sndChime();
+  const g=GOODS[def.produce]; toast('+'+def.amount+' '+g.ic+' '+g.nm+' aldın');
 }
 
 /* ============ ATMOSFER: yıldızlar + bulutlar + nûr zerreleri (gece) ============ */
@@ -1039,6 +1088,7 @@ function buildWorld(){
   // her adanın imtihan meydanı
   buildExamNodes();
   buildGatherNodes();   // Medine: Hurma Bahçesi'nde toplanabilir ağaçlar
+  buildAnimals();       // Medine: dolaşan hayvanlar (çobanlık)
 
   // player
   const pl=instance('player');
@@ -1301,6 +1351,7 @@ document.getElementById('invBtn').onclick=openInv;
 document.getElementById('invClose').onclick=closeInv;
 document.getElementById('inv').addEventListener('click',e=>{ if(e.target.id==='inv') closeInv(); });
 actBtn.onclick=()=>{ if(!near) return;
+  if(near.animal){ doTend(near); return; }
   if(near.gather){ doGather(near); return; }
   if(near.exam){ openExam(near.islId); return; }
   interact(near.q); };
@@ -1359,16 +1410,19 @@ function tick(){
       if(dd<bd){ bd=dd; best=r; } }
     if(best!==near){ near=best;
       if(near){ actBtn.style.display='block';
-        if(near.gather){ actBtn.textContent = nodeReady(near.def) ? (near.q.ic+' Topla') : '🌱 Olgunlaşıyor'; }
+        if(near.animal){ actBtn.textContent = animalReady(near.def) ? (near.q.ic+' '+near.def.label) : '🐑 Dinleniyor'; }
+        else if(near.gather){ actBtn.textContent = nodeReady(near.def) ? (near.q.ic+' Topla') : '🌱 Olgunlaşıyor'; }
         else if(near.exam){ actBtn.textContent = S.conquered[near.islId] ? 'Meydan ✓' : (examReady(near.islId) ? '📝 İmtihana Gir' : '🔒 Önce dersler'); }
         else actBtn.textContent = S.done[near.q.id] ? 'Bak ✓'
           : (questAvailable(near.q) ? 'Etkileşim '+near.q.ic : '🔒 Sırası değil'); }
       else { actBtn.style.display='none'; promptEl.style.display='none'; }
     }
     if(near){ // prompt position
-      tmp.copy(near.g.position); tmp.y+=(near.gather?2.6:1.6); tmp.project(camera);
+      tmp.copy(near.g.position); tmp.y+=(near.gather?2.6:1.3); tmp.project(camera);
       promptEl.style.display='block';
-      promptEl.textContent = near.gather
+      promptEl.textContent = near.animal
+        ? ((animalReady(near.def)?near.q.ic+' '+near.def.label:'🐑 dinleniyor'))
+        : near.gather
         ? ((nodeReady(near.def)?near.q.ic+' ':'🌱 ')+near.q.nm+(nodeReady(near.def)?' topla':' — olgunlaşıyor'))
         : near.exam
         ? ((S.conquered[near.islId]?'✓ ':examReady(near.islId)?'📝 ':'🔒 ')+'İmtihan Meydanı')
@@ -1379,11 +1433,12 @@ function tick(){
   }
   // sıradaki yapılabilir görev parıldasın (yol gösterir)
   const glow=0.28+0.22*Math.sin(clock.elapsedTime*3);
-  for(const r of interactables){ if(r.gather) continue; const on=!r.done && questAvailable(r.q);
+  for(const r of interactables){ if(r.gather||r.animal) continue; const on=!r.done && questAvailable(r.q);
     for(const x of r.meshes){ if(x.m.material.emissive){ x.m.material.emissive.setHex(on?0xffcf55:0x000000); x.m.material.emissiveIntensity=on?glow:0; } } }
   if(particles.length) updateParticles(dt);
   if(examNodes.length) animateExamNodes(dt, clock.elapsedTime);
   animateAtmosphere(dt, clock.elapsedTime);
+  if(animals.length) updateAnimals(dt);
   renderer.render(scene,camera);
   requestAnimationFrame(tick);
 }
@@ -1404,7 +1459,7 @@ addEventListener('resize',resize); resize();
   document.getElementById('load').style.display='none';
   if(newDay) setTimeout(()=>toast('🌅 Yeni gün — görevler yenilendi'),600);
   // oyun açıkken gece yarısını geçerse de sıfırla
-  setInterval(()=>{ if(rollDay()){ interactables.forEach(r=>{ if(!r.exam&&!r.gather) r.done=false; }); applyIslandLock(); refreshHUD(); toast('🌅 Yeni gün — görevler yenilendi'); } }, 60000);
+  setInterval(()=>{ if(rollDay()){ interactables.forEach(r=>{ if(!r.exam&&!r.gather&&!r.animal) r.done=false; }); applyIslandLock(); refreshHUD(); toast('🌅 Yeni gün — görevler yenilendi'); } }, 60000);
   setInterval(updateGatherRegrow, 3000);   // hasat ağaçları yeniden verir
   window.__ihya3d={S, interactables, player:()=>player, move:(x,z)=>{jVec.x=x;jVec.y=z;},
     test:(id)=>{ near=interactables.find(x=>x.q.id===id); openSheet(near.q); },
@@ -1428,6 +1483,9 @@ addEventListener('resize',resize); resize();
     gatherNodes:()=>gatherNodes.map(r=>({id:r.def.id, ready:nodeReady(r.def), bareNow:r.bareNow, item:r.def.item})),
     gatherId:(id)=>{ const r=gatherNodes.find(x=>x.def.id===id); if(r) doGather(r); return r?r.def:null; },
     forceRegrow:(id)=>{ delete S.gather[id]; updateGatherRegrow(); },
+    animals:()=>animals.map(a=>({id:a.def.id, ready:animalReady(a.def), produce:a.def.produce, pos:[Math.round(a.rec.g.position.x),Math.round(a.rec.g.position.z)], visible:a.rec.g.visible})),
+    tendId:(id)=>{ const a=animals.find(x=>x.def.id===id); if(a) doTend(a.rec); return a?a.def:null; },
+    stepAnimals:(n)=>{ for(let i=0;i<n;i++) updateAnimals(0.05); return animals.map(a=>[Math.round(a.rec.g.position.x*10)/10,Math.round(a.rec.g.position.z*10)/10]); },
     hayirMeshes:()=>hayirGroups.length,
     warnState:()=>({warned:vakitWarned, urgent:document.getElementById('vakit').classList.contains('urgent'), vakit:vakitOf(gameTime)[1]}),
     learn:(id)=>{ for(const q of islandQuests(id)) S.done[q.id]=true; interactables.forEach(r=>{ if(!r.exam) r.done=!!S.done[r.q.id]; }); save(); applyIslandLock(); refreshHUD(); } };
