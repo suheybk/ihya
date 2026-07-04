@@ -205,6 +205,26 @@ görünen fallback kutusu = yüklenememiş model). Bu yüzden dev sunucumda bile
   bayat cache'ten gelen tek-kare sapması kullanıcıyı korkutuyordu. Görünür kutu kaldırıldı, kayıt
   `window.__animLog` + ilk sapmada tek `console.warn` (spam yok).
 
+### Faz 11.19 — Animasyonlar + Pazar + Etiket + Sorular (2026-07-04)
+> Kalan animasyon/yerleşim işlerinin çoğu + cila. Hepsi tarayıcıda eval-sampler ile doğrulandı, konsol temiz.
+- [x] **#1 İkram animasyonu** — `doGiveHayir` → `playAction(1.5,'give')`. Tick'te 'give' pozu: iki kol simetrik
+  öne uzanır (`aL=aR≈-1.48`) + gövde saygıyla hafif eğilir (`rotation.x→0.17`). Sampler: eğim 0→0.17→0 (1.5s).
+- [x] **#2 Namaz animasyonu + kıbleye dönüş** — `prayNamaz` → `playAction(4.4,'namaz')`; snap yerine tick'te
+  kıbleye **yumuşak dönüş** (`rotation.y`→QIBLA_ANGLE ease). `namazPose(p)` fazlı sekans:
+  kıyam→rükû→kıyam→secde→celse→secde→kıyam (gövde `rotation.x` + kol açısı). Sampler doğruladı:
+  rotY 1.5→π (0.6s), gövde eğimi kıyam0→rükû0.8→secde1.29→dik0, 4.4s'de tamamlanıp dik döner.
+- [x] **#7 Medine Pazarı 3x + tüccar** — `buildMarket`: market_stall `scale 3` (bbox H4.9/W5.7); `merchant`
+  modeli (kendi tezgâhı+malı+sunma pozuyla) tezgâhın arkasına (`pz+1.15`, scale 2.7, başı 2.94 < tente 4.9);
+  sepet/çuval/testi önde büyütüldü. Screenshot: çizgili tente altında tüccar + mal, doğru.
+- [x] **NPC etiketi yüzü kapatmıyor** — prompt konumu ölçek-farkında: NPC/hayvan için `yOff=scale*1.15+0.6`
+  (baş üstü), gather 2.6, diğer 1.3. Yüz görünür.
+- [x] **+8 imtihan sorusu** — `QBANK`: quran/dua/selam/komsu/sadaka/ilim/adalet/hayir konularına 3. soru
+  (kaynaklı: Buhârî/Müslim/Tirmizî/Ebû Dâvûd/Bakara/Mâide). ⚠️ yeni dinî metinler yayın öncesi ehlince teyit.
+- [ ] **#6 Zikir kitabı ağaçta asılı** — BEKLİYOR: hangi book node'u ('selam'/'davet'/'dua' hepsi book modeli)
+  kastedildiği belirsiz; Suheyb'e soruldu. Netleşince konum+yükseklik (ağaca asılı) değişimi yapılacak.
+- **NOT (debug artefaktı, bug DEĞİL):** `d.teleport` sonrası prompt bayat kalıyordu ("Tuvalet âdâbı" pazarda);
+  normal `d.move`'da anında güncelledi → gerçek oyunda (oyuncu hep yürür) sorun yok, dokunulmadı.
+
 ## 📌 3D Modeller ✅ (2026-07-02)
 Prompt listesindeki **36 model** Blender'da üretilip `models/*.glb` olarak eklendi
 (hayvanlar, hurma/dut ağaçları, eşya/pickup, pazar, yapılar, Mescid-i Nebevî, NPC'ler).
@@ -216,20 +236,17 @@ Oyundaki âyet/hadîs/sîret bilgileri dikkatle seçiliyor; yine de yeni eklenen
 yayına almadan önce güvenilir bir kaynaktan/ehlinden teyit edilmeli. Niyet: sevdirmek,
 yanıltmamak.
 
-## 🔜 Sıradaki Oturum — Kalan İstekler (Faz 11.18 sonrası)
-> **Faz 11.18'de hızlı 4 fix bitti** (#3 koyun plaka · #4 takke yeşil · #5 NPC kol · #8 hurma 2x) —
-> bkz. Faz 11.18 bölümü. Kalan 4 madde animasyon/yerleşim ağırlıklı, daha çok iş:
+## 🔜 Sıradaki Oturum — Kalan İşler (Faz 11.19 sonrası)
+> **Faz 11.18–11.19'da 8 isteğin 7'si + cila bitti** (koyun·takke·NPC kol·hurma·ikram anim·namaz anim·
+> pazar 3x·NPC etiket·+8 soru). Kalan:
 
-- [ ] **İkram animasyonları özel olsun** — komşuya ikram + yetime ikram (`doGiveHayir`) için jenerik
-  `playAction` yerine ÖZEL animasyon (ör. yemeği iki elle uzatma / hafif eğilip verme jesti). Yeni bir
-  `actionKind` ('give' gibi) + tick'te kol pozu ekle. İPUCU: oyuncu kolları artık `PP.armL/armR`
-  {parts,piv} + `swingLeg` ile riglenmiş; ikram jesti için X-swing + hafif öne uzatma pozu eklenebilir.
-- [ ] **Namaz kılma animasyonu yenilensin + KIBLEYE DÖNÜŞ** — `prayNamaz`'da oyuncu **kıble yönüne dönsün**
-  (`faceQibla(player)` var ama animasyonla belirginleşsin); namaz hareketi değişsin (kıyam→rükû→secde
-  benzeri gerçek namaz pozu; şu an sadece kol öne-aşağı 'work').
-- [ ] **Zikir kitabı yerde olmasın** — book/zikir modeli **ağaçta asılı** olsun (konum + yükseklik değişimi).
-- [ ] **Medine Pazarı 3x büyük** (her şeyiyle: market_stall + tezgâh + mal). **Tüccar NPC arkasına** konsun;
-  **tüccarın başı tentenin altında** kalacak yükseklik oranında olsun.
+- [ ] **#6 Zikir kitabı ağaçta asılı** — book modeli (selam/davet/dua node'ları book kullanıyor) yerde;
+  **hangisi** "zikir kitabı" belirsiz → Suheyb'e soruldu. Netleşince o node'u ağaca asılı konuma taşı
+  (küçük tree instance + book Y↑ ~1.3 + hafif tilt). İPUCU: node'lar `QUESTS`/`evQuests` listesinde pos ile.
+- [ ] **Yeni bölüm/ada fikri (Suheyb "düşünebiliriz")** — adaylar: 🕋 Hac/Umre · ⚔️ Bedir-Uhud sîret olayları ·
+  📜 Ashâb-ı Suffa'ya hizmet · 💧 ekin/sulama derinliği. Karar Suheyb'de; seçilince yeni ada + mekanik + QBANK.
+- [ ] **Daha çok soru (sürüyor)** — 11.19'da 8 eklendi; her topic 3+ soruya çıkarılabilir (taharet/abdest/
+  namaz/fidan/canli/davet/emanet/cemaat henüz 2-3).
 
 **NOT (yeni model reçetesi):** karakter modelleri Pant_L/R+Shoe/Sole (bacak), Sleeve_L/R+Hand (kol),
 yüz +Z, `lin()` sRGB→linear renk. Kodda `prig`/`rigNpcLegs` {parts,piv} + `swingLeg` ile otomatik anime
