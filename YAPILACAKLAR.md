@@ -280,6 +280,16 @@ görünen fallback kutusu = yüklenememiş model). Bu yüzden dev sunucumda bile
   yeşil işaret). (c) Panel "**4 gidiş + 3 geliş = 7**" + button gidiş/geliş etiketi. (d) **Bakara 158**
   ﴿إِنَّ الصَّفَا وَالْمَرْوَةَ...﴾ âyeti panelde + namazdan sonra banner/toast ile öğretilir. Akış eval+screenshot doğrulandı.
 
+### Faz 11.25 — AFK oturma + intro otur/kalk (2026-07-04, Suheyb)
+- [x] **AFK oturma**: `sitAmount`(0=ayakta,1=oturur) + `lastActT`(son aktivite, sn). Tick'te 10 sn hareketsiz +
+  eylemsiz (`!moving && actionT<=0 && !mod`) kalınca `sitAmount→1`: gövde alçalır (`position.y=-0.26`), bacaklar
+  kıvrık (`swingLeg 1.4`), kollar dizlere (`+0.45`), hafif öne eğim (`rotation.x 0.2`). `pointerdown`/`keydown`
+  → `wake()` (lastActT sıfırlanır) → kalkar. Doğrulama: dokun→y0(~2s), 10.8s→otur(y-0.26).
+- [x] **Namaz sonrası seccadede oturma**: namaz eylemi bitince (`actionT<=0 && actionKind==='namaz'`)
+  `lastActT=nowS-11` → 10 sn beklemeden AFK ise seccadede oturur. Doğrulama: namaz(~4.4s)→otur(y-0.26).
+- [x] **Intro otur→kalk**: `introTick`'e `sitY` eklendi (yerde çömük −0.28 → doğrulup ayağa kalkar), bacak
+  kıvrımı 1.45. `wake()` endIntro/exitMosque/exitHac'te (moda dönüşte hemen oturmasın).
+
 ## 📌 3D Modeller ✅ (2026-07-02)
 Prompt listesindeki **36 model** Blender'da üretilip `models/*.glb` olarak eklendi
 (hayvanlar, hurma/dut ağaçları, eşya/pickup, pazar, yapılar, Mescid-i Nebevî, NPC'ler).
