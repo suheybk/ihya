@@ -178,6 +178,33 @@ Bu oyun manipülasyonla değil, **anlamla** bağ kurar. Kırmızı çizgiler:
   (openGuide callback'li, finishLesson'a düşmez) → tamamlanınca S.toilet=0 + 2 nûr (temizlik şükrü,
   "Temizlik imanın yarısıdır" Müslim). openGuide(q,onDone) callback desteği + guideNext çift-tetik guard.
 
+### Faz 11.18 — Suheyb istek listesi: hızlı fix'ler (2026-07-04)
+> 8 isteğin 4 "hızlı" olanı yapıldı; hepsi tarayıcıda eval+screenshot ile doğrulandı, konsol temiz.
+- [x] **#3 Koyun altındaki kare** — yeni `sheep.glb` `'Mat'` zemin plakası görünüyordu. `BASE_HIDE`'a
+  `'sheep'` eklendi + `instance()` gizleme koşulu `o.name==='Base'||o.name==='Mat'` (koyun plakası dâhil).
+  Doğrulama: 5 koyunun `Mat` mesh'i `visible:false`.
+- [x] **#4 Takke yeşil** — `boy_takke` Cap+Cap_Rim kahveydi (`#6a503e`, saça çok yakın). `makePlayer`'da
+  `Cap`/`Cap_Rim` mesh'leri `#2e7d46` yeşile recolor (material.color + `orig` + `gray` güncellendi ki
+  ihyâ gri↔renk geçişi tutarlı kalsın). Sadece oyuncuyu etkiler (tek boy_takke instance).
+- [x] **#5 NPC kolları normalize** — bazı NPC modelleri (neighbor 'kucaklayıcı') kollarını YATAY DIŞA
+  baked poz'da tutuyordu. Çözüm **geometri-farkında omuz-pivot**: `wrapArm()` her kolu (Sleeve+Hand)
+  `pivot.attach()` ile omuz eklemine sarar; baked kol açısını ölçüp aşağı-yana (`restZ`) döndürür,
+  yürürken omuzdan X-salınım (`poseArm`). Zaten-aşağı kolları döndürmez (restZ≈0). Test: 8 kol → kol ucu
+  omuzun 0.50–0.66 birim altında; yürürken swingX≈0.22. Model rebuild GEREKMEDİ (mevcut modeller korundu).
+- [x] **#8 Hurma ağacı 2x boy** — `GATHER_DEFS` date_palm `scale 1.7→3.4`. Temiz 11.18'de dünya-bbox
+  **H=4.21 / W=4.6** (ratio 1.09 → geniş fronds'lu KOCAMAN palmiye, "sopa" DEĞİL). Kullanıcının gördüğü
+  ince sopa ya `date_palm_bare` (hasat sonrası gövde) ya da bayat cache. (date_palm BASE_HIDE'da → plakasız.)
+
+**⚠️ CACHE KÖK SEBEBİ (Suheyb "mavi küpler + batan deve + eski rozet" screenshot'ı):** Bunların HİÇBİRİ
+temiz 11.18 kodunda yok — SW kaydını kaldırıp cache temizleyince badge 11.18, `fallbackBox=0`,
+300 karede deve `feetY=-0.011` (batmıyor). Sebep: **`sw.js` cache adı `ihya-v1117`'de takılıydı** →
+GitHub Pages flaky olunca SW bozuk/eski HTML'i saklayıp tekrar sunuyordu (mavi küp = gece ışığında koyu
+görünen fallback kutusu = yüklenememiş model). Bu yüzden dev sunucumda bile reload'lar bayat içerik verdi.
+- [x] **SW cache bump** `ihya-v1117→v1118` → `activate` eski cache'leri siler, online'da kendini iyileştirir.
+- [x] **"HAYVAN ANOMALİ" kırmızı overlay SESSİZLEŞTİRİLDİ** — Faz 11.9 geçici teşhisi; bug çözülü,
+  bayat cache'ten gelen tek-kare sapması kullanıcıyı korkutuyordu. Görünür kutu kaldırıldı, kayıt
+  `window.__animLog` + ilk sapmada tek `console.warn` (spam yok).
+
 ## 📌 3D Modeller ✅ (2026-07-02)
 Prompt listesindeki **36 model** Blender'da üretilip `models/*.glb` olarak eklendi
 (hayvanlar, hurma/dut ağaçları, eşya/pickup, pazar, yapılar, Mescid-i Nebevî, NPC'ler).
@@ -189,29 +216,20 @@ Oyundaki âyet/hadîs/sîret bilgileri dikkatle seçiliyor; yine de yeni eklenen
 yayına almadan önce güvenilir bir kaynaktan/ehlinden teyit edilmeli. Niyet: sevdirmek,
 yanıltmamak.
 
-## 🔜 Sıradaki Oturum — Suheyb'in İstek Listesi (2026-07-04, Faz 11.17 sonrası)
-> Canlı sürüm **Faz 11.17** (live2=ihya-medine). Oyuncu=boy_takke, dev deve (2.8x koyun), NPC bacak+kol
-> animasyonu, yeni sheep/traveler, Medine Adaleti mekaniği hepsi canlı. Aşağıdakiler bir sonraki oturumda:
+## 🔜 Sıradaki Oturum — Kalan İstekler (Faz 11.18 sonrası)
+> **Faz 11.18'de hızlı 4 fix bitti** (#3 koyun plaka · #4 takke yeşil · #5 NPC kol · #8 hurma 2x) —
+> bkz. Faz 11.18 bölümü. Kalan 4 madde animasyon/yerleşim ağırlıklı, daha çok iş:
 
 - [ ] **İkram animasyonları özel olsun** — komşuya ikram + yetime ikram (`doGiveHayir`) için jenerik
   `playAction` yerine ÖZEL animasyon (ör. yemeği iki elle uzatma / hafif eğilip verme jesti). Yeni bir
-  `actionKind` ('give' gibi) + tick'te kol pozu ekle.
+  `actionKind` ('give' gibi) + tick'te kol pozu ekle. İPUCU: oyuncu kolları artık `PP.armL/armR`
+  {parts,piv} + `swingLeg` ile riglenmiş; ikram jesti için X-swing + hafif öne uzatma pozu eklenebilir.
 - [ ] **Namaz kılma animasyonu yenilensin + KIBLEYE DÖNÜŞ** — `prayNamaz`'da oyuncu **kıble yönüne dönsün**
   (`faceQibla(player)` var ama animasyonla belirginleşsin); namaz hareketi değişsin (kıyam→rükû→secde
   benzeri gerçek namaz pozu; şu an sadece kol öne-aşağı 'work').
-- [ ] **Koyunun altındaki KARE şey** — yeni sheep.glb'de zemin plakası/gölge var → `BASE_HIDE`'a `sheep`
-  ekle ya da o kare mesh'i gizle. (Hızlı fix; mesh adını in-game incele.)
-- [ ] **Oyuncu takkesi YEŞİL olsun** — build_boy.py'de `CAP=(106,80,62)` kahve, `HAIR=(96,62,46)`ye çok
-  yakın → takke **yeşil** yap, saçtan net ayrışsın. (Model rebuild veya kodda Cap+Cap_Rim mesh recolor.)
-- [ ] **NPC normal hali "kucaklayıcı" olmasın** — neighbor modelinin açık-kollu (welcoming) duruşu nötrlensin;
-  kollar **oyuncudaki gibi** yanda dursun, yürürken sallansın, **dururken normal** (kollar aşağı). Model
-  rebuild (Sleeve pozu yana/aşağı) ya da kod-pivot ile idle'da kolları aşağı çek.
 - [ ] **Zikir kitabı yerde olmasın** — book/zikir modeli **ağaçta asılı** olsun (konum + yükseklik değişimi).
 - [ ] **Medine Pazarı 3x büyük** (her şeyiyle: market_stall + tezgâh + mal). **Tüccar NPC arkasına** konsun;
   **tüccarın başı tentenin altında** kalacak yükseklik oranında olsun.
-- [ ] **Hurma ağacı boyu 2x** (şu an gather scale 1.7 → ~2.08 birim; **2 katına** ~4 birim). Sebep: hurma
-  toplama animasyonunda oyuncu kolları yukarı kalkıyor; ağaç kısayken "yukarıdan hurma alma" gerçekçi
-  durmuyor → ağaç uzayınca jest anlamlı olur.
 
 **NOT (yeni model reçetesi):** karakter modelleri Pant_L/R+Shoe/Sole (bacak), Sleeve_L/R+Hand (kol),
 yüz +Z, `lin()` sRGB→linear renk. Kodda `prig`/`rigNpcLegs` {parts,piv} + `swingLeg` ile otomatik anime
