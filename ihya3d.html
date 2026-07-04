@@ -264,7 +264,7 @@
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.7 (PWA · her zaman güncel)</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.8 (deve-teleport fix + eylem animasyonları)</div>
 
 <div id="prompt"></div>
 <div id="joy"><div id="knob"></div></div>
@@ -912,14 +912,16 @@ function buildIslands(){
       const edge=Math.max(0, Math.min(1, (R-Math.max(Math.abs(lx),Math.abs(ly)))/1.6));   // kenarda 0, içeride 1
       gp.setZ(vi, terrainH(wx,wz)*edge); }
     gGeo.computeVertexNormals();
-    const top=new THREE.Mesh(gGeo,is.gMat); top.rotation.x=-Math.PI/2; top.position.set(is.c[0],0,is.c[1]); scene.add(top);
+    const top=new THREE.Mesh(gGeo,is.gMat); top.rotation.x=-Math.PI/2; top.position.set(is.c[0],0,is.c[1]); top.frustumCulled=false; scene.add(top);
     // KARE toprak gövde (hafif konik): 4-kenar prizma, PI/4 döndürülür → yüzler eksene hizalı (çimle aynı kare)
     const cliff=new THREE.Mesh(new THREE.CylinderGeometry(R*1.386,R*1.103,2.6,4),is.cMat);
-    cliff.rotation.y=Math.PI/4; cliff.position.set(is.c[0],-1.3,is.c[1]); scene.add(cliff);   // üst y≈0, alt y=-2.6
+    cliff.rotation.y=Math.PI/4; cliff.position.set(is.c[0],-1.3,is.c[1]); cliff.frustumCulled=false; scene.add(cliff);   // üst y≈0, alt y=-2.6
+    // frustumCulled=false ŞART: hayvanlar (frustumCulled=false) hep çizilir; ada zemini culle atılırsa
+    // kenar adanın devesi/koyunu "suyun üstünde uçuyor/off-grid" görünür (asıl teleport gizemi buydu)
     decorateIsland(is);
     const mist=new THREE.Mesh(new THREE.BoxGeometry(R*2.1,1.4,R*2.1),
       new THREE.MeshStandardMaterial({color:0xe8eff3,transparent:true,opacity:0.5,depthWrite:false,roughness:1}));
-    mist.position.set(is.c[0],0.7,is.c[1]); scene.add(mist); is.mist=mist;
+    mist.position.set(is.c[0],0.7,is.c[1]); mist.frustumCulled=false; scene.add(mist); is.mist=mist;
   }
 }
 function inIsland(x,z,margin){ for(const is of WORLD.islands){ if(isUnlocked(is.id) && inSq(x,z,is.c,is.r-margin)) return true; } return false; }
@@ -989,7 +991,7 @@ function doGather(rec){
   const def=rec.def;
   if(!isUnlocked(def.islId)){ toast('🔒 Burası henüz açılmadı'); return; }
   if(!nodeReady(def)){ const s=Math.max(1,Math.ceil((S.gather[def.id]-Date.now())/1000)); toast('🌱 Olgunlaşıyor… '+s+' sn'); return; }
-  facePlayer(rec.g.position); playAction();
+  facePlayer(rec.g.position); playAction(1.1,'pluck');   // meyve/su: yukarı uzanıp koparma hareketi
   invAdd(def.item, def.amount);
   S.gather[def.id]=Date.now()+def.cd;
   swapGatherModel(rec,false);
@@ -1105,7 +1107,7 @@ function doTend(rec){
   const def=rec.def;
   if(!isUnlocked(def.islId)){ toast('🔒 Burası henüz açılmadı'); return; }
   if(!animalReady(def)){ const s=Math.max(1,Math.ceil((S.gather[def.id]-Date.now())/1000)); toast('🐑 Dinleniyor… '+s+' sn'); return; }
-  facePlayer(rec.g.position); playAction();
+  facePlayer(rec.g.position); playAction(1.2, def.produce==='yun'?'shear':'milk');   // yün→kırpma, süt→sağma
   invAdd(def.produce, def.amount);
   S.gather[def.id]=Date.now()+def.cd;
   save(); refreshHUD(); sndChime();
@@ -1593,8 +1595,8 @@ function updateWoolHint(){
 }
 
 /* ============ ÇALIŞMA ANİMASYONU (toplama/sağma/kırpma) ============ */
-let actionT=0;
-function playAction(dur){ actionT=dur||0.9; }
+let actionT=0, actionKind='work';
+function playAction(dur,kind){ actionT=dur||0.9; actionKind=kind||'work'; }
 
 /* ============ KİŞİSEL PROFİL / MÜKELLEFİYET ============
    "İhya Etmeye Devam Et" → yaş/cinsiyet/… sorulur; oyun ona göre yönlendirir.
@@ -2508,12 +2510,37 @@ function tick(){
     L(PP.armL, -sw*0.45); L(PP.armR, sw*0.45);
     if(PP.upper) PP.upper.rotation.z += ((moving?Math.sin(walkPhase*2)*0.02:0)-PP.upper.rotation.z)*0.2;
   }
-  // çalışma animasyonu (toplama/sağma/kırpma): kolları öne-aşağı sallar, gövde eğilir
+  // çalışma animasyonu — EYLEME göre FARKLI hareket (toplama/sağma/kırpma birbirinden ayrı, gerçekçi)
   if(PP && PP.armL){
-    if(actionT>0){ actionT-=dt; const w=Math.sin(clock.elapsedTime*17);
-      PP.armL.rotation.x=-1.15+w*0.55; PP.armR.rotation.x=-1.15-w*0.55;
-      if(PP.upper) PP.upper.rotation.x=0.38; }
-    else if(PP.upper){ PP.upper.rotation.x += (0-PP.upper.rotation.x)*0.2; }
+    if(actionT>0){ actionT-=dt; const et=clock.elapsedTime;
+      const A=(o,x,z)=>{ if(o){ o.rotation.x=x; if(z!=null) o.rotation.z=z; } };
+      if(actionKind==='pluck'){
+        // MEYVE/SU: kollar başın üstüne uzanır, sırayla koparır (yukarı uzanma)
+        const w=Math.sin(et*9);
+        A(PP.armL,-2.35+w*0.5,0); A(PP.armR,-2.35-w*0.5,0);
+        if(PP.upper){ PP.upper.rotation.x=-0.12; PP.upper.rotation.z=0; }   // hafif yukarı bakış
+      } else if(actionKind==='milk'){
+        // SÜT SAĞMA: gövde öne eğik (çömelme), iki el alçakta ritmik aşağı çeker
+        const w=Math.sin(et*13);
+        A(PP.armL,-0.5+Math.max(0,w)*0.4,0); A(PP.armR,-0.5+Math.max(0,-w)*0.4,0);  // eller sırayla çeker
+        if(PP.upper){ PP.upper.rotation.x=0.7; PP.upper.rotation.z=0; }
+      } else if(actionKind==='shear'){
+        // YÜN KIRPMA: gövde eğik, sağ el yanlamasına süpürerek kırpar, sol el hayvanı tutar
+        const w=Math.sin(et*15);
+        A(PP.armR,-0.9,w*0.6); A(PP.armL,-0.6,0.15);
+        if(PP.upper){ PP.upper.rotation.x=0.5; PP.upper.rotation.z=w*0.07; }
+      } else {
+        // varsayılan (namaz serme, ikram): kollar öne-aşağı sallar
+        const w=Math.sin(et*17);
+        A(PP.armL,-1.15+w*0.55,0); A(PP.armR,-1.15-w*0.55,0);
+        if(PP.upper) PP.upper.rotation.x=0.38;
+      }
+    }
+    else { // eylem bitti → tüm eğim/dönüşleri yumuşakça sıfırla
+      if(PP.upper){ PP.upper.rotation.x += (0-PP.upper.rotation.x)*0.2; PP.upper.rotation.z += (0-PP.upper.rotation.z)*0.2; }
+      if(PP.armR) PP.armR.rotation.z += (0-PP.armR.rotation.z)*0.2;
+      if(PP.armL) PP.armL.rotation.z += (0-PP.armL.rotation.z)*0.2;
+    }
   }
   // seccade serilme (açılma) animasyonu
   if(seccadeAnim>0 && laidSeccadeRec){ seccadeAnim-=dt*2.6; const t=Math.max(0,Math.min(1,1-seccadeAnim)); const e=t*t*(3-2*t); const s=0.16+0.84*e; laidSeccadeRec.g.scale.set(s,1,s); if(seccadeAnim<=0){ laidSeccadeRec.g.scale.set(1,1,1); seccadeAnim=0; } }
@@ -2593,7 +2620,7 @@ function resize(){ renderer.setSize(innerWidth,innerHeight,false); camera.aspect
 addEventListener('resize',resize); resize();
 
 /* ============ BOOT ============ */
-console.log('%cİHYA sürüm: Faz 11.7 — PWA (service worker, her zaman güncel) + hayvan kod-doğrulama','color:#8fce58;font-weight:bold');
+console.log('%cİHYA sürüm: Faz 11.8 — ada frustumCulled=false (deve-teleport GERÇEK fix) + eyleme göre animasyon','color:#8fce58;font-weight:bold');
 (async()=>{
   let n=0;
   for(const m of MODELS){ await load(m); loadBar.style.width=(++n/MODELS.length*100)+'%'; }
