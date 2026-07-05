@@ -119,10 +119,15 @@
     box-shadow:0 8px 22px #d9a44166;display:none;animation:pop .3s}
   @keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
   /* prompt over object */
-  #prompt{position:fixed;z-index:5;transform:translate(-50%,-100%);background:#fff;border-radius:12px;padding:6px 11px;
-    font-weight:700;color:var(--ink);font-size:13px;box-shadow:0 4px 14px #0003;display:none;pointer-events:none;white-space:nowrap}
-  #prompt::after{content:"";position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
-    border:6px solid transparent;border-top-color:#fff}
+  /* etkileşim altyazısı: ekranın ALT-ORTASINDA (kontrollerin üstünde), sinematik şerit — kamera odağıyla birlikte belirir */
+  #prompt{position:fixed;z-index:5;left:50%;bottom:104px;transform:translateX(-50%);
+    background:rgba(18,26,22,.74);border-radius:14px;padding:8px 16px;max-width:80vw;
+    font-weight:800;color:#fff;font-size:15px;box-shadow:0 6px 20px #0005;display:none;pointer-events:none;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em;text-shadow:0 1px 3px #0008;
+    opacity:0;transition:opacity .22s ease,bottom .22s ease}
+  #prompt.show{opacity:1}
+  /* Umre girişi: ekranın Y-ekseni kart-flip geçişi (ada → Kâbe) sırasında HUD kaybolur (temiz görünüm) */
+  body.warping .top, body.warping .toolbar, body.warping #joy, body.warping #act, body.warping #prompt{ opacity:0!important; transition:opacity .18s ease; pointer-events:none }
   /* sheet */
   .veil{position:fixed;inset:0;background:#0006;backdrop-filter:blur(3px);display:none;align-items:flex-end;z-index:20}
   .veil.show{display:flex}
@@ -335,7 +340,7 @@
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.25 (AFK oturma: 10s durunca yere çömer · namaz sonrası seccadede oturur · dokununca kalkar)</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 11.29 (Umre girdabı: karakter etrafında Z-roll (yavaş→hızlı) → Kâbe orbit · horoz ezandan 15s önce her adadan öter (kuşluk güçlü) · tavuk sık)</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -533,7 +538,7 @@ const QUESTS = [
   { id:'selam',  model:'book', pos:[30,0,2.2],   rot:0,    scale:2.0, ic:'✋',
     nm:'5 kişiye selam ver', rem:'Selamı yayın ki birbirinizi sevesiniz.',
     refs:[{tag:'Hadis',txt:'Birbirinizi sevmedikçe cennete giremezsiniz; selamı aranızda yayın.',cite:'Müslim, Îmân 93'}]},
-  { id:'komsu',  model:'door', pos:[32.5,0,-2.6], rot:1.57, scale:1.0, ic:'🤝',
+  { id:'komsu',  model:'basket', pos:[32.5,0,-2.6], rot:0, scale:1.7, ic:'🤝',
     nm:'Komşuya ikram et', rem:'Bir tabak yemek, bir selam, bir yardım.',
     refs:[{tag:'Hadis',txt:'Cebrâil komşu hakkını o kadar tavsiye etti ki, mirasçı kılacak sandım.',cite:'Buhârî, Edeb 28'}]},
   { id:'sadaka', model:'plot', pos:[35,0,2.2],   rot:0,    scale:1.4, ic:'💛',
@@ -550,7 +555,7 @@ const QUESTS = [
     nm:'Birini hayra davet et', rem:'Bir kişinin hidayetine vesile olmak dünyadan hayırlıdır.',
     refs:[{tag:'Hadis',txt:'Senin vesilenle bir kişinin hidayete ermesi, kızıl develerden hayırlıdır.',cite:'Buhârî, Cihâd 102'}]},
   // ===== ŞEHİR =====
-  { id:'adalet', model:'door',  pos:[63,0,2],   rot:1.57, scale:1.0, ic:'⚖️',
+  { id:'adalet', model:'scale',  pos:[63,0,2],   rot:0, scale:1.7, ic:'⚖️',
     nm:'Adil ol, bir hakkı koru', rem:'Adaletle hükmet; Allah adaletli olanları sever.',
     refs:[{tag:'Ayet',txt:'Adaletli olun; bu, takvâya daha yakındır.',cite:'Mâide 5/8'}]},
   { id:'emanet', model:'rahle', pos:[65,0,-2],  rot:0,    scale:1.4, ic:'🔑',
@@ -572,6 +577,9 @@ const MODELS = ['player','boy_takke','prayer','rahle','book','door','tree','plot
   // Mescid iç mekânı: imam + cemaat (Faz 7)
   'merchant','shepherd',
   // Mescid binası (jenerik; Mescid-i Nebevî sonra) — 'mosque' zaten gömülü listede
+  // Faz 11.29 — senaryo modelleri (build_pack5.py): barıştırma/adalet/emanet/sadaka/kümes/faydalı iş
+  'arg_villager_a','arg_villager_b','qadi','plaintiff','beggar','trust_owner','trust_pouch',
+  'dispute_item','coop','mud_doorway','shade_bench','public_fountain',
   ];
 
 /* ===== HÂNE (ev) — SABİT GÜNLÜK ÖĞRENME MÜFREDATI =====
@@ -863,11 +871,18 @@ function updateDayNight(dt){
   sun.position.set(px+12,24,pz+8); sun.target.position.set(px,0,pz);
   const el=Math.sin((gameTime-0.25)*Math.PI*2), az=(gameTime-0.25)*Math.PI*2;
   nightF=Math.max(0,Math.min(1,(-el)*1.6+0.05));   // gece yoğunluğu (atmosfer katmanları için)
-  sunMesh.position.set(px+Math.sin(az)*16, 5+el*24, pz-34); sunMesh.visible=el>-0.06;
-  moonMesh.position.set(px-Math.sin(az)*16, 5-el*24, pz-34); moonMesh.visible=el<0.06;
+  // GÜNEŞ ufka inince yumuşak SÖNER; AY ancak güneş TAM battıktan SONRA doğar (asla çakışmazlar)
+  const sunFade=Math.max(0,Math.min(1,(el+0.12)/0.12));       // el: 0→-0.12 iken opaklık 1→0 (batış)
+  const moonRise=Math.max(0,Math.min(1,(-0.12-el)/0.16));     // el<-0.12'den itibaren 0→1 (güneş bittikten SONRA)
+  sunMesh.position.set(px+Math.sin(az)*16, 5+el*24, pz-34);
+  sunMesh.visible=sunFade>0.01; sunMesh.material.transparent=true; sunMesh.material.opacity=sunFade;
+  if(sunMesh.children[0]) sunMesh.children[0].material.opacity=0.22*sunFade;
+  moonMesh.position.set(px-Math.sin(az)*16, 5-el*24, pz-34);
+  moonMesh.visible=moonRise>0.01; moonMesh.material.transparent=true; moonMesh.material.opacity=moonRise;
   const v=vakitOf(gameTime);
   if(v!==lastVakit){ const prev=lastVakit; lastVakit=v; const el2=document.getElementById('vakit'); if(el2){ el2.textContent=(isFriday()?'🕌 Cuma':dayName())+' · '+v[2]+' '+v[1]; el2.classList.remove('urgent'); } vakitWarned=false; if(prev) onVakitChange(v); }
   checkVakitWarning();
+  if(typeof updateRoosterAzan==='function') updateRoosterAzan();   // ezandan 15 sn önce horoz (her adadan)
   skyAcc+=dt; if(dt===0 || skyAcc>=0.15){ skyAcc=0; updateSkyWidget(); }
 }
 function onVakitChange(v){
@@ -1096,14 +1111,16 @@ function applyIslandLock(){
 const GOODS={ hurma:{ic:'🌴',nm:'Hurma'}, dut:{ic:'🫐',nm:'Dut'}, sut:{ic:'🥛',nm:'Süt'}, yun:{ic:'🧶',nm:'Yün'}, ekmek:{ic:'🍞',nm:'Ekmek'}, su:{ic:'💧',nm:'Su'}, bal:{ic:'🍯',nm:'Bal'} };
 // Hurma Bahçesi'nde toplanabilir ağaçlar (tekrarlanır: topla → hasat hali → cooldown → yeniden dolar)
 // Tüm adalara EŞİT dağıt: her adada 1 hurma + 1 dut ağacı (kenarlarda, görev hattından uzak)
+// Gather node'ları ada'nın 4 KÖŞESİNE dağıt (ada-yarıçapı-farkında): merkez görev hattından (z≈±2.6)
+// ve birbirinden uzak → hiçbir şey birbirini gölgelemez. Kocaman hurma palmiyesi köşede, açıkta durur.
 const GATHER_DEFS=[];
-WORLD.islands.forEach(is=>{ const cx=is.c[0];
-  GATHER_DEFS.push({id:'palm_'+is.id, islId:is.id, pos:[cx-3,0,5], full:'date_palm', bare:'date_palm_bare', item:'hurma', amount:3, cd:40000, scale:3.4});   // hurma = en uzun ağaç (2x boy: yukarıdan hurma alma jesti gerçekçi olsun)
-  GATHER_DEFS.push({id:'mul_'+is.id, islId:is.id, pos:[cx+3,0,-5], full:'mulberry_tree', bare:'mulberry_tree_bare', item:'dut', amount:4, cd:30000, scale:1.0});
-  // KUYU: su çek (susuzluk için) — model değişmez, bol ve kısa cooldown (oyuncu lehine)
-  GATHER_DEFS.push({id:'well_'+is.id, islId:is.id, pos:[cx-4.5,0,-1.5], full:'well', bare:'well', item:'su', amount:3, cd:12000, scale:1.0});
-  // ARICILIK: yalnız Hurma Bahçesi'nde (2. ada) — çiçeklerden bal; hasat → cooldown (arılar tekrar doldurur)
-  if(is.id==='bahce') GATHER_DEFS.push({id:'hive_'+is.id, islId:is.id, pos:[cx+4.5,0,-4], full:'hive', bare:'hive', item:'bal', amount:2, cd:45000, scale:1.0});   // sağ-üst köşe (aşağıda/görünmez kalmasın)
+WORLD.islands.forEach(is=>{ const cx=is.c[0]; const off=is.r-2.5, offZ=is.r-3.0;   // köşe ofseti (kenardan içeri)
+  GATHER_DEFS.push({id:'palm_'+is.id, islId:is.id, pos:[cx-off,0, offZ], full:'date_palm', bare:'date_palm_bare', item:'hurma', amount:3, cd:40000, scale:3.4});   // ARKA-SOL köşe (dev palmiye açıkta)
+  GATHER_DEFS.push({id:'mul_'+is.id, islId:is.id, pos:[cx+off,0, offZ], full:'mulberry_tree', bare:'mulberry_tree_bare', item:'dut', amount:4, cd:30000, scale:1.0});   // ARKA-SAĞ köşe
+  // KUYU: su çek (susuzluk için) — ÖN-SOL köşe; model değişmez, bol ve kısa cooldown (oyuncu lehine)
+  GATHER_DEFS.push({id:'well_'+is.id, islId:is.id, pos:[cx-off,0,-offZ], full:'well', bare:'well', item:'su', amount:3, cd:12000, scale:1.0});
+  // ARICILIK: yalnız Hurma Bahçesi'nde (2. ada) — ÖN-SAĞ köşe; çiçeklerden bal; hasat → cooldown
+  if(is.id==='bahce') GATHER_DEFS.push({id:'hive_'+is.id, islId:is.id, pos:[cx+off,0,-offZ], full:'hive', bare:'hive', item:'bal', amount:2, cd:45000, scale:1.0});
 });
 // Prosedürel ARI KOVANI (skep) modeli — tpl'e enjekte edilir (base64 modeli yok)
 function buildHiveTemplate(){
@@ -1139,7 +1156,9 @@ function doGather(rec){
   const def=rec.def;
   if(!isUnlocked(def.islId)){ toast('🔒 Burası henüz açılmadı'); return; }
   if(!nodeReady(def)){ const s=Math.max(1,Math.ceil((S.gather[def.id]-Date.now())/1000)); toast('🌱 Olgunlaşıyor… '+s+' sn'); return; }
-  facePlayer(rec.g.position); playAction(1.1,'pluck');   // meyve/su: yukarı uzanıp koparma hareketi
+  facePlayer(rec.g.position);
+  if(def.item==='su') playAction(1.7,'draw');            // KUYU: ipi hand-over-hand çek (su çekme)
+  else playAction(1.1,'pluck');                          // meyve: yukarı uzanıp koparma
   invAdd(def.item, def.amount);
   S.gather[def.id]=Date.now()+def.cd;
   swapGatherModel(rec,false);
@@ -1458,7 +1477,7 @@ function enterMosque(){
   jVec.x=0; jVec.y=0; near=null;
   camera.position.copy(mosCamStart); camera.lookAt(mosCamLook);   // uçuş yok: doğrudan iç mekâna (tick dolly-in yapar)
   const ab=document.getElementById('act'); if(ab) ab.style.display='none';
-  const pe=document.getElementById('prompt'); if(pe) pe.style.display='none';
+  const pe=document.getElementById('prompt'); if(pe){ pe.classList.remove('show'); pe.style.display='none'; }
   document.getElementById('mosque').classList.add('show');
   mosqueFade(); renderMosque(); sndVakit(); banner('🕌 Mescid\'e girdin');
 }
@@ -1479,6 +1498,11 @@ const MESA_X=KABE_IC.x+46;                           // Sa'y AYRI yerde (Kâbe'd
 const hacSayCamPos=new THREE.Vector3(MESA_X,10,KABE_IC.z+11);
 const hacSayCamLook=new THREE.Vector3(MESA_X,1.0,KABE_IC.z);
 let hacState={phase:'ihram', tavaf:0, say:0, ang:Math.PI/4, angT:Math.PI/4, sayPos:-1, sayT:-1};
+// SİNEMATİK GİRİŞ: niyete basınca Kâbe etrafında yavaşça 360° dönüp zoom-in ile son konuma inilir
+let hacIntroT=0; const hacIntroDur=4.4, hacIntroEndAng=Math.PI/2;
+let warpBlock=false;   // geçiş sırasında hareket/etkileşim kilitli
+// GİRDAP GEÇİŞİ (Umre): adada kamera önce Z (roll) sonra Y (orbit) döner + karakter Kâbe'nin girdabına kapılır
+let hacVortexT=0; const hacVortexDur=2.1; let hacVortexCX=0, hacVortexCZ=0;
 function buildKaabaScene(){
   const g=new THREE.Group(); g.visible=false; hacGroup=g;
   const cx=KABE_IC.x, cz=KABE_IC.z;
@@ -1500,18 +1524,32 @@ function buildKaabaScene(){
 }
 function hacFade(){ const f=document.getElementById('hacFade'); if(!f)return; f.style.transition='none'; f.style.opacity='1'; requestAnimationFrame(()=>{ f.style.transition='opacity .55s ease'; f.style.opacity='0'; }); }
 function telbiye(){ if(muted) return; try{ const u=new SpeechSynthesisUtterance('لَبَّيْكَ اللَّهُمَّ لَبَّيْك'); u.lang='ar-SA'; u.rate=0.7; u.pitch=0.6; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){} }
+function startHacScene(){   // sahneyi Kâbe'ye çevir + 360° orbit sinematiğini başlat (girdap sonunda çağrılır)
+  hacVortexT=0; document.body.classList.remove('warping'); warpBlock=false;
+  if(player){ camera.up.set(0,1,0); player.rotation.x=0; player.rotation.z=0; player.position.y=0; player.scale.setScalar(1.95); }
+  hacMode=true; if(hacGroup) hacGroup.visible=true; near=null;
+  hacState={phase:'ihram', tavaf:0, say:0, ang:Math.PI/4, angT:Math.PI/4, sayPos:-1, sayT:-1};
+  hacIntroT=hacIntroDur;                                        // 360° dönüş + zoom-in
+  const ab=document.getElementById('act'); if(ab) ab.style.display='none';
+  const pe=document.getElementById('prompt'); if(pe){ pe.classList.remove('show'); pe.style.display='none'; }
+  document.getElementById('hac').classList.remove('show');     // panel orbit bitince açılır
+  renderHac(); banner('🕋 Kâbe\'ye yöneliyorsun…');
+}
 function enterHac(){
   if(!isUnlocked('sehir')){ toast('🔒 Önce Medine (Şehir) açılmalı — Umre için oradan yola çıkılır'); return; }
-  hacMode=true; if(hacGroup) hacGroup.visible=true;
-  jVec.x=0; jVec.y=0; near=null;
-  hacState={phase:'ihram', tavaf:0, say:0, ang:Math.PI/4, angT:Math.PI/4, sayPos:-1, sayT:-1};
-  camera.position.copy(hacCamPos); camera.lookAt(hacCamLook);
+  if(hacMode||hacVortexT>0) return;   // zaten geçişte/Mekke'de → tekrar tetikleme
+  // GİRDAP GEÇİŞİ: adada kamera ÖNCE Z (roll) SONRA Y (orbit) döner + karakter Kâbe'nin girdabına kapılıp
+  // dönerek/çekilerek aşağı iner → geçiş Kâbe etrafında dönen umreci (360° orbit) ile son bulur.
+  warpBlock=true; jVec.x=0; jVec.y=0; near=null;
   const ab=document.getElementById('act'); if(ab) ab.style.display='none';
-  const pe=document.getElementById('prompt'); if(pe) pe.style.display='none';
-  document.getElementById('hac').classList.add('show');
-  hacFade(); renderHac(); banner('🕋 Mîkāta vardın — Umre\'ye niyet');
+  const pe=document.getElementById('prompt'); if(pe){ pe.classList.remove('show'); pe.style.display='none'; }
+  document.body.classList.add('warping');   // HUD kaybol
+  hacVortexT=hacVortexDur; hacVortexCX=player?player.position.x:0; hacVortexCZ=player?player.position.z:0;
+  banner('🌀 Kâbe seni kendine çekiyor…');
 }
-function exitHac(){ hacMode=false; wake(); if(hacGroup) hacGroup.visible=false; document.getElementById('hac').classList.remove('show'); if(player){ camera.position.copy(player.position).add(CAM_OFF); } hacFade(); }
+function exitHac(){ hacMode=false; hacVortexT=0; warpBlock=false; document.body.classList.remove('warping'); wake();
+  if(hacGroup) hacGroup.visible=false; document.getElementById('hac').classList.remove('show');
+  if(player){ camera.up.set(0,1,0); player.rotation.x=0; player.rotation.z=0; player.position.y=0; player.scale.setScalar(1.95); camera.position.copy(player.position).add(CAM_OFF); } hacFade(); }
 function renderHac(){
   const st=document.getElementById('hacStep'), body=document.getElementById('hacBody'); if(!body)return;
   const P=hacState; let title='', h='';
@@ -1873,6 +1911,19 @@ function updateWoolHint(){
 
 /* ============ ÇALIŞMA ANİMASYONU (toplama/sağma/kırpma) ============ */
 let actionT=0, actionKind='work', actionDur=0.9;
+let camFocus=0;   // kamera sinematik odak (0=kuşbakışı … 1=alçak/yakın) — eylem/etkileşim sırasında yükselir
+let SIT_FOLD=-1.0, SIT_CROSS=-1.15;   // bağdaş: bacak ÖNE katlanır (negatif fold=ön) + dizler dışa/ayaklar içe yaw (setSitLegs ile ayarlanabilir)
+// OCCLUSION: kamera ile oyuncu arasında dev palmiye kalırsa kamerayı yukarı kaldır (palmiyenin üstünden bak)
+function occlusionLift(px,pz,cx,cz){
+  let lift=0; const dx=cx-px, dz=cz-pz, len2=dx*dx+dz*dz; if(len2<0.1) return 0;
+  for(const rec of gatherNodes){ if(!rec.def||rec.def.full!=='date_palm'||!rec.g||!rec.g.visible) continue;
+    const nx=rec.g.position.x, nz=rec.g.position.z;
+    const t=((nx-px)*dx+(nz-pz)*dz)/len2; if(t<0.08||t>0.96) continue;         // oyuncu↔kamera arasında mı?
+    const perp=Math.hypot(nx-(px+dx*t), nz-(pz+dz*t));
+    if(perp<2.8) lift=Math.max(lift,(2.8-perp)/2.8*8);                          // dev palmiye: üstünden bakacak kadar (≤8) yüksel
+  }
+  return lift;
+}
 function playAction(dur,kind){ actionT=dur||0.9; actionDur=actionT; actionKind=kind||'work'; }
 // Namaz sekansı: ilerleme p(0→1) → [kolAçısı, gövdeEğimi]. kıyam→rükû→kıyam→secde→celse→secde→kıyam.
 // (kol: swingLeg X açısı, 0=yanda; gövde: player.rotation.x öne eğim, 0=dik)
@@ -1935,19 +1986,19 @@ let marketRec=null, marketDecor=[], marketMerchant=null;
 function buildMarket(){
   marketDecor=[];
   const px=MARKET_POS.pos[0], pz=MARKET_POS.pos[2];
-  const it=instance('market_stall'); it.g.position.set(px,0,pz); it.g.rotation.y=0; it.g.scale.setScalar(3); scene.add(it.g);   // #7 Medine Pazarı 3x; ÖNÜ kameraya (+z) dönük
+  const it=instance('market_stall'); it.g.position.set(px,0,pz); it.g.rotation.y=0; it.g.scale.setScalar(1); scene.add(it.g);   // 3'te 1 küçültüldü (Suheyb); ÖNÜ kameraya (+z) dönük
   marketRec={ q:{id:'market', market:true, pos:MARKET_POS.pos, nm:'Medine Pazarı', ic:'🛒'}, g:it.g, meshes:it.meshes, market:true, islId:MARKET_POS.islId };
   interactables.push(marketRec);
-  OBSTACLES.push({x:px,z:pz,r:1.9});   // engel < etkileşim menzili(2.4) → oyuncu tezgâha yaklaşıp satış yapabilir
+  OBSTACLES.push({x:px,z:pz,r:0.7});   // küçük tezgâh → dar engel; oyuncu her yönden yaklaşıp satabilir
   // Tüccar: tezgâhın ARKA tarafında (kameradan uzak, -z), ÖNÜ müşteriye/kameraya (+z) dönük
   marketMerchant=instance('merchant'); tintNpc(marketMerchant.g,'merchant');
-  marketMerchant.g.position.set(px,0,pz-1.2); marketMerchant.g.rotation.order='YXZ'; marketMerchant.g.rotation.y=0;  // +z: yüzü bize dönük
-  marketMerchant.g.scale.setScalar(2.7); scene.add(marketMerchant.g); marketDecor.push(marketMerchant.g);
+  marketMerchant.g.position.set(px,0,pz-0.4); marketMerchant.g.rotation.order='YXZ'; marketMerchant.g.rotation.y=0;  // +z: yüzü bize dönük
+  marketMerchant.g.scale.setScalar(0.9); scene.add(marketMerchant.g); marketDecor.push(marketMerchant.g);   // tüccar da 3'te 1 küçültüldü
   // (merchant modeli kendi tezgâhı + malı + "sunma" pozuyla gelir — baked poz korunur)
-  // mal sepetleri ÖNDE (kamera tarafı, +z) — müşteri görsün
-  const b1=instance('basket'); b1.g.position.set(px-2.6,0,pz+1.6); b1.g.scale.setScalar(1.7); scene.add(b1.g); marketDecor.push(b1.g);
-  const b2=instance('sack');   b2.g.position.set(px+2.6,0,pz+1.6); b2.g.scale.setScalar(1.7); scene.add(b2.g); marketDecor.push(b2.g);
-  const j=instance('jar');     j.g.position.set(px,0,pz+2.2);      j.g.scale.setScalar(1.4); scene.add(j.g); marketDecor.push(j.g);
+  // mal sepetleri ÖNDE (kamera tarafı, +z) — müşteri görsün (ölçek+konum tezgâhla orantılı küçültüldü)
+  const b1=instance('basket'); b1.g.position.set(px-0.87,0,pz+0.53); b1.g.scale.setScalar(0.57); scene.add(b1.g); marketDecor.push(b1.g);
+  const b2=instance('sack');   b2.g.position.set(px+0.87,0,pz+0.53); b2.g.scale.setScalar(0.57); scene.add(b2.g); marketDecor.push(b2.g);
+  const j=instance('jar');     j.g.position.set(px,0,pz+0.73);       j.g.scale.setScalar(0.47); scene.add(j.g); marketDecor.push(j.g);
 }
 function sellGood(k, all){
   const have=S.inv[k]||0; if(have<=0) return;
@@ -2113,7 +2164,7 @@ function makeMuahat(){
 function doMuahat(rec){
   if(!isUnlocked('mahalle')){ toast('🔒 Burası henüz açılmadı'); return; }
   rec.g.rotation.y=Math.atan2(player.position.x-rec.g.position.x, player.position.z-rec.g.position.z);
-  facePlayer(rec.g.position); playAction();
+  facePlayer(rec.g.position); playAction(1.4,'hug');   // kardeşi selâmla/sarıl (garip 'çalışma' jesti yerine)
   if(!S.muahat){
     S.muahat=true; addNur(25); save(); refreshHUD(); sndFanfare();
     banner('🤝 Muâhât — Kardeşlik Ahdi');
@@ -2234,8 +2285,10 @@ function donateHayir(id){
 /* ============ MEDİNE ADALETİ — muhtaç ihmali → mutsuzluk → şehir huzursuzluğu/zulüm ============ */
 // Zekât/sadaka/hayrın düştüğü muhtaçlar. Haftalık gözetilmezlerse mutsuzlaşır; mutsuzluk
 // birikince şehirde yağma/eşkıya/saldırı çıkar → adaletsizlik. Sadaka/hayır ile düzelir.
-const NEEDY=[{id:'yetim1',nm:'yetim'},{id:'komsu1',nm:'komşu'},{id:'misafir1',nm:'yolcu'}];
-function moodTotal(){ return NEEDY.reduce((s,n)=>s+(S.mood[n.id]||0),0); }   // 0..9
+// yetim/komşu/yolcu → ilgili NPC'ye ikram ile gözetilir (careNeedy). DİLENCİ → yalnız SADAKA ile
+// gözetilir (careAllNeedy): "Bir dilenci geldiğinde onu boş çevirme." (Ebû Dâvûd) — sadaka ayrı vecîbe.
+const NEEDY=[{id:'yetim1',nm:'yetim'},{id:'komsu1',nm:'komşu'},{id:'misafir1',nm:'yolcu'},{id:'dilenci1',nm:'dilenci'}];
+function moodTotal(){ return NEEDY.reduce((s,n)=>s+(S.mood[n.id]||0),0); }   // 0..12 (4 muhtaç × 3)
 function careNeedy(id){ S.helpedWk[id]=true; S.mood[id]=Math.max(0,(S.mood[id]||0)-1); updateAdaletHud(); }     // bir muhtaç gözetildi
 function careAllNeedy(){ for(const n of NEEDY){ S.helpedWk[n.id]=true; S.mood[n.id]=Math.max(0,(S.mood[n.id]||0)-1); } updateAdaletHud(); }  // sadaka-i câriye topluma yayılır
 function weeklyJustice(){   // onNewDay'den — 7 günde bir değerlendirme
@@ -2326,7 +2379,9 @@ const MODELV='f8';   // model sürümü (well v2 yuvarlak+linear-renk → cache-
 // (models büyüdü → embed HTML'i şişirmesin; SW cache'ler, offline PWA çalışır. file:// bu modelleri yükleyemez.)
 const FETCH_ONLY = new Set(['boy_takke','camel','goat','sheep','traveler','date_palm','date_palm_bare','item_date','item_mulberry',
   'jar','market_stall','merchant','mulberry_tree','mulberry_tree_bare','neighbor','orphan',
-  'sack','scale','seccade','shepherd','well','basket']);
+  'sack','scale','seccade','shepherd','well','basket',
+  'arg_villager_a','arg_villager_b','qadi','plaintiff','beggar','trust_owner','trust_pouch',
+  'dispute_item','coop','mud_doorway','shade_bench','public_fountain']);
 function load(name){
   return new Promise(res=>{
     const data = (!FETCH_ONLY.has(name)) && window.IHYA_WORLD && window.IHYA_WORLD[name];
@@ -2448,7 +2503,7 @@ function buildIlimMeclisi(){
     add(new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.085,H,8), mat(0x8a6a3a)), IM[0]+dx, H/2, IM[2]+dz);
   const roof=new THREE.Mesh(new THREE.ConeGeometry(P*1.55,0.55,4), mat(0xe6d6a8)); roof.rotation.y=Math.PI/4;
   add(roof, IM[0], H+0.22, IM[2]);
-  meclisRoof=roof; MECLIS_C=[IM[0],IM[2]]; MECLIS_R=P*1.55*1.25;   // oyuncu altına/yakınına girince saydamlaşır (cömert kapsam)
+  meclisRoof=roof; MECLIS_C=[IM[0],IM[2]]; MECLIS_R=P*1.55*1.4;   // oyuncu altına/yakınına girince saydamlaşır (daha cömert kapsam)
   // 6 sahabe çember, merkeze (rahleye) dönük
   const robes=[0x7a8b5a,0x8a6f4a,0x6f7d8a,0x9a7b5a,0x6a8a6a,0x8a5a5a];
   const turbans=[0xe8e2d0,0xd8cbb0,0xeeeee6,0xd0c4a8,0xe4dcc8,0xdccfae];
@@ -2507,6 +2562,8 @@ function buildWorld(){
   buildAnimals();       // Medine: dolaşan hayvanlar (çobanlık)
   buildMarket();        // Medine: Şehir'de Sûk (pazar)
   buildNpcs();          // Medine: tekrarlanan hayır NPC'leri (yetim/komşu/misafir)
+  // KÜMES görseli — Hâne adası FARMYARD ses kümesine (tavuk/horoz sesleri Faz 11.26'da hazırdı)
+  try{ if(tpl.coop){ const cp=instance('coop'); cp.g.position.set(4,0,4); cp.g.rotation.y=-0.6; cp.g.scale.setScalar(1.35); scene.add(cp.g); OBSTACLES.push({x:4,z:4,r:1.1}); } }catch(e){ console.warn('coop yerleştirilemedi',e); }
 
   // player — boy_takke (takkeli çocuk): bacak/kol kalça-omuz pivotuyla animasyonlu
   const pl=instance('boy_takke');
@@ -2540,7 +2597,7 @@ const keys={};
 addEventListener('keydown',e=>keys[e.key.toLowerCase()]=true);
 addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 // sesi ilk kullanıcı etkileşiminde başlat (tarayıcı autoplay kuralı)
-['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{ audio(); startAmbient(); },{once:true}));
+['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{ audio(); startAmbient(); loadSamples(); },{once:true}));
 
 /* ============ INTERACTION ============ */
 let near=null, curQ=null;
@@ -2648,16 +2705,106 @@ function sndMarket(){ if(!audio()||muted)return; const ac=AC, t=ac.currentTime;
   const g=ac.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.04,t+0.2); g.gain.linearRampToValueAtTime(0.0001,t+0.85);
   src.connect(bp); bp.connect(g); g.connect(masterGain||ac.destination); src.start(t);
   if(Math.random()<0.5) voice(180+Math.random()*60,158,0.5,'sawtooth',0.02,5); }   // hafif insan uğultusu
+/* ============ Faz 11.26: GERÇEK ÖRNEK SESLER (mp3) — pazar/kuyu/hayvan yakınlık ============ */
+// sounds/ klasöründeki mp3'ler fetch+decode ile yüklenir (http.server/GitHub Pages'te çalışır).
+// Yüklenemezse (file://) sessizce eski sentetik seslere düşülür (regresyon yok).
+// İki tür: (1) DÖNGÜ YATAĞI — pazar uğultusu + kuyu suyu, mesafeye göre ses açılır/kısılır (uzak=kısık, yakın=gür).
+//          (2) YAKINLIK TEK-ATIŞ — koyun/deve/tavuk/horoz; yaklaşınca öbek-öbek öter, azalır, bir süre sonra tekrar.
+const SND_URL={
+  bazaar:'sounds/chrysalyn-middle-eastern-bazaar-ambiance-540235.mp3',
+  water:'sounds/dany_photo-water-423114.mp3',
+  sheep:'sounds/freesound_community-sheep-23761.mp3',
+  camel:'sounds/rzalmanialmani-camel-male-sound-effect-370202.mp3',
+  chicken:'sounds/digitalstore07-chicken-430403.mp3',
+  rooster:'sounds/nematoki-rooster-cry-chicken-rooster-305576.mp3',
+};
+const sndBuf={}; let sndReady=false, sndLoading=false, sndCount=0;
+function loadSamples(){ if(sndLoading||!audio())return; sndLoading=true;
+  const ac=AC, keys=Object.keys(SND_URL);
+  keys.forEach(k=>fetch(SND_URL[k]).then(r=>r.ok?r.arrayBuffer():Promise.reject())
+    .then(b=>new Promise((res,rej)=>ac.decodeAudioData(b,res,rej)))
+    .then(buf=>{ sndBuf[k]=buf; }).catch(()=>{})
+    .then(()=>{ if(++sndCount>=keys.length){ if(Object.keys(sndBuf).length){ sndReady=true; startBeds(); } } }));
+}
+// tek atış örnek (yakınlık ses seviyesi + hafif perde varyasyonu → tekdüze olmasın)
+function playSnd(key,gain,rate){ const buf=sndBuf[key]; if(!buf||!AC||muted)return;
+  const src=AC.createBufferSource(); src.buffer=buf; if(rate) src.playbackRate.value=rate;
+  const g=AC.createGain(); g.gain.value=Math.max(0,Math.min(1,gain));
+  src.connect(g); g.connect(masterGain||AC.destination); src.start(); }
+// döngü yatakları (looping) — pazar + kuyu suyu; gain her kare mesafeye göre yumuşak ayarlanır
+let bedBazaar=null, bedWater=null;
+function makeBed(key){ const buf=sndBuf[key]; if(!buf||!AC)return null;
+  const src=AC.createBufferSource(); src.buffer=buf; src.loop=true;
+  const g=AC.createGain(); g.gain.value=0; src.connect(g); g.connect(masterGain||AC.destination); src.start();
+  return {src,g}; }
+function startBeds(){ if(!bedBazaar) bedBazaar=makeBed('bazaar'); if(!bedWater) bedWater=makeBed('water'); }
+// mesafe→ses: near'da maxG, far'da 0, arada doğrusal
+function distGain(d,near,far,maxG){ if(d>=far)return 0; if(d<=near)return maxG; return maxG*(far-d)/(far-near); }
+function setBed(bed,target){ if(!bed||!AC)return; bed.g.gain.setTargetAtTime(muted?0:target, AC.currentTime, 0.45); }
+function nearestWellDist(px,pz){ let d=1e9; for(const rec of gatherNodes){ if(rec.def.item!=='su'||!rec.g.visible)continue;
+  const p=rec.g.position; const dd=Math.hypot(px-p.x,pz-p.z); if(dd<d)d=dd; } return d; }
+function updateBeds(){ if(!sndReady||!player)return; const px=player.position.x,pz=player.position.z;
+  let dM=1e9; if(marketRec&&marketRec.g.visible) dM=Math.hypot(px-MARKET_POS.pos[0],pz-MARKET_POS.pos[2]);
+  setBed(bedBazaar, distGain(dM,2.5,16,0.6));        // pazar: uzaktan ufak, tam önünde gür
+  setBed(bedWater, distGain(nearestWellDist(px,pz),1.5,9,0.4)); }
+// ---- YAKINLIK TEK-ATIŞ: koyun/deve (dolaşan hayvan) + tavuk/horoz (ev adası kümesi) ----
+const FARMYARD={x:4,z:4};   // Hâne adasında tavuk/horoz kümesi (görsel GLB sonra; ses şimdi)
+// NOT: HOROZ artık yakınlık sistemi değil — yalnız EZAN VAKİTLERİNDEN 15 sn önce, HER adadan, hafif öter
+// (kuşluk öncesi güçlü, güneş doğuşunu bildirir). Bkz. updateRoosterAzan(). Tavuk yakınlıkta sık öter.
+const voiceT={sheep:2,camel:5,goat:4,chicken:2.5};   // her tür için "sonraki ötüşe sn"
+function nearestAnimalDist(px,pz,model){ let d=1e9; for(const an of animals){ if(an.def.model!==model)continue;
+  const g=an.rec.g; if(!g.visible)continue; const dd=Math.hypot(px-g.position.x,pz-g.position.z); if(dd<d)d=dd; } return d; }
+function updateVoices(dt){ if(!sndReady||muted||!player)return; const px=player.position.x,pz=player.position.z;
+  for(const k in voiceT){ voiceT[k]-=dt; if(voiceT[k]>0)continue;
+    let d;
+    if(k==='sheep'||k==='camel'||k==='goat') d=nearestAnimalDist(px,pz,k);
+    else d=Math.hypot(px-FARMYARD.x,pz-FARMYARD.z);   // tavuk
+    const near = (k==='camel')?7:5, far=20;
+    if(d>=far){ voiceT[k]=3+Math.random()*4; continue; }        // menzil dışı → biraz sonra tekrar bak
+    if(k==='goat'){ sndGoat(); }   // keçi: örnek yok → sentetik
+    else {
+      let gain=distGain(d,near,far,(k==='camel')?0.55:0.5);
+      playSnd(k,gain,0.93+Math.random()*0.14);
+      if(Math.random()<0.4) setTimeout(()=>playSnd(k,gain*0.8,0.9+Math.random()*0.16),480+Math.random()*520);  // öbek: bazen 2. çağrı
+    }
+    // sonraki öbek: yakınsa sık (~7s), uzaksa seyrek (~24s); tavuk daha sık
+    const nf=Math.max(0,(far-d)/(far-near));   // 1 yakın … 0 uzak
+    let gap=7 + (1-nf)*17;
+    if(k==='chicken') gap*=0.6;   // tavuklar daha çok öter
+    if(k==='goat')    gap*=1.2;
+    voiceT[k]=gap*(0.7+Math.random()*0.6);
+  }
+}
+// HOROZ = EZAN HABERCİSİ: her ezan vaktinden 15 sn önce, HER adadan (global, konumsuz) hafif öter — ezanın
+// geldiğini hatırlatır; KUŞLUK öncesi daha güçlü (güneşin doğuşunu bildirir). Yakınlığa bağlı değil.
+const AZAN_STARTS=[[0.20,'Fecir'],[0.27,'Kuşluk'],[0.45,'Öğle'],[0.58,'İkindi'],[0.68,'Akşam'],[0.78,'Yatsı']];
+let lastRoosterCrow=-1;
+function updateRoosterAzan(){
+  if(!sndReady||muted) return;
+  const W=0.025;   // 15 sn (DAY_LEN=600 → 15/600 gameTime)
+  for(const vs of AZAN_STARTS){ const t=vs[0], nm=vs[1];
+    if(gameTime>=t-W && gameTime<t && lastRoosterCrow!==t){
+      lastRoosterCrow=t; const strong=(nm==='Kuşluk');
+      playSnd('rooster', strong?0.55:0.24, 0.96+Math.random()*0.08);          // hafif; kuşluk güçlü — baskın değil
+      if(strong) setTimeout(()=>{ playSnd('rooster',0.42,0.93+Math.random()*0.08); },700);   // güneş doğuşu: ikinci ötüş
+      return;
+    }
+  }
+  if(gameTime<0.19) lastRoosterCrow=-1;   // yeni gün (gece başı) → sıfırla
+}
 let sceneAmbAcc=0, sceneAmbNext=2.6;
 function updateSceneAmbient(dt){
-  if(!ambientOn||muted||!player) return;
+  if(!player) return;
+  if(sndReady) updateBeds();          // döngü yatakları her kare (mesafe→ses), muted olsa da 0'a iner
+  updateVoices(dt);                    // yakınlık tek-atış (kendi cooldown'u; muted'da çalmaz)
+  if(!ambientOn||muted) return;
   sceneAmbAcc+=dt; if(sceneAmbAcc<sceneAmbNext) return;
   sceneAmbAcc=0; sceneAmbNext=2.4+Math.random()*3.4;
+  if(sndReady) return;                 // örnekler yüklüyse sentetik pazar/hayvan çalma (yatak+voices hallediyor)
   const px=player.position.x, pz=player.position.z;
-  // pazar uğultusu (Sûk yakınında)
+  // --- FALLBACK (örnek yüklenemedi, ör. file://): eski sentetik pazar/hayvan uğultusu ---
   if(marketRec && marketRec.g.visible){ const dM=Math.hypot(px-MARKET_POS.pos[0],pz-MARKET_POS.pos[2]);
     if(dM<9 && Math.random()<0.6){ sndMarket(); return; } }
-  // en yakın görünür hayvanın sesi
   let best=null,bd=8.5;
   for(const an of animals){ const g=an.rec.g; if(!g.visible) continue; const dd=Math.hypot(px-g.position.x,pz-g.position.z); if(dd<bd){ bd=dd; best=an; } }
   if(best && Math.random()<0.7){ const m=best.def.model; if(m==='sheep') sndSheep(); else if(m==='goat') sndGoat(); else sndCamel(); }
@@ -2907,7 +3054,7 @@ function tick(){
   if(keys['w']||keys['arrowup']) iz-=1; if(keys['s']||keys['arrowdown']) iz+=1;
   if(keys['a']||keys['arrowleft']) ix-=1; if(keys['d']||keys['arrowright']) ix+=1;
   const mag=Math.hypot(ix,iz);
-  const moving = player && mag>0.06 && !mosqueMode && !hacMode && !introMode;   // mescit/Mekke/intro'dayken hareket durur
+  const moving = player && mag>0.06 && !mosqueMode && !hacMode && !introMode && !warpBlock;   // mescit/Mekke/intro/geçiş'te hareket durur
   if(moving){
     ix/=Math.max(mag,1); iz/=Math.max(mag,1);
     const spd=8.5, nx=player.position.x+ix*spd*dt, nz=player.position.z+iz*spd*dt;   // yürüme hızı artırıldı (daha akıcı)
@@ -2917,21 +3064,41 @@ function tick(){
     player.rotation.y=Math.atan2(ix,iz);
     walkPhase += dt*12;               // yürüme çevrimi hızı
     player.position.y=Math.abs(Math.sin(walkPhase))*0.05;   // gövde zıplaması
-  } else if(player){ player.position.y += (-sitAmount*0.26 - player.position.y)*0.2; }   // idle: otururken gövde alçalır
+  } else if(player){ player.position.y += (-sitAmount*0.42 - player.position.y)*0.2; }   // idle: otururken kalça yere iner (ayaklar öne uzatılmış oturuş)
   // AFK OTURMA: 10 sn hareketsiz + eylemsiz kalınca oyuncu yere çömer; dokunma/tuş (wake) → kalkar
   const nowS = performance.now()/1000;
   if(moving) lastActT = nowS;
   const canSit = player && !moving && actionT<=0 && !mosqueMode && !hacMode && !introMode;
   const sitTarget = (canSit && (nowS-lastActT)>10) ? 1 : 0;
   sitAmount += (sitTarget - sitAmount) * Math.min(1, dt*3.2);
+  // GİRDAP POZU: Kâbe'nin girdabına kapılmış — kollar havada çırpınır (kurtulmaya çalışır), ayaklar aşağı çekilir,
+  // gövde giderek hızlanarak döner ve küçülerek aşağı iner. (diğer poz blokları girdapta atlanır)
+  if(hacVortexT>0 && PP && PP.legL && PP.armL){
+    const vp=1-Math.max(0,hacVortexT)/hacVortexDur, et=clock.elapsedTime;
+    const fl=Math.sin(et*17);
+    swingLeg(PP.armL, -2.35+fl*0.55); swingLeg(PP.armR, -2.35-fl*0.55);      // kollar yukarı, çırpınır (kurtulmaya çalışır)
+    swingLeg(PP.legL, -0.45); swingLeg(PP.legR, -0.45);                       // ayaklar girdaba (aşağı-arka)
+    for(const q of PP.legL.parts){ q.rotation.order='XYZ'; q.rotation.y=0; }
+    for(const q of PP.legR.parts){ q.rotation.order='XYZ'; q.rotation.y=0; }
+    // KENDİ EKSENİNDE DÖNME YOK (mide bulanması) — dönüşü YALNIZ kamera yapar. Karakter sadece çekilir/batar/küçülür.
+    player.rotation.x = vp*0.22;                                              // hafif öne (girdaba çekilir)
+    player.rotation.z = 0;
+    player.position.y = -vp*0.6;                                              // aşağı çekilir
+    player.scale.setScalar(1.95*(1-vp*0.35));                                 // küçülerek girdaba girer
+  }
   // BACAK + KOL salınımı (boy_takke: kalça/omuz pivotu, swingLeg). Yürürken sall, otururken kıvrık, dururken sıfır.
-  if(PP && PP.legL){
-    const sw = moving ? Math.sin(walkPhase) : 0, legSit = sitAmount*1.4;
+  if(hacVortexT<=0 && PP && PP.legL){
+    // OTURUŞ = BAĞDAŞ: bacaklar öne katlanır (X) + içe YAW'lanır (Y) → önde çaprazlanır (ne uzatılmış ne arkada).
+    const sw = moving ? Math.sin(walkPhase) : 0, legSit = sitAmount*SIT_FOLD;
     swingLeg(PP.legL, legSit + sw*0.5); swingLeg(PP.legR, legSit - sw*0.5);
-    if(actionT<=0){ swingLeg(PP.armL, -sw*0.42 + sitAmount*0.45); swingLeg(PP.armR, sw*0.42 + sitAmount*0.45); }   // otururken kollar dizlere doğru
+    // İÇE yaw (çapraz) — ayaklar önde karşı tarafa geçsin (bağdaş). yürürken 0. order='YXZ' (yaw dıştan)
+    const cross = sitAmount*SIT_CROSS;
+    for(const p of PP.legL.parts){ p.rotation.order='YXZ'; p.rotation.y = cross; }
+    for(const p of PP.legR.parts){ p.rotation.order='YXZ'; p.rotation.y = -cross; }
+    if(actionT<=0){ swingLeg(PP.armL, -sw*0.42 + sitAmount*0.5); swingLeg(PP.armR, sw*0.42 + sitAmount*0.5); }   // otururken eller dizlere/kucağa
   }
   // ÇALIŞMA animasyonu — eyleme göre FARKLI kol hareketi (toplama/sağma/kırpma/namaz)
-  if(PP && PP.armL){
+  if(hacVortexT<=0 && PP && PP.armL){
     if(actionT>0){ actionT-=dt; const et=clock.elapsedTime; let aL,aR;
       if(actionKind==='pluck'){ const w=Math.sin(et*9);  aL=-2.1+w*0.45; aR=-2.1-w*0.45; }        // meyve: kollar yukarı, sırayla koparır
       else if(actionKind==='milk'){ const w=Math.sin(et*13); aL=-0.5+Math.max(0,w)*0.45; aR=-0.5+Math.max(0,-w)*0.45; }  // süt: eller alçakta sırayla çeker
@@ -2943,12 +3110,22 @@ function tick(){
         player.rotation.y += dy*0.12;                                                              // kıbleye YUMUŞAK dön (namaz başında belirgin)
         const p=1-Math.max(0,actionT)/Math.max(0.01,actionDur); const ps=namazPose(p); aL=ps[0]; aR=ps[0];
         player.rotation.x += (ps[1] - player.rotation.x)*0.22; }                                   // gövde eğimi (rükû/secde)
+      else if(actionKind==='draw'){                                                                  // KUYUDAN SU ÇEK: ipi hand-over-hand yukarı çek
+        const l=Math.sin(et*3.4), r=Math.sin(et*3.4+Math.PI);                                        // iki el ters faz (yavaş → belirgin)
+        aL=-1.5+l*1.25; aR=-1.5+r*1.25;                                                               // -2.75 (yukarı uzanıp ipi tut) ↔ -0.25 (aşağı çek)
+        player.rotation.x += (0.15 - player.rotation.x)*0.12;                                         // kuyuya doğru hafif eğil
+        player.position.y = -Math.abs(Math.sin(et*3.4))*0.06; }                                       // çekişle senkron hafif zorlanma bobu
+      else if(actionKind==='hug'){                                                                   // MUÂHÂT: kardeşi selâmla/sarıl
+        const p=1-Math.max(0,actionT)/Math.max(0.01,actionDur); const open=Math.sin(p*Math.PI);      // 0→1→0 kollar açılıp kapanır
+        aL=-1.5-open*0.8; aR=-1.5-open*0.8;                                                           // iki kol öne-yukarı (kucaklama)
+        player.rotation.x += (0.13*open - player.rotation.x)*0.18; }                                  // sıcak selâm: hafif öne eğilme
       else { const w=Math.sin(et*17); aL=-1.15+w*0.5; aR=-1.15-w*0.5; }                             // genel çalışma: kollar öne-aşağı
       swingLeg(PP.armL, aL); swingLeg(PP.armR, aR);
       if(actionT<=0 && actionKind==='namaz') lastActT = nowS - 11;   // namaz bitti + AFK → seccadede otur (10sn beklemeden)
     }
-    // gövde eğimi: namaz/ikram sırasında pozdan; bitince otururken hafif öne, ayakta dik
-    if(!(actionT>0 && (actionKind==='namaz'||actionKind==='give'))) player.rotation.x += (sitAmount*0.2 - player.rotation.x)*0.2;
+    // gövde eğimi: namaz/ikram sırasında pozdan; bitince ayakta dik. OTURURKEN gövde DİK dursun
+    // (öne eğik komik görünüyordu → hafif geriye/dik ~ -0.04, bağdaş kuran biri gibi doğal)
+    if(!(actionT>0 && (actionKind==='namaz'||actionKind==='give'||actionKind==='hug'||actionKind==='draw'))) player.rotation.x += (sitAmount*-0.04 - player.rotation.x)*0.2;
   }
   // seccade serilme (açılma) animasyonu
   if(seccadeAnim>0 && laidSeccadeRec){ seccadeAnim-=dt*2.6; const t=Math.max(0,Math.min(1,1-seccadeAnim)); const e=t*t*(3-2*t); const s=0.16+0.84*e; laidSeccadeRec.g.scale.set(s,1,s); if(seccadeAnim<=0){ laidSeccadeRec.g.scale.set(1,1,1); seccadeAnim=0; } }
@@ -2956,24 +3133,75 @@ function tick(){
   if(introMode){
     introTick(dt);           // sinematik: kamera + kahraman uyanış pozu
   } else if(hacMode){
-    const sayNow=hacState.phase==='say';               // sa'y AYRI Mes'â'da → kamera oraya kayar (Kâbe görünmez)
-    camera.position.lerp(sayNow?hacSayCamPos:hacCamPos, 0.1);
-    camera.lookAt(sayNow?hacSayCamLook:hacCamLook);
-    hacTick(dt);              // tavâf: Kâbe etrafında döner; sa'y: Safâ↔Merve yürür
+    if(hacIntroT>0){          // SİNEMATİK GİRİŞ: Kâbe etrafında yavaşça 360° dön + zoom-in
+      hacIntroT-=dt;
+      const p=1-Math.max(0,hacIntroT)/hacIntroDur;     // 0→1
+      const e=p*p*(3-2*p);                             // smoothstep (yavaş başla/yavaş bitir)
+      const cx=KABE_IC.x, cz=KABE_IC.z;
+      const ang=hacIntroEndAng - (1-e)*Math.PI*2;      // TAM 360° dönerek son açıya varır
+      const rad=30+(13-30)*e, hgt=21+(10.5-21)*e;      // uzaktan/yüksekten → yakına/alçağa (zoom-in)
+      camera.position.set(cx+Math.cos(ang)*rad, hgt, cz+Math.sin(ang)*rad);
+      camera.lookAt(cx, 5+(1.2-5)*e, cz-1);            // hep Kâbe'ye bak; yaklaştıkça alçal
+      if(hacIntroT<=0){ hacIntroT=0; document.getElementById('hac').classList.add('show'); banner('🕋 Mîkāta vardın — Umre\'ye niyet'); }
+    } else {
+      const sayNow=hacState.phase==='say';             // sa'y AYRI Mes'â'da → kamera oraya kayar (Kâbe görünmez)
+      camera.position.lerp(sayNow?hacSayCamPos:hacCamPos, 0.1);
+      camera.lookAt(sayNow?hacSayCamLook:hacCamLook);
+      hacTick(dt);              // tavâf: Kâbe etrafında döner; sa'y: Safâ↔Merve yürür
+    }
   } else if(mosqueMode){
     camera.position.lerp(mosCamPos,0.08);
     camera.lookAt(mosCamLook);
     updateMosqueCountdown();   // sonraki namaza geri-sayım (canlı animasyon)
+  } else if(hacVortexT>0 && player){
+    // GİRDAP GEÇİŞİ — KARAKTER ETRAFINDA Z-ROLL (ekran döner): kamera sabit (arkadan), oyuncu ekran ortasında;
+    // ekran Z ekseninde döner — ÖNCE yavaş ~1 tur, SONRA hızlanan tur → girdaba yaklaşır → Kâbe 360° orbit'ine geçer.
+    hacVortexT-=dt;
+    const p=1-Math.max(0,hacVortexT)/hacVortexDur;   // 0→1
+    const cx=hacVortexCX, cz=hacVortexCZ, py=player.position.y;
+    const roll=p*Math.PI*2*(1 + p*p*2.4);            // p:0→1 → 0 … ~2π*3.4 (ilk yavaş bir tur, sonra hızlanan)
+    const rad=11+(3.0-11)*(p*p);                     // sabit yön (arkadan +z), girdaba yaklaşır (zoom-in)
+    const hgt=9+(4.2-9)*p;                           // alçalır
+    camera.position.set(cx, py+hgt, cz+rad);         // Y-orbit YOK — konum sabit yön
+    camera.up.set(Math.sin(roll), Math.cos(roll), 0);// Z-ekseni roll → oyuncu merkezde, ekran döner
+    camera.lookAt(cx, py+0.25, cz);
+    if(hacVortexT<=0){ startHacScene(); }            // girdap doldu → Kâbe 360° orbit'i (dönen umreci)
   } else if(player){
-    tmp.copy(player.position).add(CAM_OFF);
+    camera.up.set(0,1,0);
+    // SİNEMATİK KAMERA ODAĞI — kuşbakışından alçalıp yatay açıya geçer, sahne daha yakın/gerçekçi olur.
+    // İki tetik: (1) İLİM MECLİSİ yakınlığı → çadır altındaki sahabe görünsün (yukarı bakar, lookY yüksek).
+    //           (2) HER ETKİLEŞİM/EYLEM (kuyudan su çek, ikram, sağma, selâm…) → 'lean-in' dip.
+    const mix=(a,b,e)=>a+(b-a)*e;
+    // odak hedefi: EYLEM sırasında tam (1) — kuyu/ikram/sağma…; sadece YAKINDA (altyazı belirir) hafif (0.5);
+    // uzakta 0. Böylece etkileşim yazısı + kamera yaklaşması BİRLİKTE olur. (near önceki kareden — 1 kare gecikme önemsiz)
+    const wantFocus = (actionT>0) ? 1 : (near ? 0.5 : 0);
+    camFocus += (wantFocus - camFocus) * Math.min(1, dt*3.5);
+    // meclis yakınlık faktörü (smoothstep)
+    let mecK=0;
+    if(meclisRoof){ const dM=Math.hypot(player.position.x-MECLIS_C[0],player.position.z-MECLIS_C[1]);
+      const outer=MECLIS_R+2.5, k=Math.max(0,Math.min(1,(outer-dM)/outer)); mecK=k*k*(3-2*k); }
+    let oy, oz, lookY;
+    if(mecK>=camFocus){ const e=mecK;                       // meclis baskın → çadır altına bak
+      oy=mix(CAM_OFF.y,5.2,e); oz=mix(CAM_OFF.z,15.5,e); lookY=mix(0.8,2.3,e); }
+    else { const e=camFocus;                                // etkileşim lean-in → oyuncu/eyleme bak
+      oy=mix(CAM_OFF.y,6.8,e); oz=mix(CAM_OFF.z,15.0,e); lookY=mix(0.8,1.25,e); }
+    // Z hareketiyle birlikte Y'de de oyna: (a) hafif rastgele salınım (canlılık, sabit occlusion'ı kırar),
+    // (b) kamera↔oyuncu arasında dev palmiye varsa üstünden bakacak kadar yüksel (arkasında kalmasın).
+    const camWX=player.position.x+CAM_OFF.x, camWZ=player.position.z+oz;
+    oy += occlusionLift(player.position.x, player.position.z, camWX, camWZ);
+    const et2=clock.elapsedTime;
+    oy += camFocus * (Math.sin(et2*0.7)*0.6 + Math.sin(et2*1.13+1.7)*0.4);      // ±~1.0, yavaş, çok abartmadan
+    tmp.set(camWX, player.position.y+oy, camWZ);
     camera.position.lerp(tmp,0.12);
-    camera.lookAt(player.position.x,player.position.y+0.8,player.position.z);
+    camera.lookAt(player.position.x,player.position.y+lookY,player.position.z);
   }
   // nearest interactable (mescit/Mekke/intro'dayken kapalı)
   if(player && !mosqueMode && !hacMode && !introMode){
-    let best=null,bd=2.4;
-    for(const r of interactables){ const dd=Math.hypot(r.g.position.x-player.position.x,r.g.position.z-player.position.z);
-      if(dd<bd){ bd=dd; best=r; } }
+    // etkileşim menzili: varsayılan 2.4; PAZAR daha geniş (4.8) → hangi yönden gelirsen gel satış açılır
+    let best=null,bd=Infinity;
+    for(const r of interactables){ const reach=r.market?4.8:(r.reach||2.4);
+      const dd=Math.hypot(r.g.position.x-player.position.x,r.g.position.z-player.position.z);
+      if(dd<reach && dd<bd){ bd=dd; best=r; } }
     if(best!==near){ near=best;
       if(near){ actBtn.style.display='block';
         if(near.seccadePickup){ actBtn.textContent='🧎 Seccadeni al'; }
@@ -2987,15 +3215,10 @@ function tick(){
         else if(near.exam){ actBtn.textContent = S.conquered[near.islId] ? 'Meydan ✓' : (examReady(near.islId) ? '📝 İmtihana Gir' : '🔒 Önce dersler'); }
         else actBtn.textContent = S.done[near.q.id] ? 'Bak ✓'
           : (questAvailable(near.q) ? 'Etkileşim '+near.q.ic : '🔒 Sırası değil'); }
-      else { actBtn.style.display='none'; promptEl.style.display='none'; }
+      else { actBtn.style.display='none'; promptEl.classList.remove('show'); promptEl.style.display='none'; }
     }
-    if(near){ // prompt position — etiket BAŞIN ÜSTÜNE (yüzü kapatmasın); ölçek-farkında yükseklik
-      const _s=(near.g.scale&&near.g.scale.x)||1;
-      const _yOff = near.gather ? 2.6
-                  : (near.npc||near.muahat||near.animal) ? (_s*1.15+0.6)   // NPC/hayvan: baş üstü (yüz görünür)
-                  : 1.3;
-      tmp.copy(near.g.position); tmp.y+=_yOff; tmp.project(camera);
-      promptEl.style.display='block';
+    if(near){ // etkileşim yazısı: sabit ALT-ORTA altyazı (kamera odağıyla birlikte belirir) — projeksiyon yok
+      promptEl.style.display='block'; promptEl.classList.add('show');
       promptEl.textContent = near.seccadePickup
         ? '🧎 Seccadeni al'
         : near.mosque
@@ -3015,8 +3238,6 @@ function tick(){
         : near.exam
         ? ((S.conquered[near.islId]?'✓ ':examReady(near.islId)?'📝 ':'🔒 ')+'İmtihan Meydanı')
         : (!S.done[near.q.id]&&!questAvailable(near.q)?'🔒 ':'')+near.q.nm;
-      promptEl.style.left=(tmp.x*0.5+0.5)*innerWidth+'px';
-      promptEl.style.top=(-tmp.y*0.5+0.5)*innerHeight+'px';
     }
   }
   // sıradaki yapılabilir görev parıldasın (yol gösterir)
@@ -3060,7 +3281,7 @@ function tick(){
   updateNeeds(dt);
   // ilim meclisi gölgeliği: oyuncu altına girince saydamlaş (altı görünsün)
   if(meclisRoof && player){ const under=Math.hypot(player.position.x-MECLIS_C[0],player.position.z-MECLIS_C[1])<MECLIS_R;
-    const m=meclisRoof.material, tgt=under?0.14:1; m.transparent=under||m.opacity<0.99;
+    const m=meclisRoof.material, tgt=under?0.10:1; m.transparent=under||m.opacity<0.99;   // daha net saydam
     m.opacity += (tgt-m.opacity)*0.18; m.depthWrite=m.opacity>0.9; if(m.opacity>0.995){m.opacity=1;m.transparent=false;} }
   renderer.render(scene,camera);
   requestAnimationFrame(tick);
@@ -3130,7 +3351,7 @@ function introTick(dt){
 }
 
 /* ============ BOOT ============ */
-console.log('%cİHYA sürüm: Faz 11.25 — AFK OTURMA: 10 sn hareketsiz kalınca oyuncu yere çömer; namaz bitince (AFK ise) seccadede oturur; dokunma/tuş ile ayağa kalkar; intro\'da net otur→ayağa kalk animasyonu','color:#8fce58;font-weight:bold');
+console.log('%cİHYA sürüm: Faz 11.29 — UMRE GİRDABI: karakter ETRAFINDA Z-ROLL (ekran döner, ÖNCE yavaş ~1 tur SONRA hızlanan tur, kamera sabit yön + zoom) + karakter girdaba kapılır (kollar çırpınır/batar/küçülür) → Kâbe 360° orbit. HOROZ: yakınlık değil — ezandan 15 sn önce HER adadan hafif öter (kuşluk öncesi güçlü=güneş doğuşu), tavuk daha sık. (önceki: sinematik kamera+occlusion, su çekme, altyazı, muâhât sarılma, bağdaş, güneş-ay geçişi, 13 model kayıtlı+kümes)','color:#8fce58;font-weight:bold');
 (async()=>{
   let n=0;
   for(const m of MODELS){ await load(m); loadBar.style.width=(++n/MODELS.length*100)+'%'; }
@@ -3225,6 +3446,43 @@ console.log('%cİHYA sürüm: Faz 11.25 — AFK OTURMA: 10 sn hareketsiz kalınc
     teleport:(x,z)=>{ if(player){ player.position.x=x; player.position.z=z; } return player?[player.position.x,player.position.z]:null; },
     doMuahat:()=>{ if(muahatRec) doMuahat(muahatRec); return S.muahat; },
     sndTest:(w)=>{ ({sheep:sndSheep,goat:sndGoat,camel:sndCamel,market:sndMarket})[w]&&({sheep:sndSheep,goat:sndGoat,camel:sndCamel,market:sndMarket})[w](); },
+    soundState:()=>{ const px=player?player.position.x:0,pz=player?player.position.z:0;
+      let dM=1e9; if(marketRec&&marketRec.g.visible) dM=Math.hypot(px-MARKET_POS.pos[0],pz-MARKET_POS.pos[2]);
+      const dW=nearestWellDist(px,pz);
+      return {ready:sndReady, loading:sndLoading, count:sndCount, loaded:Object.keys(sndBuf), acState:AC?AC.state:'noAC',
+      beds:{bazaar:bedBazaar?+bedBazaar.g.gain.value.toFixed(3):null, water:bedWater?+bedWater.g.gain.value.toFixed(3):null},
+      targets:{bazaar:+distGain(dM,2.5,16,0.6).toFixed(3), water:+distGain(dW,1.5,9,0.4).toFixed(3)},
+      dist:{market:+dM.toFixed(1), well:+dW.toFixed(1), marketVis:!!(marketRec&&marketRec.g.visible)},
+      voiceT:Object.assign({},voiceT)}; },
+    playSnd:(k,g)=>playSnd(k,g==null?0.5:g),
+    farmyard:()=>FARMYARD,
+    setSitLegs:(f,c)=>{ if(f!=null)SIT_FOLD=f; if(c!=null)SIT_CROSS=c; return {fold:SIT_FOLD,cross:SIT_CROSS}; },
+    legInfo:()=>{ if(!player) return null; player.updateMatrixWorld(true);
+      const ry=player.rotation.y, cx=player.position.x, cz=player.position.z;
+      const gw=(name)=>{ const o=player.getObjectByName(name); if(!o||!o.geometry) return null;
+        if(!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+        const bb=o.geometry.boundingBox, gx=(bb.min.x+bb.max.x)/2, gy=(bb.min.y+bb.max.y)/2, gz=(bb.min.z+bb.max.z)/2;
+        o.updateMatrixWorld(true); const e=o.matrixWorld.elements;
+        const wx=e[0]*gx+e[4]*gy+e[8]*gz+e[12], wy=e[1]*gx+e[5]*gy+e[9]*gz+e[13], wz=e[2]*gx+e[6]*gy+e[10]*gz+e[14];
+        const dx=wx-cx, dz=wz-cz;
+        return {lx:+(dx*Math.cos(ry)-dz*Math.sin(ry)).toFixed(2), lz:+(dx*Math.sin(ry)+dz*Math.cos(ry)).toFixed(2), wy:+wy.toFixed(2)}; };
+      return { fold:SIT_FOLD, cross:SIT_CROSS, note:'local +x=karakterin SOLU, +z=ön',
+        ShoeL:gw('Shoe_L'), ShoeR:gw('Shoe_R'), PantL:gw('Pant_L'), PantR:gw('Pant_R') }; },
+    sky:()=>{ const el=Math.sin((gameTime-0.25)*Math.PI*2);
+      return { gameTime:+gameTime.toFixed(3), el:+el.toFixed(3),
+        sunVis:sunMesh.visible, sunOp:+sunMesh.material.opacity.toFixed(2),
+        moonVis:moonMesh.visible, moonOp:+moonMesh.material.opacity.toFixed(2),
+        overlap:(sunMesh.visible&&sunMesh.material.opacity>0.02)&&(moonMesh.visible&&moonMesh.material.opacity>0.02) }; },
+    cam:()=>({ focus:+camFocus.toFixed(2), actionT:+actionT.toFixed(2), kind:actionKind,
+      camDy: player?+(camera.position.y-player.position.y).toFixed(1):null,
+      camDz: player?+(camera.position.z-player.position.z).toFixed(1):null,
+      camAbs:[+camera.position.x.toFixed(1),+camera.position.y.toFixed(1),+camera.position.z.toFixed(1)],
+      hacIntroT:+hacIntroT.toFixed(2), hacMode:hacMode }),
+    meclis:()=>({ hasRoof:!!meclisRoof, C:MECLIS_C, R:+MECLIS_R.toFixed(2),
+      dist: player?+Math.hypot(player.position.x-MECLIS_C[0],player.position.z-MECLIS_C[1]).toFixed(2):null,
+      opacity: meclisRoof?+meclisRoof.material.opacity.toFixed(3):null,
+      transparent: meclisRoof?meclisRoof.material.transparent:null,
+      inScene: meclisRoof?(function(){let s=meclisRoof;while(s.parent)s=s.parent;return s===scene;})():null }),
     setDirhem:(n)=>{ S.dirhem=n; save(); refreshHUD(); }, donateHayir:(id)=>donateHayir(id),
     setProfile:(age,gen,q)=>{ profSel={ageGroup:age,gender:gen,quran:q}; startProfile(); return Object.assign({},S.profile); },
     profile:()=>Object.assign({},S.profile),

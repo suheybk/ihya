@@ -103,3 +103,86 @@ Küçük, tek nesne, zeminde/elde durabilir; envanterde ikon olarak da kullanıl
 
 > Modeller hazır olunca `models/` klasörüne koy; ben `MODELS` dizisine ekleyip (base64 gömme
 > dahil) mekaniği kodlayacağım. Gömme için `scratchpad/inline_world.py` akışını kullanırız.
+
+---
+
+## 🆕 Faz 11.27 — Senaryo modelleri (barıştırma + 4 etkinlik)
+> Aşağıdaki senaryoların TASARIMI `YAPILACAKLAR.md` Faz 11.27'de. Bu modeller gelince kodlanacak.
+> Karakterler diğer NPC'lerle aynı reçete: `Pant_L/R+Shoe/Sole`, `Sleeve_L/R+Hand`, yüz +Z, `lin()`
+> renk; mesh adları `<model>_1..6` (1=cübbe, 2=ten, 3=başörtü, 4=koyu aksan). Ortak stil yukarıda.
+
+### 🕊️ Barıştırma (hayra davet — iki kişiyi sulh et)
+1. **`arg_villager_a.glb` — Tartışan köylü A**: standing villager, **agitated/angry pose** — one arm
+   raised/pointing forward, torso leaning in, brows down. Warm tunic (terracotta). ~1.7 m, facing +Z.
+2. **`arg_villager_b.glb` — Tartışan köylü B**: facing counterpart, **defensive/upset pose** — arms
+   crossed or one hand up "stop", head turned slightly away. Olive/indigo tunic. ~1.7 m, facing +Z.
+   > İkisi birbirine dönük yerleştirilecek; oyuncu araya girince "sulh" pozuna (eller açık, sakin)
+   > geçiş kodda yapılabilir — ama istersen **`reconciled_pair.glb`** (el sıkışan/kucaklaşan ikili)
+   > ayrı model olarak da verebilirsin (sulh sonrası swap).
+3. **`dispute_item.glb`** (opsiyonel): anlaşmazlık konusu — yere düşmüş bir çuval/testi ya da sınır
+   taşı (üzerinde kavga edilen mal). ~0.4 m.
+
+### ⚖️ Adil ol, hakkı savun
+4. **`qadi.glb` — Kadı/hakem**: dignified seated or standing judge figure, longer robe, calm face,
+   maybe a small scale in hand or beside. Muted green/gold. ~1.8 m. (Adalet meclisi için.)
+5. **`plaintiff.glb` / `defendant.glb`** (ops.): iki davacı figürü — biri şikâyetçi (elini uzatan),
+   biri savunan. `arg_villager_a/b` yeniden kullanılabilir; ayrı istersen bunlar.
+
+### 🤝 Topluma faydalı bir iş yap
+6. **`public_fountain.glb` — Halk çeşmesi (sebil)**: small stone public fountain/sebil with a basin
+   and spout, water trickling. Warm sandstone. ~1.3 m. (İnşa edilebilir hayır — sadaka-i câriye.)
+7. **`shade_bench.glb` — Gölgelik/oturak**: simple palm-thatch shade over a low stone bench (yolcular
+   dinlensin). ~2 m. (Alternatif faydalı iş.)
+
+### 📿 Emaneti yerine ulaştır
+8. **`trust_pouch.glb` — Emanet kesesi**: sealed cloth pouch / small tied bundle (emanet mal), a bit
+   heavier/fuller than `item_coin`. Neutral linen with a wax seal knot. ~0.3 m. (Bir NPC'den alıp
+   diğerine götürme görevi — taşıma sırasında elde görünebilir.)
+9. **`trust_owner.glb`** (ops.): emaneti bekleyen sahibi — mevcut `traveler.glb`/`neighbor.glb`
+   yeniden kullanılabilir; ayrı istersen bekleyen, minnettar poz.
+
+### 🤲 Bir sadaka ver (dilenci)
+10. **`beggar.glb` — Dilenci/muhtaç**: humble seated figure by a wall, worn simple robe (muted grey-
+    brown), cupped hands or a small bowl in front, gentle downcast face — **not caricatured**,
+    dignified. ~1.2 m seated. (Huzur sistemindeki `dilenci1` için görünür NPC; şu an ses/mekanik
+    var, model yok. Sadaka verilince minnet pozu/toast.)
+12. **`mud_doorway.glb` — Kerpiç kapı/perde (taharet)**: small Medina-style **mud-brick doorway** —
+    a low sandstone/adobe arched frame with a simple wooden or cloth privacy screen, warm terracotta.
+    Replaces the current generic red `door` model (torii-like, out of place) used by *Tuvalet âdâbı*.
+    ~1.8 m. (İstersen tek `mud_doorway.glb` ver, ben `taharet` node'unun modelini onunla değiştiririm.)
+### 🆕 Faz 11.29 — İyileştirme promptları (mevcut prosedürel modellerin yerine)
+> Bunlar `build_pack5.py` stiliyle (prosedürel low-poly claymorphism, +Z önlü, origin taban-merkez, `lin()` renk,
+> Draco'suz GLB) uyumlu. İstersen aynı .py toolkit'ine fonksiyon olarak ekle ve `models/` klasörüne bas — ben
+> kodda `tpl` üstünden değiştiririm.
+
+**A) `seated_sahabe.glb` — İlim meclisinde oturan sahabe** (huni+top-takke yerine):
+> Dignified low-poly seated companion (Sahabi), **cross-legged (bağdaş)**, sitting upright. Full-length warm
+> robe (jubba) draping over the crossed legs; a simple sash at the waist. Head with a **wrapped turban / keffiye**
+> (soft rounded cloth, not a ball), gentle calm face (two dot eyes, small nose, faint serene mouth), short beard
+> optional. **Hands resting on the knees** (palms down). Origin at seated base center, faces **+Z**. ~0.9 m tall
+> seated. Warm palette (olive/cream/terracotta robe, cream turban). Give each part a distinct mesh name
+> (Robe/Legs/Head/Turban/Hand_L/Hand_R) so I can tint variants. Hepsi AYNI model — kodda 6'sı çembere dizilip
+> merkeze döndürülür + robe/turban renkleri per-kişi değiştirilir. (Not: mevcut `beggar.glb` oturuşuna benzer
+> ama dik, üzgün değil sakin, elleri dizde — kucakta kâse yok.)
+
+**B) `hive.glb` — Arı kovanı = PETEK** (piramit/skep değil, HONEYCOMB):
+> Low-poly beehive shaped like a **honeycomb**: a cluster of **hexagonal-prism cells** (bal peteği) packed
+> together into a rounded slab/disk, golden-amber wax color with slightly darker cell rims; a few filled cells
+> glossy honey. Optional: 2-3 tiny stylized bees hovering. NOT a stacked cone/pyramid skep. ~0.5 m. Origin base
+> center, matte finish, warm gold palette. (Mevcut prosedürel `buildHiveTemplate` skep'in yerine geçecek —
+> `hive.glb` verirsen kodda onu kullanırım.)
+
+**C) Eksik / faydalı ek promptlar:**
+- **`kaaba.glb`** (opsiyonel, daha detaylı Kâbe): black cube with the **gold embroidered kiswa band (hizam)**,
+  a hint of the door in gold, subtle fabric folds. ~2.6 m. (Şu an prosedürel kutu+bant; istersen değiştiririm.)
+- **`vortex_swirl.glb`** (opsiyonel — Umre girdabı görseli): a translucent **spiral funnel / whirlpool** of
+  concentric swirling rings narrowing downward, sandy-gold with faint motion streaks. ~2 m çap. (Karakter buna
+  kapılır; şu an girdap yalnız hareketle anlatılıyor, görsel huni eklersek daha güçlü olur.)
+- **`rooster.glb` / `chicken.glb`** (ayrı, opsiyonel): kümesin dışında dolaşan tekil tavuk/horoz (ses zaten var).
+- **`mescid_nabawi.glb`**: Mescid-i Nebevî — green dome (Kubbetü'l-Hadrâ) + minarets + arched courtyard;
+  jenerik `mosque` yerine. ~büyük yapı.
+
+11. **`coop.glb` — Kümes (tavuk/horoz)**: small low-poly chicken coop — wooden hut + little fenced
+    run, a couple of cream hens + one rooster (red comb) pecking. ~1.2 m. (Hâne adasındaki `FARMYARD`
+    ses kümesine görsel; tavuk/horoz sesleri hazır, sadece görsel eksik. İstersen tek `chicken.glb` +
+    `rooster.glb` ayrı da olur, ben yerleştiririm.)
