@@ -1253,6 +1253,16 @@ function buildHiveTemplate(){
 }
 let gatherNodes=[];
 function nodeReady(def){ const t=S.gather[def.id]; return !t || Date.now()>=t; }
+// ---- COOLDOWN GÖRSELİ: bekleyen (olgunlaşan/dinlenen) düğümün üstünde geri-sayım rozeti ----
+function makeCdSprite(){ const c=document.createElement('canvas'); c.width=140; c.height=64;
+  const tx=new THREE.CanvasTexture(c); tx.colorSpace=THREE.SRGBColorSpace;
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,depthWrite:false,depthTest:false}));
+  sp.scale.set(1.0,0.46,1); sp.renderOrder=13; sp.visible=false; sp.userData={c,tx,last:-2}; return sp; }
+function drawCd(sp,secs){ const u=sp.userData; if(u.last===secs) return; u.last=secs;
+  const c=u.c, x=c.getContext('2d'); x.clearRect(0,0,140,64);
+  x.fillStyle='rgba(24,34,28,0.76)'; if(x.roundRect){ x.beginPath(); x.roundRect(6,10,128,44,16); x.fill(); } else x.fillRect(6,10,128,44);
+  x.fillStyle='#ffe08a'; x.font='bold 32px system-ui'; x.textAlign='center'; x.textBaseline='middle';
+  x.fillText('⏳ '+secs+'s',70,34); u.tx.needsUpdate=true; }
 function makeGatherNode(def){
   const ready=nodeReady(def);
   const it=instance(ready?def.full:def.bare);
@@ -1261,6 +1271,7 @@ function makeGatherNode(def){
   const rec={ q:{id:'gather_'+def.id, gather:true, def, pos:def.pos, nm:GOODS[def.item].nm, ic:GOODS[def.item].ic}, g:it.g, meshes:it.meshes, gather:true, def, islId:def.islId, bareNow:!ready };
   interactables.push(rec); gatherNodes.push(rec);
   OBSTACLES.push({x:def.pos[0],z:def.pos[2],r:0.7});   // hasat ağacının etrafından dolan
+  rec.cdSprite=makeCdSprite(); rec.cdSprite.position.set(def.pos[0], 1.55+((def.scale||1)-1)*0.5, def.pos[2]); scene.add(rec.cdSprite);   // bekleme rozeti (node sabit → scene'e)
   return rec;
 }
 function buildGatherNodes(){ gatherNodes=[]; for(const d of GATHER_DEFS) makeGatherNode(d); }
@@ -1302,6 +1313,15 @@ function updateGatherRegrow(){
   for(const rec of gatherNodes){
     if(rec.bareNow && nodeReady(rec.def)){ swapGatherModel(rec,true); }   // sessiz yenilenme (uyarı yok)
   }
+}
+// COOLDOWN ROZETLERİ: bekleyen düğüm/hayvanın üstünde kalan saniye (insanlar boş ağacı/demeti bekleyebilsin)
+let cdAcc=0;
+function updateCooldownSprites(){ const now=Date.now();
+  for(const rec of gatherNodes){ if(!rec.cdSprite) continue; const t=S.gather[rec.def.id]; const rem=t?Math.ceil((t-now)/1000):0;
+    const show=rem>0 && isUnlocked(rec.def.islId); rec.cdSprite.visible=show; if(show) drawCd(rec.cdSprite,rem); }
+  for(const an of animals){ if(!an.cdSprite) continue; const t=S.gather[an.def.id]; const rem=t?Math.ceil((t-now)/1000):0;
+    const show=rem>0 && an.rec.g.visible; an.cdSprite.visible=show;
+    if(show){ an.cdSprite.position.set(an.rec.g.position.x, 1.6+(an.def.scale||1)*0.55, an.rec.g.position.z); drawCd(an.cdSprite,rem); } }
 }
 
 /* ============ ÇOBANLIK (Faz 2) — dolaşan hayvanlar ============ */
@@ -1371,6 +1391,7 @@ function makeAnimal(def){
   }
   const hasLegs=Object.keys(legs).length>0;
   const an={rec, def, is, tx:x, tz:z, pause:Math.random()*3, ph:Math.random()*6.28, spd:def.spd, legs:hasLegs?legs:null};
+  if(!def.decor && def.produce){ an.cdSprite=makeCdSprite(); scene.add(an.cdSprite); }   // sağma/kırpma cooldown rozeti (hayvan gezer → konumu tick'te güncellenir)
   animals.push(an); return an;
 }
 function buildAnimals(){
@@ -2907,7 +2928,7 @@ function buildRod(){
   const line=new THREE.Mesh(new THREE.CylinderGeometry(0.005,0.005,0.85,4), new THREE.MeshStandardMaterial({color:0xe8e8e8,roughness:0.5})); line.position.set(0,0.62,0.42); line.rotation.x=0.5; g.add(line);   // misina uçtan öne-aşağı sarkar
   const bob=new THREE.Mesh(new THREE.SphereGeometry(0.035,6,5), new THREE.MeshStandardMaterial({color:0xd23b3b})); bob.position.set(0,0.24,0.78); g.add(bob);   // şamandıra
   g.traverse(o=>{ if(o.isMesh) o.frustumCulled=false; });
-  g.scale.setScalar(0.9); g.rotation.x=-0.5;   // çubuk öne-yukarı doğrulsun (el frame'ine göre)
+  g.scale.setScalar(0.9);   // yönelim oyuncu-frame'inde tick'te ayarlanır (rotation.x)
   return g;
 }
 const SCENE_DO={};
@@ -3326,7 +3347,7 @@ function sayPhrase(text, delay){
 }
 function sndEzan(full){ audio(); if(muted) return;
   if(sndBuf.ezan){   // GERÇEK ezan kaydı yüklüyse onu çal: full → baştan sona (Cuma+mescit), değilse sadece başı (~14 sn)
-    playSnd('ezan', 0.85, 1, full?0:14);
+    playSnd('ezan', 0.42, 1, full?0:14);   // ses kısıldı (kullanıcı: çok yüksekti)
     return;
   }
   if('speechSynthesis' in window){
@@ -3825,11 +3846,11 @@ function tick(){
       else if(actionKind==='stir'){                                                                  // PEKMEZ: kazanı kepçeyle karıştır (yavaş döngüsel)
         aL=-1.05; aR=-1.05+Math.sin(et*3.6)*0.5;                                                      // sağ el kepçeyle döndürür, sol el sabit tutar
         player.rotation.x += (0.16 - player.rotation.x)*0.12; }                                       // kazana hafif eğil
-      else if(actionKind==='fish'){                                                                  // BALIK TUT: TEK EL (sağ) oltayı sallar; sol el yanda serbest
-        const cast=Math.sin(et*2.6);                                                                  // olta savurma/çekiş salınımı
-        aR=-1.3+cast*0.55;                                                                            // sağ kol oltayı savurur/çeker (yukarı ↔ öne)
+      else if(actionKind==='fish'){                                                                  // BALIK TUT: TEK EL (sağ) oltayı tutar; olta kendi savrulur (yukarıda ayarlanır); sol el serbest
+        const cast=Math.sin(et*2.6);                                                                  // el hafif eşlik etsin (olta ile senkron)
+        aR=-1.05+cast*0.12;                                                                          // sağ kol oltayı öne-yukarı tutar (sabit-ish)
         aL=-0.12;                                                                                     // sol kol yanda aşağıda (serbest)
-        player.rotation.x += (0.07+Math.max(0,cast)*0.06 - player.rotation.x)*0.12; }                 // suya hafif eğik, savuruşta doğrulur
+        player.rotation.x += (0.07 - player.rotation.x)*0.12; }                                       // suya hafif eğik
       else { const w=Math.sin(et*17); aL=-1.15+w*0.5; aR=-1.15-w*0.5; }                             // genel çalışma: kollar öne-aşağı
       swingLeg(PP.armL, aL); swingLeg(PP.armR, aR);
       if(actionT<=0 && actionKind==='namaz') lastActT = nowS - 11;   // namaz bitti + AFK → seccadede otur (10sn beklemeden)
@@ -3840,10 +3861,10 @@ function tick(){
   }
   // EMANET taşırken SOL kol dirsekten kıvrık (keseyi GÖĞÜS hizasında tutar) — dururken/yürürken/harekette HEP (son yazan → salınımı ezer)
   if(hacVortexT<=0 && S.carryPouch && PP && PP.armL){ swingLeg(PP.armL, -1.18); }   // -1.45→-1.18: el göğse iner, kese elin üstünde kalmaz
-  // BALIK OLTASI: fishing sırasında sağ elde görünür (Hand_R'a bağlı → el ile sallanır)
+  // BALIK OLTASI: fishing sırasında sağ elde görünür — OYUNCUYA bağlı (sağ el hizası), yukarı-öne bakar, savrulur
   { const fishing = actionT>0 && actionKind==='fish';
-    if(fishing && !fishRod && player){ const hand=player.getObjectByName('Hand_R'); if(hand){ fishRod=buildRod(); hand.add(fishRod); } }
-    if(fishRod) fishRod.visible=fishing; }
+    if(fishing && !fishRod && player){ fishRod=buildRod(); fishRod.position.set(0.3,0.86,0.34); player.add(fishRod); }   // sağ el konumu (oyuncu-local)
+    if(fishRod){ fishRod.visible=fishing; if(fishing){ const c=Math.sin(clock.elapsedTime*2.6); fishRod.rotation.x=-0.62+c*0.4; } } }   // çubuk yukarı-öne (+savurma salınımı)
   // seccade serilme (açılma) animasyonu
   if(seccadeAnim>0 && laidSeccadeRec){ seccadeAnim-=dt*2.6; const t=Math.max(0,Math.min(1,1-seccadeAnim)); const e=t*t*(3-2*t); const s=0.16+0.84*e; laidSeccadeRec.g.scale.set(s,1,s); if(seccadeAnim<=0){ laidSeccadeRec.g.scale.set(1,1,1); seccadeAnim=0; } }
   // camera follow (intro / mescit / Mekke / normal)
@@ -3974,6 +3995,7 @@ function tick(){
   if(scenarioRecs.length) updateScenarios(dt, clock.elapsedTime);
   if(bees.length) updateBees(dt, clock.elapsedTime);
   if(animals.length) updateAnimals(dt);
+  cdAcc+=dt; if(cdAcc>=0.4){ cdAcc=0; updateCooldownSprites(); }   // bekleme geri-sayım rozetleri (~0.4 sn'de bir)
   groundAnimals();   // güvenlik ağı: her kare tüm hayvan klonlarını ada+tabana sıkıştır (orphan/uçan dahil)
   // ---- TEŞHİS (Faz 11.9 geçici): görünür hayvanın GERÇEK render pozisyonu (dünya bbox) anormal mi? Ekranda göster ----
   window.__animDbgN=(window.__animDbgN||0)+1;
