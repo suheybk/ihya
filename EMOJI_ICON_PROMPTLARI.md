@@ -84,6 +84,26 @@ Bu dosya: (1) üretim promptu/stil kılavuzu, (2) tam ikon listesi (dosya adı +
 | 🦶 | `foot.png` | ayak (abdest/adım) |
 | 🚶 | `walk.png` | yürüyen figür |
 
+### 🌾 Üretim Zinciri (yeni — şu an ham emoji, ikon YOK)
+> Aynı ortak stil/palet. Bunlar Dağarcık/pazar/Atölye'de sık görünür; öncelik orta.
+| emoji | `icons/…` | açıklama |
+|---|---|---|
+| 🌾 | `wheat.png` | altın buğday demeti (başaklı) |
+| 🥣 | `flour.png` | un (açık krem toz + küçük çuval ya da kâse) |
+| 🥚 | `egg.png` | tek yumurta (krem, yumuşak) |
+| 🥯 | `pastry.png` | yuvarlak çörek/simit (susamlı imâsı) |
+| 🫙 | `molasses.png` | pekmez kavanozu (koyu bordo/kahve dolu cam kavanoz) |
+| 🐟 | `fish.png` | tek balık (gümüş/turkuaz, sevimli) |
+| 🍢 | `grilled_fish.png` | tandırda kızarmış balık (altın-kahve, hafif ateş imâsı) |
+| 🎣 | `fishing.png` | olta + misina (balık tutma aksiyonu) |
+
+### 🧱 Kerpiç & İnşaat (gelecek — su+balçık→kerpiç→ev/cami; kod planlanıyor)
+| emoji | `icons/…` | açıklama |
+|---|---|---|
+| 🟤 | `clay.png` | balçık topağı (ıslak kahverengi çamur yığını) |
+| 🧱 | `mudbrick.png` | kerpiç kalıbı/tuğlası (kurumuş saman-katkılı çamur, terracotta) |
+| 🏠 | `house_build.png` | yapım hâlinde kerpiç ev (iskele/yarım duvar imâsı) |
+
 ### 🧩 Durum & Arayüz (UI)
 | ✓ / ✅ | `check.png` | onay/tamam |
 | 🔒 / 🔓 | `lock.png`,`unlock.png` | kilit/açık kilit |

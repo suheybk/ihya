@@ -1200,7 +1200,7 @@ function applyIslandLock(){
 }
 
 /* ============ HASAT / TOPLAMA (Faz 1) — kesb-i helâl ============ */
-const GOODS={ hurma:{ic:'🌴',nm:'Hurma'}, dut:{ic:'🫐',nm:'Dut'}, sut:{ic:'🥛',nm:'Süt'}, yun:{ic:'🧶',nm:'Yün'}, ekmek:{ic:'🍞',nm:'Ekmek'}, su:{ic:'💧',nm:'Su'}, bal:{ic:'🍯',nm:'Bal'}, bugday:{ic:'🌾',nm:'Buğday'}, un:{ic:'🥣',nm:'Un'}, yumurta:{ic:'🥚',nm:'Yumurta'}, corek:{ic:'🥯',nm:'Çörek'}, pekmez:{ic:'🫙',nm:'Pekmez'}, balik:{ic:'🐟',nm:'Balık'} };
+const GOODS={ hurma:{ic:'🌴',nm:'Hurma'}, dut:{ic:'🫐',nm:'Dut'}, sut:{ic:'🥛',nm:'Süt'}, yun:{ic:'🧶',nm:'Yün'}, ekmek:{ic:'🍞',nm:'Ekmek'}, su:{ic:'💧',nm:'Su'}, bal:{ic:'🍯',nm:'Bal'}, bugday:{ic:'🌾',nm:'Buğday'}, un:{ic:'🥣',nm:'Un'}, yumurta:{ic:'🥚',nm:'Yumurta'}, corek:{ic:'🥯',nm:'Çörek'}, pekmez:{ic:'🫙',nm:'Pekmez'}, balik:{ic:'🐟',nm:'Balık'}, izgara:{ic:'🍢',nm:'Kızarmış Balık'} };
 // Hurma Bahçesi'nde toplanabilir ağaçlar (tekrarlanır: topla → hasat hali → cooldown → yeniden dolar)
 // Tüm adalara EŞİT dağıt: her adada 1 hurma + 1 dut ağacı (kenarlarda, görev hattından uzak)
 // Gather node'ları ada'nın 4 KÖŞESİNE dağıt (ada-yarıçapı-farkında): merkez görev hattından (z≈±2.6)
@@ -1530,6 +1530,13 @@ function craftPekmez(){ if((S.inv.dut||0)<PEKMEZ_DUT || (S.inv.bal||0)<PEKMEZ_BA
   S.inv.dut-=PEKMEZ_DUT; if(S.inv.dut<=0) delete S.inv.dut; S.inv.bal-=PEKMEZ_BAL; if(S.inv.bal<=0) delete S.inv.bal;
   invAdd('pekmez', PEKMEZ_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🫙 Pekmez kaynadı');
   setTimeout(()=>toast('Dut ve balı kaynatıp pekmez yaptın (+'+PEKMEZ_YIELD+') — kışa azık, muhtaca kuvvet, pazarda değerli.'),1300); }
+// BALIK IZGARA — çiğ balık tandırda kızartılır (FOOD; çiğ balıktan değerli). Gölet→balık zincirini tamamlar.
+const IZGARA_BALIK=1, IZGARA_YIELD=1;
+function craftIzgara(){ if((S.inv.balik||0)<IZGARA_BALIK){ toast('🐟 '+IZGARA_BALIK+' balık gerek ('+(S.inv.balik||0)+' var)'); return; }
+  playAction(1.8,'knead');   // tandır ateşinde balığı çevir
+  S.inv.balik-=IZGARA_BALIK; if(S.inv.balik<=0) delete S.inv.balik;
+  invAdd('izgara', IZGARA_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🍢 Balık kızardı');
+  setTimeout(()=>toast('Tandırda kızarmış balık (+'+IZGARA_YIELD+') — besleyici; aç kalana ikram et ya da pazarda sat.'),1300); }
 // yerde serili seccade = toplanabilir düğüm; almazsan orada kalır
 function placeLaidSeccade(x,z,ry,animate){
   removeLaidSeccade();
@@ -2158,7 +2165,7 @@ function applyProfile(){ if(isChild()){ S.hasSeccade=true; } save(); updateSecca
 
 /* ============ MEDİNE PAZARI (Faz 3) — kesb-i helâli dirhem'e çevir ============ */
 const MARKET_POS={ islId:'sehir', pos:[67,0,-4] };
-const PRICES={ hurma:2, dut:2, sut:3, yun:4, ekmek:3, su:1, bal:6, bugday:2, yumurta:3, corek:5, pekmez:8, balik:5 };   // bal = en değerli hasat; un craft-ara ürün (satılmaz); çörek = katma değerli; pekmez = işlenmiş (dut+bal, en değerli); balık = değerli yiyecek
+const PRICES={ hurma:2, dut:2, sut:3, yun:4, ekmek:3, su:1, bal:6, bugday:2, yumurta:3, corek:5, pekmez:8, balik:5, izgara:8 };   // bal = en değerli hasat; un craft-ara ürün (satılmaz); çörek = katma değerli; pekmez = işlenmiş (dut+bal, en değerli); balık = değerli yiyecek; ızgara = tandırda kızarmış (balıktan değerli)
 let marketRec=null, marketDecor=[], marketMerchant=null;
 function buildMarket(){
   marketDecor=[];
@@ -2205,7 +2212,7 @@ function renderMarket(){
 }
 
 /* ============ TEKRARLANAN HAYIR — NPC'ler (Faz 4): aynî sadaka ============ */
-const FOOD=['hurma','dut','ekmek','sut','yumurta','corek','pekmez','balik'];   // yiyecek kategorisi (muhtaçlara verilebilir)
+const FOOD=['hurma','dut','ekmek','sut','yumurta','corek','pekmez','balik','izgara'];   // yiyecek kategorisi (muhtaçlara verilebilir)
 function foodCount(){ return FOOD.reduce((s,k)=>s+(S.inv[k]||0),0); }
 function takeFood(n){ let need=n; for(const k of FOOD){ while(need>0 && (S.inv[k]||0)>0){ S.inv[k]--; if(S.inv[k]<=0) delete S.inv[k]; need--; } } return n-need; }
 const NPC_DEFS=[
@@ -2860,8 +2867,8 @@ function doStation(rec){
   if(rec.craft==='un'){
     openDialog({ic:'🌾',title:'Değirmen', start:'s0', steps:{ s0:{who:'Buğday öğüt', txt:'Değirmen taşını çevir, buğdayı una öğüt.\n\n<b>'+UN_BUGDAY+' buğday → 1 un</b>\nElinde: '+bug+' buğday · '+un+' un.', ref:'<b>Hadis:</b> «Kişinin yediği en helâl şey, kendi elinin emeğidir.» (Buhârî)', opts:[ {l:'🌾 Buğday öğüt (un yap)', act:()=>craftUn()}, {l:'Kapat'} ]} }});
   } else if(rec.craft==='ekmek'){
-    const yum=S.inv.yumurta||0;
-    openDialog({ic:'🍞',title:'Tandır', start:'s0', steps:{ s0:{who:'Fırın', txt:'Tandırda pişir; sıcak ekmeği/çöreği aç kalana ver.\n<b>'+EKMEK_UN+' un → '+EKMEK_YIELD+' ekmek</b>\n<b>'+COREK_UN+' un + '+COREK_YUMURTA+' yumurta → '+COREK_YIELD+' çörek</b> (yumurtalı, besleyici)\n\nElinde: '+un+' un · '+yum+' yumurta · '+ek+' ekmek.', ref:'<b>Hadis:</b> «İnsanların en hayırlısı, insanlara faydalı olandır.» (Beyhakî)', opts:[ {l:'🍞 Ekmek pişir', act:()=>craftEkmek()}, {l:'🥯 Çörek pişir (yumurtalı)', act:()=>craftCorek()}, {l:'Kapat'} ]} }});
+    const yum=S.inv.yumurta||0, blk=S.inv.balik||0;
+    openDialog({ic:'🍞',title:'Tandır', start:'s0', steps:{ s0:{who:'Fırın', txt:'Tandırda pişir; sıcak ekmeği/çöreği/balığı aç kalana ver.\n<b>'+EKMEK_UN+' un → '+EKMEK_YIELD+' ekmek</b>\n<b>'+COREK_UN+' un + '+COREK_YUMURTA+' yumurta → '+COREK_YIELD+' çörek</b> (yumurtalı, besleyici)\n<b>'+IZGARA_BALIK+' balık → '+IZGARA_YIELD+' kızarmış balık</b>\n\nElinde: '+un+' un · '+yum+' yumurta · '+blk+' balık · '+ek+' ekmek.', ref:'<b>Hadis:</b> «İnsanların en hayırlısı, insanlara faydalı olandır.» (Beyhakî)', opts:[ {l:'🍞 Ekmek pişir', act:()=>craftEkmek()}, {l:'🥯 Çörek pişir (yumurtalı)', act:()=>craftCorek()}, {l:'🍢 Balık kızart', act:()=>craftIzgara()}, {l:'Kapat'} ]} }});
   } else if(rec.craft==='seccade'){
     const opts=[];
     opts.push({l:(S.hasSeccade?'🧵 Yeni seccade ör':'🧵 Seccade ör')+' ('+yun+'/'+SECCADE_YUN+' yün)', act:()=>craftSeccade()});
