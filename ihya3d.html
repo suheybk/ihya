@@ -3884,7 +3884,6 @@ function tick(){
         else actBtn.textContent = S.done[near.q.id] ? 'Bak ✓'
           : (questAvailable(near.q) ? 'Etkileşim '+near.q.ic : '🔒 Sırası değil');
         actBtn.innerHTML=emo(actBtn.textContent); }   // emojileri özel ikonlarla değiştir
-      else { actBtn.style.display='none'; promptEl.classList.remove('show'); promptEl.style.display='none'; }
     }
     if(near){ // etkileşim yazısı: sabit ALT-ORTA altyazı (kamera odağıyla birlikte belirir) — projeksiyon yok
       promptEl.style.display='block'; promptEl.classList.add('show');
@@ -3912,7 +3911,7 @@ function tick(){
         ? ((S.conquered[near.islId]?'✓ ':examReady(near.islId)?'📝 ':'🔒 ')+'İmtihan Meydanı')
         : (!S.done[near.q.id]&&!questAvailable(near.q)?'🔒 ':'')+near.q.nm;
       promptEl.innerHTML=emo(promptEl.textContent);   // altyazıdaki emojileri özel ikonlarla değiştir
-    }
+    } else { actBtn.style.display='none'; promptEl.classList.remove('show'); promptEl.style.display='none'; }   // near BOŞSA her kare gizle → harici null'lama (ör. seccade alımı: removeLaidSeccade near=null) sonrası takılı yazı kalmaz
   }
   // sıradaki yapılabilir görev parıldasın (yol gösterir)
   const glow=0.28+0.22*Math.sin(clock.elapsedTime*3);
