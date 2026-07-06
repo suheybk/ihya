@@ -357,6 +357,21 @@
   <button class="iconbtn" id="invBtn" title="Dağarcık (envanter)">🎒</button>
   <button class="iconbtn" id="muteBtn" title="Ses aç/kapat">🔊</button>
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
+  <button class="iconbtn" id="helpBtn" title="Nasıl oynanır?">❓</button>
+</div>
+
+<div id="tut" style="position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(8,14,10,0.74)">
+  <div style="max-width:340px;width:86%;background:#12211a;border:1px solid #2f8f6355;border-radius:20px;padding:22px 20px;box-shadow:0 12px 40px #0008;color:#eafff2;font-family:system-ui">
+    <div id="tutIcon" style="font-size:46px;text-align:center;margin-bottom:4px">🕹️</div>
+    <div id="tutTitle" style="font-weight:900;font-size:19px;text-align:center;margin-bottom:8px;color:#7fe0a8"></div>
+    <div id="tutBody" style="font-size:14px;line-height:1.55;text-align:center;opacity:.92;min-height:74px"></div>
+    <div id="tutDots" style="display:flex;gap:6px;justify-content:center;margin:14px 0 12px"></div>
+    <div style="display:flex;gap:8px">
+      <button id="tutPrev" style="flex:1;padding:11px;border:0;border-radius:12px;background:#ffffff18;color:#eafff2;font-weight:800;font-size:14px">‹ Geri</button>
+      <button id="tutNext" style="flex:2;padding:11px;border:0;border-radius:12px;background:#2f8f63;color:#fff;font-weight:900;font-size:14px">İleri ›</button>
+    </div>
+    <div style="text-align:center;margin-top:10px"><button id="tutSkip" style="background:none;border:0;color:#9fd8bf;font-size:12px;text-decoration:underline;opacity:.85">Atla / kapat</button></div>
+  </div>
 </div>
 
 <div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:6px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.5;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.05em">İhya · Faz 4.4 (YUMURTA KÜMESTEN alınır — tavuklar artık dekoratif [dolaşır, etkileşimsiz], peşinde koşulmaz; kümes = yumurta gather-düğümü · tavuk boyu keçinin yarısından biraz küçük · bağışlanan hayır eserleri Sadaka Bahçesi'nde toplanır · arılar · çanta/kapasite)</div>
@@ -3698,6 +3713,31 @@ document.getElementById('muteBtn').onclick=()=>{ audio(); setMuted(!muted); };
 setMuted(muted);  // ilk ikon durumu (kayıtlı tercih)
 document.getElementById('hayirBtn').onclick=openHayir;
 document.getElementById('hayirClose').onclick=closeHayir;
+// ---- TUTORIAL (ilk açılışta + ❓ butonu) — nasıl oynanır rehberi ----
+const TUT_STEPS=[
+  {ic:'🕹️',t:'Hareket',b:'Alt-soldaki yuvarlağı sürükle ya da <b>WASD</b> ile Medine\'de gez. Bir şeyin yanına gidince <b>sağ-alttaki buton</b> onunla etkileşir.'},
+  {ic:'🌴',t:'Çalış (kesb-i helâl)',b:'Ağaçtan <b>meyve topla</b>, hayvandan <b>süt/yün al</b>, kuyudan <b>su çek</b>, tarladan <b>buğday biç</b>, gölette <b>balık tut</b>. Boş olanın üstünde <b>bekleme süresi</b> görünür.'},
+  {ic:'🔨',t:'Üret',b:'Hurma Bahçesi\'nin güneyindeki <b>Atölye</b> adasında değirmen·tandır·tezgâh·kazan ile un·ekmek·çörek·seccade·çanta·pekmez yap.'},
+  {ic:'🛒',t:'Pazar',b:'Topladığın/ürettiğin malları <b>Medine Pazarı</b>\'nda (Şehir adası) <b>dirheme</b> sat.'},
+  {ic:'🤲',t:'Hayır & Sadaka',b:'Muhtaçlara (yetim·komşu·yolcu·dilenci) <b>yiyecek ver</b>; dirhemini <b>🤲 Hayır</b> ile sadakaya dönüştür → <b>nûr</b> kazan.'},
+  {ic:'🕌',t:'İbadet',b:'Vakti gelince <b>🧎 namazını kıl</b>. Cuma günü <b>Mescid</b>\'e git, cemaatle kıl. Camide istikrarlı namaz, <b>imamın rehberliğini</b> açar.'},
+  {ic:'🌍',t:'Amaç: İhyâ',b:'Her adanın derslerini öğren, <b>İmtihan Meydanı</b>\'nda sınavı geç → adayı feth et. Çorak Yesrib\'i yeşil <b>Medine</b>\'ye çevir!'},
+];
+let tutIdx=0;
+function openTut(i){ tutIdx=i||0; document.getElementById('tut').style.display='flex'; renderTut(); }
+function closeTut(){ document.getElementById('tut').style.display='none'; S.tutSeen=true; save(); }
+function renderTut(){ const s=TUT_STEPS[tutIdx];
+  document.getElementById('tutIcon').innerHTML=emo(s.ic);
+  document.getElementById('tutTitle').textContent=s.t;
+  document.getElementById('tutBody').innerHTML=emo(s.b);
+  document.getElementById('tutDots').innerHTML=TUT_STEPS.map((_,i)=>'<span style="width:8px;height:8px;border-radius:50%;background:'+(i===tutIdx?'#2f8f63':'#ffffff30')+'"></span>').join('');
+  document.getElementById('tutPrev').style.visibility=tutIdx>0?'visible':'hidden';
+  document.getElementById('tutNext').textContent=tutIdx<TUT_STEPS.length-1?'İleri ›':'Başla ✓';
+}
+document.getElementById('tutPrev').onclick=()=>{ if(tutIdx>0){tutIdx--;renderTut();} };
+document.getElementById('tutNext').onclick=()=>{ if(tutIdx<TUT_STEPS.length-1){tutIdx++;renderTut();} else closeTut(); };
+document.getElementById('tutSkip').onclick=closeTut;
+document.getElementById('helpBtn').onclick=()=>openTut(0);
 document.getElementById('scenClose').onclick=closeScen;
 document.getElementById('hayir').addEventListener('click',e=>{ if(e.target.id==='hayir') closeHayir(); });
 document.getElementById('invBtn').onclick=openInv;
@@ -4078,7 +4118,8 @@ function endIntro(){
   document.body.classList.remove('intro');
   if(player){ player.rotation.x=0; player.position.y=0; if(PP&&PP.legL){ swingLeg(PP.legL,0); swingLeg(PP.legR,0); } }
   setTimeout(()=>{ const r=document.getElementById('introRoot'); if(r) r.style.display='none';
-    banner(tI('welcome')); setTimeout(()=>toast(tI('hint')),2200); }, 1200);
+    banner(tI('welcome'));
+    if(!S.tutSeen){ setTimeout(()=>openTut(0),1500); } else setTimeout(()=>toast(tI('hint')),2200); }, 1200);
 }
 // sinematik: yakın-alçak kamera; kahraman yerde oturur → sağa-sola bakar → ayağa kalkar → karanlık açılır (evinde bulur)
 function introTick(dt){
