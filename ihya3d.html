@@ -1261,8 +1261,11 @@ function doGather(rec){
   if(!nodeReady(def)){ const s=Math.max(1,Math.ceil((S.gather[def.id]-Date.now())/1000)); toast('🌱 Olgunlaşıyor… '+s+' sn'); return; }
   if(invFull()){ toast('🎒 Dağarcık dolu ('+invCap()+') — sat/kullan ya da Atölye\'de çanta ör'); return; }
   facePlayer(rec.g.position);
-  if(def.item==='su') playAction(1.7,'draw');            // KUYU: ipi hand-over-hand çek (su çekme)
-  else playAction(1.1,'pluck');                          // meyve: yukarı uzanıp koparma
+  // İŞE ÖZEL toplama animasyonu (item'e göre)
+  const GK={ su:['draw',1.7], bugday:['reap',1.7], yumurta:['coop',1.4], bal:['honey',1.6] };
+  const gk=GK[def.item];
+  if(gk) playAction(gk[1], gk[0]);                        // su=kuyudan çek · buğday=orakla biç · yumurta=kümesten al · bal=kovandan al
+  else   playAction(1.1,'pluck');                         // hurma/dut: yukarı uzanıp koparma
   const got=invAdd(def.item, def.amount);
   S.gather[def.id]=Date.now()+def.cd;
   swapGatherModel(rec,false);
@@ -1467,6 +1470,7 @@ let laidSeccadeRec=null, seccadeAnim=0;
 function craftSeccade(){
   if(S.hasSeccade){ toast('✓ Zaten bir seccaden var'); return; }
   if((S.inv.yun||0)<SECCADE_YUN){ toast('🧵 '+SECCADE_YUN+' yün gerek ('+(S.inv.yun||0)+' var)'); return; }
+  playAction(2.0,'weave');   // tezgâhta dokuma
   // Serili/unutulmuş bir seccade varsa onu GERİDE BIRAK, yenisini ör (yoksa oyuncu tıkanıyordu)
   const abandoned=!!S.laidSeccade; if(abandoned){ S.laidSeccade=null; removeLaidSeccade(); }
   S.inv.yun-=SECCADE_YUN; if(S.inv.yun<=0) delete S.inv.yun; S.hasSeccade=true; save(); refreshHUD(); renderInv(); sndFanfare();
@@ -1479,6 +1483,7 @@ function craftBag(level){
   if((S.bag||0)>=level){ toast('🎒 Zaten bu çanta (ya da daha büyüğü) sende var'); return; }
   const need=BAG_YUN[level]||15;
   if((S.inv.yun||0)<need){ toast('🎒 '+need+' yün gerek ('+(S.inv.yun||0)+' var)'); return; }
+  playAction(2.0,'weave');   // tezgâhta çanta ör
   S.inv.yun-=need; if(S.inv.yun<=0) delete S.inv.yun; S.bag=level; save(); refreshHUD();
   if(document.getElementById('inv').classList.contains('show')) renderInv();
   sndFanfare(); banner('🎒 '+(level===2?'Büyük Çanta':'Çanta')+' örüldü');
@@ -1487,15 +1492,18 @@ function craftBag(level){
 // ÜRETİM ZİNCİRİ (Faz 3): buğday → un → ekmek. Ekmek FOOD → muhtaçları besler (kesb-i helâl + hayır).
 const UN_BUGDAY=3, EKMEK_UN=2, EKMEK_YIELD=2;   // 3 buğday→1 un; 2 un→2 ekmek
 function craftUn(){ if((S.inv.bugday||0)<UN_BUGDAY){ toast('🌾 '+UN_BUGDAY+' buğday gerek ('+(S.inv.bugday||0)+' var)'); return; }
+  playAction(1.7,'grind');   // değirmen taşını çevir
   S.inv.bugday-=UN_BUGDAY; if(S.inv.bugday<=0) delete S.inv.bugday; S.inv.un=(S.inv.un||0)+1;
   save(); refreshHUD(); renderInv(); sndChime(); toast('🥣 Değirmen döndü — buğdayı un ettin (+1 un)'); }
 function craftEkmek(){ if((S.inv.un||0)<EKMEK_UN){ toast('🥣 '+EKMEK_UN+' un gerek ('+(S.inv.un||0)+' var)'); return; }
+  playAction(1.8,'knead');   // hamuru yoğur / tandıra at
   S.inv.un-=EKMEK_UN; if(S.inv.un<=0) delete S.inv.un; S.inv.ekmek=(S.inv.ekmek||0)+EKMEK_YIELD;
   save(); refreshHUD(); renderInv(); sndFanfare(); banner('🍞 Ekmek pişti');
   setTimeout(()=>toast('Tandırda ekmek (+'+EKMEK_YIELD+'). Bir aç kalana / yetime ver — "İnsanların hayırlısı insanlara faydalı olandır."'),1300); }
 // ÇÖREK — yumurtalı, katma değerli: 1 un + 2 yumurta → 2 çörek (FOOD; pazarda ekmekten değerli)
 const COREK_UN=1, COREK_YUMURTA=2, COREK_YIELD=2;
 function craftCorek(){ if((S.inv.un||0)<COREK_UN || (S.inv.yumurta||0)<COREK_YUMURTA){ toast('🥯 '+COREK_UN+' un + '+COREK_YUMURTA+' yumurta gerek'); return; }
+  playAction(1.8,'knead');   // hamuru yoğur / tandıra at
   S.inv.un-=COREK_UN; if(S.inv.un<=0) delete S.inv.un; S.inv.yumurta-=COREK_YUMURTA; if(S.inv.yumurta<=0) delete S.inv.yumurta;
   invAdd('corek', COREK_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🥯 Çörek pişti');
   setTimeout(()=>toast('Yumurtalı çörek (+'+COREK_YIELD+') — besleyici. Aç kalana ver ya da pazarda sat.'),1300); }
@@ -2792,7 +2800,7 @@ function buildLoom(g){   // tezgâh: ahşap çerçeve + çözgü iplikleri + yar
 const ATOLYE_STATIONS=[
   {key:'mill', tpl:'mill', build:buildMill, pos:[13.4,-13.6], ry:0.35,  nm:'Değirmen', ic:'🌾', craft:'un',      sBtn:'🌾 Un öğüt',     sTitle:'Değirmen — un öğüt'},
   {key:'oven', tpl:'oven', build:buildOven, pos:[16.6,-15.7], ry:0.0,   nm:'Tandır',   ic:'🍞', craft:'ekmek',   sBtn:'🍞 Ekmek pişir', sTitle:'Tandır — ekmek pişir'},
-  {key:'loom', tpl:'loom', build:buildLoom, pos:[19.6,-13.6], ry:-0.35, nm:'Tezgâh',   ic:'🧶', craft:'seccade', sBtn:'🧶 Seccade ör',  sTitle:'Tezgâh — seccade ör'},
+  {key:'loom', tpl:'loom', build:buildLoom, pos:[19.6,-13.6], ry:-0.35, nm:'Tezgâh',   ic:'🧶', craft:'seccade', sBtn:'🧶 Yünü işle',   sTitle:'Tezgâh — yünü işle (seccade · çanta)'},
 ];
 function buildAtolye(){
   const isl=WORLD.islands.find(i=>i.id==='atolye'); if(!isl) return;
@@ -3709,6 +3717,29 @@ function tick(){
         const p=1-Math.max(0,actionT)/Math.max(0.01,actionDur); const open=Math.sin(p*Math.PI);      // 0→1→0 kollar açılıp kapanır
         aL=-1.5-open*0.8; aR=-1.5-open*0.8;                                                           // iki kol öne-yukarı (kucaklama)
         player.rotation.x += (0.13*open - player.rotation.x)*0.18; }                                  // sıcak selâm: hafif öne eğilme
+      else if(actionKind==='reap'){                                                                  // BUĞDAY BİÇ: orakla alçak yatay süpürme
+        const w=Math.sin(et*5.2);                                                                     // iki el birlikte orağı tutar, sallar
+        aL=-0.85+w*0.55; aR=-0.85+w*0.55;                                                             // alçak-önde beraber sağa-sola/aşağı sürükle
+        player.rotation.x += (0.24 - player.rotation.x)*0.14;                                         // eğilerek biç
+        player.position.y = -Math.abs(w)*0.04; }                                                      // her darbede hafif çök
+      else if(actionKind==='coop'){                                                                  // YUMURTA AL: kümese eğilip alçaktan topla
+        const w=Math.max(0,Math.sin(et*4.6)); aL=-0.3-w*0.15; aR=-0.3-w*0.15;                         // eller aşağıda, yuvaya uzanır
+        player.rotation.x += (0.4 - player.rotation.x)*0.15;                                          // belden öne eğil
+        player.position.y = -0.05; }                                                                  // çömelme hissi
+      else if(actionKind==='honey'){                                                                 // BAL AL: kovana dikkatlice uzan (yavaş, sakin)
+        const w=Math.sin(et*3.0); aL=-1.35; aR=-1.35+Math.max(0,w)*0.3;                               // sağ el yavaşça kovana girip peteği çeker
+        player.rotation.x += (0.12 - player.rotation.x)*0.1; }                                        // hafif öne, temkinli
+      else if(actionKind==='grind'){                                                                 // UN ÖĞÜT: değirmen taşını çevir (döngüsel itiş)
+        aL=-1.2+Math.sin(et*4.2)*0.7; aR=-1.2+Math.sin(et*4.2+Math.PI)*0.7;                           // iki kol ters faz → taşı döndürme
+        player.rotation.x += (0.14 - player.rotation.x)*0.12;
+        player.position.y = -Math.abs(Math.sin(et*4.2))*0.05; }                                       // ağır taşı çevirme zorlanması
+      else if(actionKind==='knead'){                                                                 // EKMEK/ÇÖREK: hamuru yoğur / tandıra at
+        const w=Math.sin(et*6.0); aL=-1.05+w*0.4; aR=-1.05+w*0.4;                                     // iki el birlikte aşağı bastır
+        player.rotation.x += (0.2 - player.rotation.x)*0.14;
+        player.position.y = -Math.max(0,w)*0.05; }                                                    // her bastırışta çök
+      else if(actionKind==='weave'){                                                                 // DOKUMA/ÖRGÜ: tezgâhta mekiği ileri-geri
+        const w=Math.sin(et*7.5); aL=-1.25+w*0.32; aR=-1.25-w*0.32;                                   // eller dönüşümlü küçük hareket
+        player.rotation.x += (0.1 - player.rotation.x)*0.12; }                                        // tezgâha hafif eğik
       else { const w=Math.sin(et*17); aL=-1.15+w*0.5; aR=-1.15-w*0.5; }                             // genel çalışma: kollar öne-aşağı
       swingLeg(PP.armL, aL); swingLeg(PP.armR, aR);
       if(actionT<=0 && actionKind==='namaz') lastActT = nowS - 11;   // namaz bitti + AFK → seccadede otur (10sn beklemeden)
