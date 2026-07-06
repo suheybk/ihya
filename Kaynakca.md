@@ -74,6 +74,7 @@ metnin kendisini, kaynağını ve derlenme/erişim tarihini listeler.
 | 26 | «Gizli sadaka, Rabbin öfkesini söndürür.» | Tirmizî | Dilenci senaryosu |
 | 27 | «Sağa ve sola selâm ile (namazın bitişi).» | Tirmizî, Salât 188 | Namaz kılış âdâbı |
 | 28 | «Girerken sol, çıkarken sağ ayak (tuvalet âdâbı).» | Tirmizî, Tahâret 5 | Taharet âdâbı |
+| 29 | «Her aydan üç gün oruç, bütün seneyi oruçlu geçirmek gibidir.» (Eyyâm-ı Bîz) | Buhârî, Savm 60 | Dolunay/Eyyâm-ı Bîz hatırlatması (üst HUD ay evresi 13-14-15) |
 
 > **Not (imtihan soruları):** İmtihan Meydanı'ndaki bazı `cite` alanları fıkhî bilgi notudur (ör. "İmam ve bir
 > cemaat yeterlidir", "Abdestin farzları: yüz, kollar, başın meshi, ayaklar") — hadîs/âyet lafzı değil, ders

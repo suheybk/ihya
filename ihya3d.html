@@ -106,7 +106,9 @@
   .eztest{display:flex;flex-direction:column;gap:7px}
   .eztbtn{text-align:left;padding:11px 12px;border:none;border-radius:12px;background:var(--panel);font-weight:700;font-size:13.5px;cursor:pointer;box-shadow:0 2px 8px #0002}
   .eztbtn.placed{background:#cfe9c0;color:#2b5323;opacity:.85;cursor:default}
-  .skyclock{display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 4px 3px;border-radius:16px;background:var(--panel);box-shadow:0 4px 14px #0002}
+  .skyclock{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 4px 3px;border-radius:16px;background:var(--panel);box-shadow:0 4px 14px #0002}
+  #vakitRing{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:2}
+  #vakitRingPath{transition:stroke .5s ease, stroke-dashoffset .5s linear}
   #skySvg{width:124px;height:auto;display:block;border-radius:12px}
   .vakitlbl{font-weight:800;color:var(--ink);font-size:12.5px;line-height:1;padding:1px 2px 2px;border-radius:8px}
   .vakitlbl.urgent{color:#fff;background:#d1442f;animation:vakiturgent 1s ease-in-out infinite}
@@ -334,6 +336,9 @@
       </g>
     </svg>
     <div class="vakitlbl" id="vakit">☀ Kuşluk</div>
+    <svg id="vakitRing" viewBox="0 0 132 96" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect id="vakitRingPath" x="2.5" y="2.5" width="127" height="91" rx="16" fill="none" stroke="#3fae6a" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+    </svg>
   </div>
 </div>
 
@@ -865,7 +870,8 @@ function onNewDay(){
   weeklyJustice();   // haftalık: muhtaç ihmali → mutsuzluk → şehir olayları
   toast('🌙 Yeni gün doğdu — '+dayName());
   if(isFriday()) setTimeout(()=>{ banner('🕌 Bugün Cuma'); toast('Öğle vakti gelince Mescid\'e git, Cuma\'yı cemaatle kıl 🕌'); },1300);
-  if(isFastingDay() && orucMukellef()) setTimeout(()=>{ banner('🌙 Bugün '+dayName()); toast('Sünnet oruç günü — gece/öğleden önce niyet et, Akşam iftar (🌙 düğmesi)'); },1300);
+  if(isEyyamBiz() && orucMukellef()) setTimeout(()=>{ banner('🌕 Eyyâm-ı Bîz — Ayın '+lunarDay()+'. günü'); toast('Dolunay günleri (13-14-15) sünnet oruç: «Her aydan üç gün oruç, bütün seneyi oruçlu geçirmek gibidir.» (Buhârî) — 🌙 ile niyet et'); },1700);
+  else if(isFastingDay() && orucMukellef()) setTimeout(()=>{ banner('🌙 Bugün '+dayName()); toast('Sünnet oruç günü — gece/öğleden önce niyet et, Akşam iftar (🌙 düğmesi)'); },1300);
   updateFastBtn();
 }
 
@@ -943,7 +949,7 @@ function updateDayNight(dt){
   moonMesh.position.set(px-Math.sin(az)*16, 5-el*24, pz-34);
   moonMesh.visible=moonRise>0.01; moonMesh.material.transparent=true; moonMesh.material.opacity=moonRise;
   const v=vakitOf(gameTime);
-  if(v!==lastVakit){ const prev=lastVakit; lastVakit=v; const el2=document.getElementById('vakit'); if(el2){ el2.textContent=(isFriday()?'🕌 Cuma':dayName())+' · '+v[2]+' '+v[1]; el2.classList.remove('urgent'); } vakitWarned=false; if(prev) onVakitChange(v); }
+  if(v!==lastVakit){ const prev=lastVakit; lastVakit=v; const el2=document.getElementById('vakit'); if(el2){ const icon=(v[2]==='☾')?moonPhase().e:v[2]; el2.textContent=(isFriday()?'🕌 Cuma':dayName())+' · '+icon+' '+v[1]; el2.classList.remove('urgent'); } vakitWarned=false; if(prev) onVakitChange(v); }
   checkVakitWarning();
   if(typeof updateRoosterAzan==='function') updateRoosterAzan();   // ezandan 15 sn önce horoz (her adadan)
   skyAcc+=dt; if(dt===0 || skyAcc>=0.15){ skyAcc=0; updateSkyWidget(); }
@@ -1041,6 +1047,10 @@ function updateSkyWidget(){
     skyRefs.moon.setAttribute('transform',`translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})`);
     skyRefs.moon.setAttribute('opacity','1'); skyRefs.sun.setAttribute('opacity','0');
   }
+  // VAKİT İLERLEME HALKASI: kalan süreyle dolar; namaz kılınmadıysa KIRMIZI, kılındıysa yeşil (kullanıcı isteği)
+  const ring=skyRefs.ring||(skyRefs.ring=document.getElementById('vakitRingPath'));
+  if(ring){ const done=prayerDoneNow(); ring.setAttribute('stroke-dashoffset',(100*(1-vakitFrac())).toFixed(1));
+    ring.setAttribute('stroke', done?'#3fae6a':'#d1442f'); ring.setAttribute('stroke-width', done?'2.4':'3.4'); }
 }
 
 // ---- ADA DÜNYASI (yükseltili adalar + köprüler + kilit) ----
@@ -1522,6 +1532,29 @@ const DAYS=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumarte
 const WEEK_START=6;   // oyun CUMARTESİ başlar (birkaç gün keşfet → Cuma gelince camiye)
 function dow(){ return (WEEK_START+(S.dayNum||0))%7; }   // gerçek takvimden bağımsız; her gün/gece döngüsünde ilerler
 function dayName(){ return DAYS[dow()]; }
+// ---- KAMERÎ AY (30 günlük döngü): ay evreleri + Eyyâm-ı Bîz (13-14-15 = beyaz günler orucu) ----
+function lunarDay(){ return ((S.dayNum||0) % 30) + 1; }   // 1..30 (1: hilâl doğar, 14-15: dolunay, 29-30: kaybolur)
+function moonPhase(){ const d=lunarDay();
+  if(d<=1)  return {e:'🌑', n:'Yeni ay'};
+  if(d<=6)  return {e:'🌒', n:'Hilâl'};            // ince hilâl (artan)
+  if(d<=8)  return {e:'🌓', n:'İlk dördün'};
+  if(d<=12) return {e:'🌔', n:'Şişkin ay (artan)'};
+  if(d<=16) return {e:'🌕', n:'Dolunay'};          // 13-15 Eyyâm-ı Bîz
+  if(d<=21) return {e:'🌖', n:'Şişkin ay (azalan)'};
+  if(d<=23) return {e:'🌗', n:'Son dördün'};
+  if(d<=28) return {e:'🌘', n:'Ters hilâl'};       // azalan ince hilâl
+  return {e:'🌑', n:'Kayboluş'};
+}
+function isEyyamBiz(){ const d=lunarDay(); return d>=13 && d<=15; }
+// current vakit'in ne kadarı geçti (0→1) — ilerleme halkası için
+function vakitFrac(){ const t=gameTime;
+  for(let i=0;i<VAKIT.length;i++){ if(t<VAKIT[i][0]){ const s=(i>0?VAKIT[i-1][0]:VAKIT[VAKIT.length-2][0]-1); return Math.max(0,Math.min(1,(t-s)/((VAKIT[i][0]-s)||1))); } }
+  return 0.99; }
+// current farz namaz kılındı mı (kılınmadıysa halka KIRMIZI)
+function prayerDoneNow(){ const vn=vakitOf(gameTime)[1];
+  if(!FARZ_VAKIT.includes(vn)) return true;                        // farz olmayan vakit → sorun yok
+  if(vn==='Öğle' && isFriday() && cumaActive()) return S.cumaDone===S.dayNum;   // Cuma → cami
+  return !!S.done['ev_namaz']; }
 function isFriday(){ return dow()===5; }
 
 /* ============ SECCADE ÖRME + HER YERDE NAMAZ ============ */
