@@ -81,13 +81,31 @@
     display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12.5px;font-weight:800;
     background:var(--panel);color:var(--muted);box-shadow:0 4px 14px #0002;border:1px solid #0000}
   .woolhint.ready{color:#33240a;background:linear-gradient(135deg,#e9c478,#d9a441);cursor:pointer;animation:pop .3s}
-  #needs{position:fixed;top:52px;left:12px;z-index:6;display:flex;flex-direction:column;gap:4px;pointer-events:none}
+  /* SOL HUD KOLONU: needs + adalet + imam vazifeleri — tek flex sütun, otomatik istiflenir (sabit-konum çakışması yok) */
+  #leftHud{position:fixed;top:76px;left:12px;z-index:6;display:flex;flex-direction:column;align-items:flex-start;gap:8px;pointer-events:none;width:min(202px,46vw)}
+  #needs{display:flex;flex-direction:column;gap:4px;pointer-events:none}
   .need{display:flex;align-items:center;gap:5px;font-size:13px;filter:drop-shadow(0 1px 2px #0004)}
   .nbar{width:60px;height:7px;background:#00000033;border-radius:5px;overflow:hidden;box-shadow:0 1px 3px #0002}
   .nbar>i{display:block;height:100%;width:0%;border-radius:5px;transition:width .35s}
   /* Medine Adaleti göstergesi (muhtaç ihmali → huzursuzluk) */
-  .adalet{position:fixed;top:118px;left:12px;z-index:6;display:flex;align-items:center;gap:5px;pointer-events:auto;cursor:pointer;
+  .adalet{display:flex;align-items:center;gap:5px;pointer-events:auto;cursor:pointer;
     padding:5px 10px;border-radius:12px;font:800 12px system-ui;box-shadow:0 3px 10px #0003;color:#fff}
+  /* İMAM VAZİFELERİ kartı (ana ekranda kalıcı görev takibi) */
+  #vazife{width:100%;background:var(--panel);border-radius:14px;padding:8px 10px 6px;box-shadow:0 4px 14px #0002;pointer-events:auto;cursor:pointer;
+    border:1px solid #0000000d;transition:transform .12s}
+  #vazife:active{transform:scale(.98)}
+  .vzhead{display:flex;align-items:center;gap:5px;font-weight:800;font-size:12px;color:var(--ink);margin-bottom:5px;letter-spacing:.01em}
+  .vzhead>span:not(.chev){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .vzhead .chev{flex:0 0 auto;font-size:13px;color:var(--muted);font-weight:800}
+  .vzrow{display:flex;align-items:center;gap:7px;padding:4px 1px;font-size:12.5px;font-weight:700}
+  .vzrow + .vzrow{border-top:1px solid #00000010}
+  .vzic{width:1.15em;height:1.15em;flex:0 0 auto;text-align:center;line-height:1.15em}
+  .vznm{flex:1;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vzst{flex:0 0 auto;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:9px;white-space:nowrap}
+  .vzrow.todo .vzst{background:linear-gradient(135deg,#ffd27a,#f0a63e);color:#5a3a06;box-shadow:0 0 0 2px #f0a63e22;animation:fastpulse 1.7s ease-in-out infinite}
+  .vzrow.done .vzst{background:#dff0e4;color:#2f7a53}
+  .vzrow.lock{opacity:.5}
+  .vzrow.lock .vzst{background:#ececec;color:#8a8a8a}
   .adalet.ok{background:#3f8f63dd}
   .adalet.warn{background:#d99a2edd;animation:fastpulse 1.4s ease-in-out infinite}
   .adalet.bad{background:#c0341fdd;animation:fastpulse .9s ease-in-out infinite}
@@ -200,7 +218,7 @@
   .gic{font-size:44px;margin-bottom:8px}
   .gtitle{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
   .gdesc{font-size:15px;line-height:1.6;color:#26352c}
-  .toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%) translateY(20px);background:#d9a441;color:#33240a;
+  .toast{position:fixed;left:50%;bottom:158px;transform:translateX(-50%) translateY(20px);background:#d9a441;color:#33240a;
     padding:11px 18px;border-radius:14px;font-weight:800;font-size:14px;box-shadow:0 8px 22px #0003;opacity:0;transition:.3s;z-index:30;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   #banner{position:fixed;top:36%;left:50%;transform:translate(-50%,-50%) scale(.7);z-index:35;
@@ -344,12 +362,15 @@
 
 <div class="woolhint" id="woolHint" style="display:none"></div>
 
-<div id="needs" style="display:none">
-  <div class="need"><span>💧</span><div class="nbar"><i id="thirstBar"></i></div></div>
-  <div class="need"><span>🍞</span><div class="nbar"><i id="hungerBar"></i></div></div>
-  <div class="need"><span>🚻</span><div class="nbar"><i id="toiletBar"></i></div></div>
+<div id="leftHud">
+  <div id="needs" style="display:none">
+    <div class="need"><span>💧</span><div class="nbar"><i id="thirstBar"></i></div></div>
+    <div class="need"><span>🍞</span><div class="nbar"><i id="hungerBar"></i></div></div>
+    <div class="need"><span>🚻</span><div class="nbar"><i id="toiletBar"></i></div></div>
+  </div>
+  <div id="adalet" class="adalet" style="display:none" onclick="__ihya3d&&__ihya3d.openHayir&&__ihya3d.openHayir()"></div>
+  <div id="vazife" style="display:none" onclick="__ihya3d&&__ihya3d.openScen&&__ihya3d.openScen()"></div>
 </div>
-<div id="adalet" class="adalet" style="display:none" onclick="__ihya3d&&__ihya3d.openHayir&&__ihya3d.openHayir()"></div>
 
 <div class="toolbar" id="toolbar">
   <button class="iconbtn" id="prayBtn" title="Namaz kıl (seccadeni ser)" style="display:none">🧎</button>
@@ -837,6 +858,10 @@ if(typeof S.mosqueStreak!=='number') S.mosqueStreak=0;   // ardışık tam-cami 
 if(typeof S.mosqueStreakDay!=='number') S.mosqueStreakDay=-1;
 if(typeof S.mosqueFullDay!=='number') S.mosqueFullDay=-1;
 if(S.mosqueUnlocked===undefined) S.mosqueUnlocked=false; // imam/cemaat sohbeti açıldı mı (KALICI)
+// İMAM QUEST-GIVER (Faz 6): 5 vakit ÜST ÜSTE cemaatle namaz → imam vazife verir → Senaryo Defteri (barıştır/hükmet/emanet) açılır
+if(typeof S.mosqueConsec!=='number') S.mosqueConsec=0;   // ardışık cemaat-farz namazı sayısı (kaçırınca sıfırlanır)
+if(typeof S.mosqueConsecMark!=='number') S.mosqueConsecMark=-1;  // son cemaat-farzın global vakit indeksi (dayNum*5+vakitIdx)
+if(S.imamMet===undefined) S.imamMet = (S.mosqueUnlocked===true) || (!!S.scen && Object.values(S.scen).some(x=>x&&x.n>0));  // grandfather: eski oyuncu (7-gün açmış / senaryo çözmüş) otomatik tanışmış sayılır — kimse kilitlenmez
 if(typeof S.thirst!=='number') S.thirst=0;   // susuzluk 0..100 (0=tok, oyuncu lehine yavaş biriker)
 if(typeof S.hunger!=='number') S.hunger=0;   // açlık 0..100
 if(typeof S.toilet!=='number') S.toilet=0;   // tuvalet ihtiyacı 0..100 → giderince abdest tazelenir
@@ -1329,6 +1354,7 @@ function doGather(rec){
   const got=invAdd(def.item, def.amount);
   S.gather[def.id]=Date.now()+def.cd;
   swapGatherModel(rec,false);
+  reviveTint(rec.meshes, 0.78);   // hasat anında solgun (cooldown boyunca updateCooldownSprites yeşertir)
   save(); refreshHUD(); sndChime();
   const g=GOODS[def.item]; toast('+'+got+' '+g.ic+' '+g.nm+(got<def.amount?' (çanta doldu)':' topladın'));
   checkZekat();
@@ -1343,7 +1369,9 @@ function updateGatherRegrow(){
 let cdAcc=0;
 function updateCooldownSprites(){ const now=Date.now();
   for(const rec of gatherNodes){ if(!rec.cdSprite) continue; const t=S.gather[rec.def.id]; const rem=t?Math.ceil((t-now)/1000):0;
-    const show=rem>0 && isUnlocked(rec.def.islId); rec.cdSprite.visible=show; if(show) drawCd(rec.cdSprite,rem); }
+    const unl=isUnlocked(rec.def.islId); const show=rem>0 && unl; rec.cdSprite.visible=show; if(show) drawCd(rec.cdSprite,rem);
+    // DİRİLİŞ: cooldown boyunca düğüm gri→gerçek verimli renge döner (bare model üstünde; well/hive/coop/pond dahil)
+    if(unl && rec.bareNow && t){ const cd=rec.def.cd||8000; const p=Math.max(0,Math.min(1,1-(t-now)/cd)); reviveTint(rec.meshes,(1-p)*0.78); } }
   for(const an of animals){ if(!an.cdSprite) continue; const t=S.gather[an.def.id]; const rem=t?Math.ceil((t-now)/1000):0;
     const show=rem>0 && an.rec.g.visible; an.cdSprite.visible=show;
     if(show){ an.cdSprite.position.set(an.rec.g.position.x, 1.6+(an.def.scale||1)*0.55, an.rec.g.position.z); drawCd(an.cdSprite,rem); } }
@@ -1869,6 +1897,13 @@ function hacTick(dt){
 function recordMosquePrayer(vn){
   if(!FARZ_VAKIT.includes(vn)) return;
   const d=S.dayNum||0;
+  // İMAM QUEST-GIVER: 5 vakit ÜST ÜSTE cemaat-farz → imam vazife vermeye hazır (imamMet olana dek say)
+  if(!S.imamMet){
+    const gIdx=d*5+FARZ_VAKIT.indexOf(vn);        // global vakit indeksi (ardışıklık ölçütü)
+    S.mosqueConsec=(gIdx===S.mosqueConsecMark+1)?(S.mosqueConsec+1):1;   // bir önceki vakti takip ediyorsa +1, yoksa baştan
+    S.mosqueConsecMark=gIdx;
+    if(S.mosqueConsec===5) setTimeout(()=>{ banner('🕌 İmam seni tanıdı'); toast('5 vakti üst üste cemaatle kıldın — İmam sana bir vazife vermek istiyor. Aşağıdan «İmam\'dan vazife al». 📜'); sndFanfare(); },500);
+  }
   if(S.mosqueVDay!==d){ S.mosqueVDay=d; S.mosqueVSet=[]; }
   if(!S.mosqueVSet.includes(vn)) S.mosqueVSet.push(vn);
   if(S.mosqueVSet.length>=FARZ_VAKIT.length && S.mosqueFullDay!==d){
@@ -1940,6 +1975,16 @@ function renderMosque(){
   const key=S.dayNum+'_'+vn;
   h+= (S.mosqueSat===key) ? '<div class="sub" style="opacity:.7;text-align:center;margin-top:8px">🤲 Bu vakit oturup dinledin</div>'
     : '<button class="do" style="background:#5a7d5a;margin-top:8px" onclick="__mosqueAct(\'sit\')">🤲 Sessizce otur, imamı dinle (+3 nûr)</button>';
+  // İMAM VAZİFESİ — 5 vakit üst üste cemaatle namaz → imam Senaryo Defteri'ni (barıştır/hükmet/emanet) açar
+  if(!S.imamMet){
+    if(S.mosqueConsec>=5){
+      h+='<button class="do" style="background:#8a6a3a;margin-top:8px" onclick="__mosqueAct(\'vazife\')">📜 İmam\'dan vazife al (barıştır · hükmet · emanet)</button>';
+    } else {
+      h+='<div class="sub" style="opacity:.85;margin-top:8px;text-align:center">📜 İmam\'ın vazifesi kilitli — 5 vakti <b>üst üste</b> cemaatle kıl<br><b>'+(S.mosqueConsec||0)+'/5 vakit</b> ardışık</div>';
+    }
+  } else {
+    h+='<div class="sub" style="opacity:.7;margin-top:8px;text-align:center">📜 İmam sana barıştırma · hüküm · emanet vazifelerini verdi ✓</div>';
+  }
   // imam ve cemaatle sohbet — 7 gün her vakti camide kılınca açılır
   if(S.mosqueUnlocked){
     h+='<button class="do" style="background:#6a5a8a;margin-top:8px" onclick="__mosqueAct(\'sohbet\')">💬 İmam ve cemaatle sohbet et (ilim +5)</button>';
@@ -1966,6 +2011,9 @@ window.__mosqueAct=function(kind){
     setTimeout(()=>toast('🤲 Cemaatle '+(NAMAZ_LABEL[vn]||vn)+' kıldın (+12 nûr)'),200); if(islandDone('ev')) checkStreak(); }
   else if(kind==='nafile'){ const nkey=S.dayNum+'_'+vn; if(S.mosqueNafile===nkey){ renderMosque(); return; }
     S.mosqueNafile=nkey; addNur(5); sndChime(); setTimeout(()=>toast('🤲 Nâfile kıldın (+5 nûr) — bu vakit tekrar kılamazsın'),150); }
+  else if(kind==='vazife'){ if(S.imamMet || S.mosqueConsec<5){ renderMosque(); return; }
+    S.imamMet=true; addNur(15); sndFanfare(); banner('📜 İmam sana vazife verdi');
+    setTimeout(()=>toast('İmam: «Sende adalet ve merhamet gördüm. Bundan sonra insanların arasını bul (🕊️ barıştır), haksızlığa âdil hükmet (⚖️), emaneti ehline ulaştır (📿). Senaryo Defterin açıldı.» (+15 nûr)'),250); }
   else if(kind==='sohbet'){ if(!S.mosqueUnlocked){ renderMosque(); return; }
     addNur(5); sndChime(); const soz=IMAM_SOZ[(S.dayNum*3+ (vakitOf(gameTime)[0]*7|0))%IMAM_SOZ.length];
     banner('💬 İmam sohbeti'); setTimeout(()=>toast(soz+' (+5 nûr)'),200); }
@@ -2753,6 +2801,8 @@ function instance(name){
   return {g,meshes};
 }
 function setAlive(meshes,alive){ meshes.forEach(x=>x.m.material.color.copy(alive?x.orig:x.orig.clone().lerp(x.gray,0.8))); }
+// COOLDOWN DİRİLİŞ (Faz 6): hasat sonrası düğüm solgun/gri → bekleme ilerledikçe gerçek verimli renge döner (ihyâ teması)
+function reviveTint(meshes,g){ const a=Math.max(0,Math.min(0.78,g)); for(const x of meshes){ if(x.m&&x.m.material&&x.m.material.color) x.m.material.color.copy(x.orig).lerp(x.gray,a); } }
 
 /* ============ BUILD WORLD ============ */
 const interactables=[]; // {q, g, meshes, done}  (exam düğümleri: r.exam=true)
@@ -3203,8 +3253,13 @@ function buildScenarios(){
   // taşınan emanet kesesini geri yükle (kaydedilmiş oyun)
   if(S.carryPouch && player){ const it=instance('trust_pouch'); carryPouch=it.g; carryPouch.scale.setScalar(0.85); carryPouch.position.set(-0.15,0.64,0.3); player.add(carryPouch); }   // SOL kolda (kıvrık) GÖĞÜS hizası (0.9→0.64: elin üstünde durmasın)
 }
+const IMAM_SCEN=['baris','adalet','emanet','emanet_deliver'];   // imam vazifesine bağlı senaryolar (barıştır/hükmet/emanet); diğer hayırlar (sebil/dilenci/taharet) serbest
 function doScenario(rec){
   if(rec.islId && !isUnlocked(rec.islId)){ toast('🔒 Burası henüz açılmadı'); return; }
+  // İMAM QUEST-GIVER yumuşak kapısı: barıştır/hükmet/emanet, imamdan vazife alınana dek kilitli (eski oyuncular grandfather ile açık)
+  if(!S.imamMet && IMAM_SCEN.includes(rec.sid)){
+    toast('🔒 Önce İmam\'dan vazife al — Mescid\'e git, 5 vakti üst üste cemaatle kıl'+(S.mosqueConsec>0?' ('+Math.min(S.mosqueConsec,5)+'/5)':''));
+    return; }
   // prereq kapısı: yalnız İLK KEZ (ada henüz fethedilmemiş VE senaryo hiç çözülmemiş) uygulanır.
   // Aksi hâlde günlük S.done sıfırlaması senaryoyu her gün yeniden kilitliyordu → tekrar barıştıramama/hükmedememe.
   const freeRepeat = rec.renew && (S.conquered[rec.islId] || (S.scen[rec.renew] && S.scen[rec.renew].n>0));
@@ -3753,7 +3808,7 @@ const TUT_STEPS=[
   {ic:'🔨',t:'Üret',b:'Hurma Bahçesi\'nin güneyindeki <b>Atölye</b> adasında değirmen·tandır·tezgâh·kazan ile un·ekmek·çörek·seccade·çanta·pekmez yap.'},
   {ic:'🛒',t:'Pazar',b:'Topladığın/ürettiğin malları <b>Medine Pazarı</b>\'nda (Şehir adası) <b>dirheme</b> sat.'},
   {ic:'🤲',t:'Hayır & Sadaka',b:'Muhtaçlara (yetim·komşu·yolcu·dilenci) <b>yiyecek ver</b>; dirhemini <b>🤲 Hayır</b> ile sadakaya dönüştür → <b>nûr</b> kazan.'},
-  {ic:'🕌',t:'İbadet',b:'Vakti gelince <b>🧎 namazını kıl</b>. Cuma günü <b>Mescid</b>\'e git, cemaatle kıl. Camide istikrarlı namaz, <b>imamın rehberliğini</b> açar.'},
+  {ic:'🕌',t:'İbadet',b:'Vakti gelince <b>🧎 namazını kıl</b>. Cuma günü <b>Mescid</b>\'e git, cemaatle kıl. <b>5 vakti üst üste</b> camide cemaatle kılınca <b>imam sana vazife açar</b> (barıştır·hükmet·emanet).'},
   {ic:'🌍',t:'Amaç: İhyâ',b:'Her adanın derslerini öğren, <b>İmtihan Meydanı</b>\'nda sınavı geç → adayı feth et. Çorak Yesrib\'i yeşil <b>Medine</b>\'ye çevir!'},
 ];
 let tutIdx=0;
@@ -3802,6 +3857,29 @@ actBtn.onclick=()=>{ if(!near) return;
   if(near.exam){ openExam(near.islId); return; }
   interact(near.q); };
 
+// İMAM VAZİFELERİ — ana ekran kalıcı görev takibi (imamdan vazife alındıktan sonra)
+function vazifeRowStatus(k){
+  const recs=scenarioRecs.filter(r=> k==='emanet' ? (r.sid==='emanet'||r.sid==='emanet_deliver') : r.sid===k);
+  if(!recs.length) return {cls:'lock'};
+  const isl=recs[0].islId; if(isl && !isUnlocked(isl)) return {cls:'lock'};
+  const todo=recs.some(r=>{ try{ return scenArmed(r); }catch(e){ return false; } });
+  return { cls: todo?'todo':'done', n: scenOf(k).n };
+}
+let _vzSig='';
+function renderVazife(){
+  const el=document.getElementById('vazife'); if(!el) return;
+  if(!S.imamMet){ if(el.style.display!=='none'){ el.style.display='none'; _vzSig=''; } return; }
+  const rows=['baris','adalet','emanet'].map(k=>Object.assign({k}, vazifeRowStatus(k)));
+  const sig=rows.map(r=>r.k+r.cls+(r.n||0)).join('|');
+  if(sig===_vzSig && el.style.display!=='none') return;   // değişiklik yoksa DOM'a dokunma
+  _vzSig=sig; el.style.display='block';
+  let h='<div class="vzhead" title="Senaryo Defteri\'ni aç">'+emo('📜')+' <span>İmam Vazifelerin</span><span class="chev">›</span></div>';
+  for(const r of rows){ const m=SCEN_META[r.k];
+    const badge = r.cls==='todo' ? '● Bekliyor' : r.cls==='done' ? ('✓ Yapıldı'+(r.n?' ×'+r.n:'')) : '🔒 kilitli';
+    h+='<div class="vzrow '+r.cls+'"><span class="vzic">'+emo(m.ic)+'</span><span class="vznm">'+SCEN_LABEL[r.k]+'</span><span class="vzst">'+badge+'</span></div>';
+  }
+  el.innerHTML=h;
+}
 function refreshHUD(){
   document.getElementById('nur').textContent=S.nur;
   const rk=document.getElementById('rank'); if(rk) rk.textContent=rankName(S.nur);
@@ -3815,6 +3893,7 @@ function refreshHUD(){
   if(typeof updateNeedsHud==='function') updateNeedsHud();
   if(typeof updateEzberBtn==='function') updateEzberBtn();
   if(typeof updateAdaletHud==='function') updateAdaletHud();   // adalet göstergesi hep güncel/görünür
+  if(typeof renderVazife==='function') renderVazife();         // imam vazife takibi (ana ekran)
 }
 
 /* ============ LOOP ============ */
@@ -4068,7 +4147,7 @@ function tick(){
   if(scenarioRecs.length) updateScenarios(dt, clock.elapsedTime);
   if(bees.length) updateBees(dt, clock.elapsedTime);
   if(animals.length) updateAnimals(dt);
-  cdAcc+=dt; if(cdAcc>=0.4){ cdAcc=0; updateCooldownSprites(); }   // bekleme geri-sayım rozetleri (~0.4 sn'de bir)
+  cdAcc+=dt; if(cdAcc>=0.4){ cdAcc=0; updateCooldownSprites(); if(typeof renderVazife==='function') renderVazife(); }   // bekleme geri-sayım rozetleri + imam vazife takibi (~0.4 sn'de bir)
   groundAnimals();   // güvenlik ağı: her kare tüm hayvan klonlarını ada+tabana sıkıştır (orphan/uçan dahil)
   // ---- TEŞHİS (Faz 11.9 geçici): görünür hayvanın GERÇEK render pozisyonu (dünya bbox) anormal mi? Ekranda göster ----
   window.__animDbgN=(window.__animDbgN||0)+1;
@@ -4210,6 +4289,9 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     hayirCounts:()=>({agac:S.hayir.agac.length,kandil:S.hayir.kandil.length,cesme:S.hayir.cesme.length,ilim:S.hayir.ilim.length}),
     openInv:()=>openInv(), inv:()=>Object.assign({},S.inv),
     gatherNodes:()=>gatherNodes.map(r=>({id:r.def.id, ready:nodeReady(r.def), bareNow:r.bareNow, item:r.def.item})),
+    nodeColor:(id)=>{ const r=gatherNodes.find(x=>x.def.id===id); if(!r||!r.meshes[0]) return null; const c=r.meshes[0].m.material.color, o=r.meshes[0].orig, gr=r.meshes[0].gray;
+      const d=(a,b)=>Math.abs(a.r-b.r)+Math.abs(a.g-b.g)+Math.abs(a.b-b.b); return {bareNow:r.bareNow, cur:[+c.r.toFixed(2),+c.g.toFixed(2),+c.b.toFixed(2)], distToOrig:+d(c,o).toFixed(2), distToGray:+d(c,gr).toFixed(2), rem:S.gather[id]?Math.max(0,Math.round((S.gather[id]-Date.now())/1000)):0}; },
+    setCd:(id,ms)=>{ S.gather[id]=Date.now()+ms; },
     gatherId:(id)=>{ const r=gatherNodes.find(x=>x.def.id===id); if(r) doGather(r); return r?r.def:null; },
     forceRegrow:(id)=>{ delete S.gather[id]; updateGatherRegrow(); },
     animals:()=>animals.map(a=>({id:a.def.id, ready:animalReady(a.def), produce:a.def.produce, isl:a.def.islId, pos:[Math.round(a.rec.g.position.x),Math.round(a.rec.g.position.z)], visible:a.rec.g.visible})),
@@ -4247,7 +4329,9 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     enterHac:()=>enterHac(), exitHac:()=>exitHac(), hacAct:(k)=>window.__hacAct(k), hacState:()=>({mode:hacMode, ...hacState}),
     mosqueState:()=>({mode:mosqueMode, cumaDone:S.cumaDone, sat:S.mosqueSat, interiorNodes:mosqueGroup?mosqueGroup.children.length:0}),
     mosqueWeek:()=>({vDay:S.mosqueVDay, vSet:S.mosqueVSet.slice(), streak:S.mosqueStreak, streakDay:S.mosqueStreakDay, unlocked:S.mosqueUnlocked}),
-    recordMosque:(vn)=>{ recordMosquePrayer(vn); save(); return {streak:S.mosqueStreak, unlocked:S.mosqueUnlocked, todaySet:S.mosqueVSet.length}; },
+    imamState:()=>({consec:S.mosqueConsec, mark:S.mosqueConsecMark, met:S.imamMet, ready:(!S.imamMet&&S.mosqueConsec>=5)}),
+    setImam:(v)=>{ S.imamMet=!!v; S.mosqueConsec=v?0:S.mosqueConsec; save(); return {met:S.imamMet}; },
+    recordMosque:(vn)=>{ recordMosquePrayer(vn); save(); return {streak:S.mosqueStreak, unlocked:S.mosqueUnlocked, todaySet:S.mosqueVSet.length, consec:S.mosqueConsec, imamMet:S.imamMet}; },
     obstacles:()=>OBSTACLES.length, blocked:(x,z)=>blocked(x,z),
     dayNum:()=>S.dayNum, setDayNum:(n)=>{ S.dayNum=n; save(); },
     fastPhase:()=>fastPhase(), doFast:()=>doFast(),
