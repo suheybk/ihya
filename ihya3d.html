@@ -891,7 +891,7 @@ function dnSample(t){ let a=SKY[0],b=SKY[SKY.length-1];
   const f=(t-a.t)/((b.t-a.t)||1);
   return { sky:new THREE.Color(a.sky).lerp(new THREE.Color(b.sky),f), hemi:a.hemi+(b.hemi-a.hemi)*f,
     sun:new THREE.Color(a.sun).lerp(new THREE.Color(b.sun),f), sunI:a.sunI+(b.sunI-a.sunI)*f }; }
-const VAKIT=[[0.20,'Gece','☾'],[0.27,'Fecir','☾'],[0.45,'Kuşluk','☀'],[0.58,'Öğle','☀'],[0.68,'İkindi','☀'],[0.78,'Akşam','☀'],[0.90,'Yatsı','☾'],[1.01,'Gece','☾']];
+const VAKIT=[[0.20,'Gece','☾'],[0.27,'Fecir','☾'],[0.45,'Kuşluk','☀'],[0.58,'Öğle','☀'],[0.68,'İkindi','☀'],[0.80,'Akşam','☀'],[0.90,'Yatsı','☾'],[1.01,'Gece','☾']];   // Akşam 0.68-0.80 (eskiden 0.78 → çok kısaydı, kullanıcı bildirdi); Yatsı 0.80-0.90
 function vakitOf(t){ for(const v of VAKIT){ if(t<v[0]) return v; } return VAKIT[VAKIT.length-1]; }
 function isNight(){ return gameTime<0.24 || gameTime>=0.72; }
 let lastVakit=null;
@@ -945,7 +945,7 @@ function onVakitChange(v){
 /* ---- NAMAZ VAKTİ ÇIKIYOR UYARISI ---- */
 const FARZ_VAKIT=['Fecir','Öğle','İkindi','Akşam','Yatsı'];
 // Farz vakit BAŞLANGIÇ zamanları (gün 0-1 döngüsünde) — sonraki namaza geri-sayım için
-const FARZ_STARTS=[[0.20,'Fecir'],[0.45,'Öğle'],[0.58,'İkindi'],[0.68,'Akşam'],[0.78,'Yatsı']];
+const FARZ_STARTS=[[0.20,'Fecir'],[0.45,'Öğle'],[0.58,'İkindi'],[0.68,'Akşam'],[0.80,'Yatsı']];   // Yatsı 0.78→0.80 (Akşam penceresi genişledi)
 function nextFarzInfo(){
   const t=gameTime; let next=null,name=null;
   for(const fs of FARZ_STARTS){ if(fs[0]>t){ next=fs[0]; name=fs[1]; break; } }
@@ -1592,7 +1592,7 @@ function sellSeccade(){
   toast('💰 +'+SECCADE_FIYAT+' dirhem (seccade satıldı)');
 }
 // kerahat (mekruh) vakitleri: güneş doğarken, tam tepede (istivâ), batarken
-function isKerahat(t){ return (t>=0.27 && t<0.32) || (t>=0.55 && t<0.585) || (t>=0.66 && t<0.705); }
+function isKerahat(t){ return (t>=0.27 && t<0.32) || (t>=0.55 && t<0.585) || (t>=0.655 && t<0.68); }   // batış kerahati Akşam başında (0.68) BİTER → Akşam penceresi baştan sona kılınabilir (eskiden 0.705'e taşıp Akşam'ı yiyordu)
 function prayNamaz(){
   if(!S.hasSeccade){
     if(S.laidSeccade){ toast('🧎 Seccaden yerde serili — yanına gidip al'); return; }
@@ -2677,7 +2677,7 @@ function wake(){ lastActT=performance.now()/1000; }  // dokunma/tuş → aktivit
 ['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{ wake(); },{passive:true}));
 
 /* ---- İMTİHAN MEYDANI düğümleri (prosedürel: kürsü + kandil + hâle) ---- */
-const EXAM_POS={ ev:[6.6,0,2.2], bahce:[20.5,0,2.5], mahalle:[32.5,0,4.3], cami:[54.5,0,-0.5], sehir:[70,0,-0.5] };   // cami: mescit girişinden (49,-4.4) UZAK ön-doğu köşe (kullanıcı isteği); Medine: pazar (67,-4) ile Kâbe (70,3) arası, adanın en sonuna
+const EXAM_POS={ ev:[6.6,0,2.2], bahce:[20.5,0,2.5], mahalle:[32.5,0,4.3], cami:[54,0,-2.5], sehir:[70,0,-0.5] };   // cami: mescit girişinden UZAK + doğu köprü ağzından (55.8,0) YUKARI çekildi (köprü geçişini kısıtlamasın, kullanıcı isteği); Medine: pazar (67,-4) ile Kâbe (70,3) arası, adanın en sonuna
 const examNodes=[]; // {islId, g, ped, pedMat, halo, haloMat, core, coreMat, rec}
 function examReady(islId){ return isUnlocked(islId) && islandDone(islId) && !S.conquered[islId]; }
 function makeExamNode(islId,pos){
@@ -2940,8 +2940,15 @@ function scenNext(k){ const ts=SCEN_TITLES[k]||[], n=scenOf(k).n; for(const t of
 function scenXP(){ return scenOf('baris').n+scenOf('adalet').n+scenOf('emanet').n; }   // toplam çözülen mesele = senaryo XP
 function scenSolve(key,rec,nur,bannerTxt,toastTxt){
   const st=scenOf(key);
-  if(rec && rec.q && !S.done[rec.q.id]) sceneComplete(rec,nur,bannerTxt,toastTxt);   // ilk kez → ilerleme + ada kilidi
-  else { addNur(nur); sndFanfare(); banner(bannerTxt); if(toastTxt) setTimeout(()=>toast(toastTxt),1450); }
+  // çift-tıkla nûr farming engeli: aynı vaka cooldown içinde tekrar çözülmesin
+  if(rec && rec.q && S.done[rec.q.id] && Date.now()<st.cd){ closeDialog(); return; }
+  // KÖK NEDEN FIX: eskiden sceneComplete çağrılıyordu; onun rec.done erken-return'ü, senaryo rec.done'u
+  // yeni günde SIFIRLANMADIĞI için (reset döngüsü !r.scenario) 2. günden sonra S.done[q.id]'yi set ETMİYOR
+  // → argueOn hep true → 💢 geçmiyor + nûr verilmiyordu (ünvan geliyor çünkü st.n++ altta çalışıyor).
+  const firstEver = !(st.n>0);   // KALICI sayaç: hiç çözülmemiş mi
+  if(rec && rec.q){ S.done[rec.q.id]=true; rec.done=true; }   // bu vaka çözüldü (💢/armed sinyali; onNewDay silinir)
+  addNur(nur); sndFanfare(); banner(bannerTxt); if(toastTxt) setTimeout(()=>toast(toastTxt),1450);
+  if(firstEver) applyIslandLock();   // ilk kez → ada görsel kilidi
   st.n++; st.idx=(st.idx+1)%(SCEN_POOL[key]||1); st.cd=Date.now()+SCEN_CD; save(); refreshHUD();
   const hit=(SCEN_TITLES[key]||[]).find(t=>t.n===st.n);   // bu mesele bir kilometre taşı mı?
   if(hit){ const bonus=15+st.n; setTimeout(()=>{ banner('🏅 Unvan: '+hit.t); sndFanfare(); addNur(bonus); toast('🏅 '+SCEN_LABEL[key]+' unvanı: «'+hit.t+'» — +'+bonus+' nûr'); },3300); }
@@ -3027,7 +3034,7 @@ function dlgEmanet(){ const c=curEmanet(); return { ic:'📿', title:'Emaneti Ul
     {l:'Şimdi olmaz'} ]},
 }}; }
 function takePouch(){ if(S.carryPouch||!player) return; S.carryPouch=true;
-  if(!carryPouch){ const it=instance('trust_pouch'); carryPouch=it.g; carryPouch.scale.setScalar(0.85); carryPouch.position.set(0.28,0.62,0.18); player.add(carryPouch); }
+  if(!carryPouch){ const it=instance('trust_pouch'); carryPouch=it.g; carryPouch.scale.setScalar(0.85); carryPouch.position.set(-0.16,0.9,0.34); player.add(carryPouch);   // SOL kolda (kıvrık) göğüs hizası }
   carryPouch.visible=true; save(); sndChime(); banner('📿 Emaneti aldın');
   setTimeout(()=>toast(curEmanet().carry),1200);
 }
@@ -3096,7 +3103,7 @@ function buildScenarios(){
     sceneRec('faydali',q('hayir'),anchor,[],'sehir','🤲 Sebil yaptır','🤲 Topluma faydalı iş yap');
     OBSTACLES.push({x:67,z:2,r:0.7}); }
   // taşınan emanet kesesini geri yükle (kaydedilmiş oyun)
-  if(S.carryPouch && player){ const it=instance('trust_pouch'); carryPouch=it.g; carryPouch.scale.setScalar(0.85); carryPouch.position.set(0.28,0.62,0.18); player.add(carryPouch); }
+  if(S.carryPouch && player){ const it=instance('trust_pouch'); carryPouch=it.g; carryPouch.scale.setScalar(0.85); carryPouch.position.set(-0.16,0.9,0.34); player.add(carryPouch);   // SOL kolda (kıvrık) göğüs hizası }
 }
 function doScenario(rec){
   if(rec.islId && !isUnlocked(rec.islId)){ toast('🔒 Burası henüz açılmadı'); return; }
@@ -3110,7 +3117,9 @@ function updateScenarios(dt,t){
   // hafif nefes/salınım — tüm senaryo karakterleri donuk durmasın
   for(const f of sceneIdle){ f.g.position.y=Math.abs(Math.sin(t*1.1+f.ph))*0.015; f.g.rotation.z=Math.sin(t*1.35+f.ph)*0.022; }
   // barıştırma: tartışırken sert titreşim (idle'ın üstüne yazar), 💢 görünür
-  const argueOn=isUnlocked('cami') && !S.done['davet'];
+  // argueOn artık ARMED durumuna bağlı (S.done['davet'] tek başına kırılgandı: rec.done stale → gün2+ temizlenmiyordu)
+  const barisRec=scenarioRecs.find(x=>x.sid==='baris');
+  const argueOn=isUnlocked('cami') && !!barisRec && scenArmed(barisRec);
   for(const a of argueList){ a.sprite.visible=argueOn;
     if(argueOn){ a.g.rotation.z=Math.sin(t*7+a.ph)*0.06; a.g.position.y=Math.abs(Math.sin(t*5+a.ph))*0.02; a.sprite.position.y=a.baseY+Math.sin(t*4+a.ph)*0.07; } }
   if(emanetRecipient){ const on=!!S.carryPouch && !S.done['emanet'], gl=0.28+0.22*Math.sin(t*3);
@@ -3793,6 +3802,8 @@ function tick(){
     // (öne eğik komik görünüyordu → hafif geriye/dik ~ -0.04, bağdaş kuran biri gibi doğal)
     if(!(actionT>0 && (actionKind==='namaz'||actionKind==='give'||actionKind==='hug'||actionKind==='draw'))) player.rotation.x += (sitAmount*-0.04 - player.rotation.x)*0.2;
   }
+  // EMANET taşırken SOL kol dirsekten yukarı kıvrık (keseyi göğüste tutar) — dururken/yürürken/harekette HEP (son yazan → salınımı ezer)
+  if(hacVortexT<=0 && S.carryPouch && PP && PP.armL){ swingLeg(PP.armL, -1.45); }
   // seccade serilme (açılma) animasyonu
   if(seccadeAnim>0 && laidSeccadeRec){ seccadeAnim-=dt*2.6; const t=Math.max(0,Math.min(1,1-seccadeAnim)); const e=t*t*(3-2*t); const s=0.16+0.84*e; laidSeccadeRec.g.scale.set(s,1,s); if(seccadeAnim<=0){ laidSeccadeRec.g.scale.set(1,1,1); seccadeAnim=0; } }
   // camera follow (intro / mescit / Mekke / normal)
