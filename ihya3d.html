@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-C6W9ZSS95L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-C6W9ZSS95L');
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#2f8f63">
@@ -1440,6 +1448,7 @@ function doTend(rec){
     return; }
   if(invFull()){ toast('🎒 Dağarcık dolu ('+invCap()+') — sat/kullan ya da Atölye\'de çanta ör'); return; }
   facePlayer(rec.g.position); playAction(1.2, def.produce==='yun'?'shear':(def.produce==='yumurta'?'pluck':'milk'));   // yün→kırpma, süt→sağma, yumurta→toplama
+  const _an=animals.find(a=>a.rec===rec); if(_an) _an.pause=1.5;   // sağma/kırpma boyunca hayvan DURSUN (işlem bitince yine dolaşır)
   const got=invAdd(def.produce, def.amount);
   S.gather[def.id]=Date.now()+def.cd;
   save(); refreshHUD(); sndChime();
@@ -3410,10 +3419,11 @@ function updateVoices(dt){ if(!sndReady||muted||!player)return; const px=player.
     if(d>=far){ voiceT[k]=3+Math.random()*4; continue; }        // menzil dışı → biraz sonra tekrar bak
     if(k==='goat'){ sndGoat(); }   // keçi: örnek yok → sentetik
     else {
-      let gain=distGain(d,near,far,(k==='camel')?0.3:0.5);          // deve çok yüksekti → kısıldı
-      const dur=(k==='camel')?2.5:0;                                 // deve: sadece ilk ~2.5 sn (uzun böğürmenin tamamını çalma)
-      playSnd(k,gain,0.93+Math.random()*0.14,dur);
-      if(Math.random()<0.4) setTimeout(()=>playSnd(k,gain*0.8,0.9+Math.random()*0.16,dur),480+Math.random()*520);  // öbek: bazen 2. çağrı
+      let gain=distGain(d,near,far,(k==='camel')?0.17:0.5);         // deve DAHA kısık (kullanıcı: çok derinden, kısık)
+      const dur=(k==='camel')?1.5:0;                                 // deve: DAHA kısa (~1.5 sn; uzun böğürmeyi çalma)
+      const rate=(k==='camel')?(0.72+Math.random()*0.1):(0.93+Math.random()*0.14);   // deve DAHA DERİN (düşük perde ~0.72-0.82)
+      playSnd(k,gain,rate,dur);
+      if(Math.random()<0.4) setTimeout(()=>playSnd(k,gain*0.8,rate*0.97,dur),480+Math.random()*520);  // öbek: bazen 2. çağrı
     }
     // sonraki öbek: yakınsa sık (~7s), uzaksa seyrek (~24s); tavuk daha sık
     const nf=Math.max(0,(far-d)/(far-near));   // 1 yakın … 0 uzak
@@ -3706,7 +3716,7 @@ function tick(){
   if(keys['w']||keys['arrowup']) iz-=1; if(keys['s']||keys['arrowdown']) iz+=1;
   if(keys['a']||keys['arrowleft']) ix-=1; if(keys['d']||keys['arrowright']) ix+=1;
   const mag=Math.hypot(ix,iz);
-  const moving = player && mag>0.06 && !mosqueMode && !hacMode && !introMode && !warpBlock;   // mescit/Mekke/intro/geçiş'te hareket durur
+  const moving = player && mag>0.06 && !mosqueMode && !hacMode && !introMode && !warpBlock && !(actionT>0);   // mescit/Mekke/intro/geçiş'te + AKSİYON (toplama/üretme/sağma/kırpma/namaz) sırasında hareket DURUR
   if(moving){
     ix/=Math.max(mag,1); iz/=Math.max(mag,1);
     const spd=8.5, nx=player.position.x+ix*spd*dt, nz=player.position.z+iz*spd*dt;   // yürüme hızı artırıldı (daha akıcı)
