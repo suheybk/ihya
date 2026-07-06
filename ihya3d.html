@@ -576,7 +576,7 @@ const QUESTS = [
     nm:'Bir sadaka ver', rem:'Sadaka malı eksiltmez, bereket katar.',
     refs:[{tag:'Hadis',txt:'Sadaka maldan bir şey eksiltmez.',cite:'Müslim, Birr 69'}]},
   // ===== CAMİ =====
-  { id:'cemaat', model:'prayer', pos:[49,0,-2.2], rot:0, scale:1.6, ic:'🕌',
+  { id:'cemaat', model:'prayer', pos:[52,0,-4.2], rot:Math.PI, scale:1.6, ic:'🕌',   // caminin DOĞU yanına + gerçek kıble yönünde (QIBLA_ANGLE=π); giriş koridorunu (x≈49 ön) kapatmasın, batıdaki kuyuya (44,-4.5) da sıkışmasın
     nm:'Cemaatle namaz kıl', rem:'Cemaat namazı, tek başına kılınandan 27 derece üstündür.',
     refs:[{tag:'Hadis',txt:'Cemaatle namaz, tek başına kılınan namazdan yirmi yedi derece daha faziletlidir.',cite:'Buhârî, Ezân 30'}]},
   { id:'ilim',   model:'rahle',  pos:[49,0,3.9],   rot:0, scale:1.5, ic:'📚',
@@ -2677,7 +2677,7 @@ function wake(){ lastActT=performance.now()/1000; }  // dokunma/tuş → aktivit
 ['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{ wake(); },{passive:true}));
 
 /* ---- İMTİHAN MEYDANI düğümleri (prosedürel: kürsü + kandil + hâle) ---- */
-const EXAM_POS={ ev:[6.6,0,2.2], bahce:[20.5,0,2.5], mahalle:[32.5,0,4.3], cami:[53,0,-2.5], sehir:[70,0,-0.5] };   // Medine: pazar (67,-4) ile Kâbe (70,3) arası, adanın en sonuna
+const EXAM_POS={ ev:[6.6,0,2.2], bahce:[20.5,0,2.5], mahalle:[32.5,0,4.3], cami:[54.5,0,-0.5], sehir:[70,0,-0.5] };   // cami: mescit girişinden (49,-4.4) UZAK ön-doğu köşe (kullanıcı isteği); Medine: pazar (67,-4) ile Kâbe (70,3) arası, adanın en sonuna
 const examNodes=[]; // {islId, g, ped, pedMat, halo, haloMat, core, coreMat, rec}
 function examReady(islId){ return isUnlocked(islId) && islandDone(islId) && !S.conquered[islId]; }
 function makeExamNode(islId,pos){
