@@ -3017,14 +3017,27 @@ function doStation(rec){
 const SCENE_QUESTS=new Set(['davet','adalet','emanet','hayir']);
 let scenarioRecs=[], argueList=[], emanetRecipient=null, carryPouch=null, sceneIdle=[];
 let fishRod=null;   // balık tutma oltası (sağ ele bağlı; fishing sırasında görünür)
+let ROD_HAND=[-0.19,0.42,0.14, 0.72,0,0];   // oltanın OYUNCU-LOCAL konum+rotasyonu (−X=sağ el hizası, öne-yukarı) [px,py,pz,rx,ry,rz]
+let fishLine=null, fishBob=null;   // misina + şamandıra: DİNAMİK — sahneye bağlı, her karede oltanın TEPE ucundan SUYA sarkar
+const _ftw=new THREE.Vector3();
+function updateFishLine(){
+  if(!fishRod) return;
+  const tip=fishRod.children[1]; if(!tip) return;                 // oltanın tepe (havadaki) ucu
+  tip.updateWorldMatrix(true,false); _ftw.setFromMatrixPosition(tip.matrixWorld);   // ucun dünya konumu
+  const waterY=0.14, bobY=waterY+Math.sin(clock.elapsedTime*2)*0.02;                // gölet su yüzeyi + hafif zıplama
+  if(!fishLine){ fishLine=new THREE.Mesh(new THREE.CylinderGeometry(0.008,0.008,1,4), new THREE.MeshStandardMaterial({color:0xf0f0f0,roughness:0.5})); fishLine.frustumCulled=false; scene.add(fishLine); }
+  if(!fishBob){ fishBob=new THREE.Mesh(new THREE.SphereGeometry(0.055,8,6), new THREE.MeshStandardMaterial({color:0xd23b3b,emissive:0x330808})); fishBob.frustumCulled=false; scene.add(fishBob); }
+  fishLine.visible=true; fishBob.visible=true;
+  const len=Math.max(0.05,_ftw.y-bobY);                          // uçtan suya dikey misina
+  fishLine.position.set(_ftw.x,(_ftw.y+bobY)/2,_ftw.z); fishLine.scale.y=len;   // cylinder ekseni +Y → dikey (döndürme gerekmez)
+  fishBob.position.set(_ftw.x,bobY,_ftw.z);
+}
 // Prosedürel OLTA: ahşap çubuk + misina (sağ elin Hand_R düğümüne eklenir → el ile sallanır)
 function buildRod(){
   const g=new THREE.Group();
   const wood=new THREE.MeshStandardMaterial({color:0x8a5a2a,roughness:0.9});
-  const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.028,1.15,6), wood); pole.position.y=0.5; g.add(pole);   // çubuk yukarı uzanır
-  const tip=new THREE.Mesh(new THREE.SphereGeometry(0.03,6,5), wood); tip.position.y=1.06; g.add(tip);
-  const line=new THREE.Mesh(new THREE.CylinderGeometry(0.005,0.005,0.87,4), new THREE.MeshStandardMaterial({color:0xe8e8e8,roughness:0.5})); line.position.set(0,0.755,0.31); line.rotation.x=-0.79; g.add(line);   // misina TAHTANIN TEPE (havadaki) ucundan öne-aşağı sarkar (tip≈1.06 → şamandıra)
-  const bob=new THREE.Mesh(new THREE.SphereGeometry(0.035,6,5), new THREE.MeshStandardMaterial({color:0xd23b3b})); bob.position.set(0,0.45,0.62); g.add(bob);   // şamandıra: misinanın ucunda
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.028,1.15,6), wood); pole.position.y=0.5; g.add(pole);   // çubuk (kabza dip → tip tepe)
+  const tip=new THREE.Mesh(new THREE.SphereGeometry(0.03,6,5), wood); tip.position.y=1.06; g.add(tip);   // TEPE ucu (havadaki uç) — misina buradan suya sarkar (dinamik, tick'te)
   g.traverse(o=>{ if(o.isMesh) o.frustumCulled=false; });
   g.scale.setScalar(0.9);   // yönelim oyuncu-frame'inde tick'te ayarlanır (rotation.x)
   return g;
@@ -4013,10 +4026,12 @@ function tick(){
   }
   // EMANET taşırken SOL kol dirsekten kıvrık (keseyi GÖĞÜS hizasında tutar) — dururken/yürürken/harekette HEP (son yazan → salınımı ezer)
   if(hacVortexT<=0 && S.carryPouch && PP && PP.armL){ swingLeg(PP.armL, -1.18); }   // -1.45→-1.18: el göğse iner, kese elin üstünde kalmaz
-  // BALIK OLTASI: fishing sırasında sağ elde görünür — OYUNCUYA bağlı (sağ el hizası), yukarı-öne bakar, savrulur
+  // BALIK OLTASI: oyuncuya bağlı, SAĞ EL hizasında (−X = sağ taraf); çubuk öne-yukarı; misina TEPE ucundan SUYA sarkar
   { const fishing = actionT>0 && actionKind==='fish';
-    if(fishing && !fishRod && player){ fishRod=buildRod(); fishRod.position.set(0.3,0.86,0.34); player.add(fishRod); }   // sağ el konumu (oyuncu-local)
-    if(fishRod){ fishRod.visible=fishing; if(fishing){ const c=Math.sin(clock.elapsedTime*2.6); fishRod.rotation.x=-0.62+c*0.4; } } }   // çubuk yukarı-öne (+savurma salınımı)
+    if(fishing && !fishRod && player){ fishRod=buildRod(); player.add(fishRod); }
+    if(fishRod){ fishRod.visible=fishing;
+      if(fishing){ const c=Math.sin(clock.elapsedTime*2.4); fishRod.position.set(ROD_HAND[0],ROD_HAND[1],ROD_HAND[2]); fishRod.rotation.set(ROD_HAND[3]+c*0.08,ROD_HAND[4],ROD_HAND[5]); updateFishLine(); }   // sağ el hizası, hafif savrulma
+      else if(fishLine){ fishLine.visible=false; if(fishBob) fishBob.visible=false; } } }
   // seccade serilme (açılma) animasyonu
   if(seccadeAnim>0 && laidSeccadeRec){ seccadeAnim-=dt*2.6; const t=Math.max(0,Math.min(1,1-seccadeAnim)); const e=t*t*(3-2*t); const s=0.16+0.84*e; laidSeccadeRec.g.scale.set(s,1,s); if(seccadeAnim<=0){ laidSeccadeRec.g.scale.set(1,1,1); seccadeAnim=0; } }
   // camera follow (intro / mescit / Mekke / normal)
