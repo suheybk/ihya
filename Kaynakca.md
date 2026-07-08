@@ -162,6 +162,24 @@ Diyalog artık `c.ref` (vakaya özel) gösterir.
 
 ---
 
+## 4d) Tam Hac Menâsiki (Faz 6.24 — bitiş ekranından ücretli yolculuk)
+
+"Dünya İhyâ Edildi" ekranından sonra oyuncu **kesb-i helâlinden ücret ödeyip Hacca gider** (Umre'den ayrı, tam menâsik).
+
+| Aşama | Âyet | Hadîs |
+|---|---|---|
+| Hac farîzası (bitiş ekranı notu) | «Ona yol bulabilenlerin Beyt'i haccetmesi Allah'ın insanlar üzerindeki hakkıdır.» (Âl-i İmrân 3/97) | — |
+| İhram + telbiye | — | (Telbiye: «Lebbeyk Allâhümme lebbeyk…») |
+| Arafat vakfesi | (Bakara 2/197-198 hac ayları/vakfe) | «Hac Arafat'tır.» (Tirmizî) |
+| Müzdelife | «Meş'ar-i Harâm'ın yanında Allah'ı anın.» (Bakara 2/198) | — |
+| Şeytan taşlama (cemre) | (Hac 22/28 menâsik) | — |
+| Kurban (hedy) | «Rabbin için namaz kıl ve kurban kes.» (Kevser 108/2) · «Onların ne etleri ne kanları Allah'a ulaşır; O'na ulaşan takvânızdır.» (Hac 22/37) | — |
+| Tavâf-ı ziyâret + namaz | «Makām-ı İbrâhîm'i namaz yeri edinin.» (Bakara 2/125) | — |
+| Sa'y (Safâ-Merve) | «Safâ ile Merve Allah'ın nişânelerindendir.» (Bakara 2/158) | — |
+| Tıraş / halk → Hac tamam | — | «Kim Allah için hacceder, kötü söz ve günah işlemezse anasından doğduğu gün gibi (günahsız) döner.» (Buhârî) |
+
+---
+
 ## 5) Metodoloji & Uyarılar
 - Meâller **oyun içi kısaltılmış/sadeleştirilmiş** hâlleriyle listelenmiştir; **birebir lafız** için Diyanet
   meâli ve matbu hadîs külliyatları esas alınmalıdır.

@@ -420,7 +420,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.23</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.24</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -603,7 +603,10 @@
 
   <div class="sec"><h3>İletişim</h3><p><a href="mailto:suheybk@gmail.com">suheybk@gmail.com</a></p></div>
 
+  <div class="sec"><h3>Hac Yolculuğu</h3><p id="endHajjNote">Dünyayı ihyâ ettin; şimdi imkânın da var. Kesb-i helâlinden <b id="endHajjFee">300</b> 💰 ücret ödeyip <b>Hacca</b> niyet et — Arafat'ta vakfe, Müzdelife, şeytan taşlama, kurban, tavâf ve sa'y. «Ona bir yol bulabilenlerin Beyt'i haccetmesi Allah'ın insanlar üzerindeki hakkıdır.» (Âl-i İmrân 3/97)</p></div>
+
   <div class="btns">
+    <button class="cont" id="endHajj" style="background:linear-gradient(135deg,#d9b25a,#a8842f)">🕋 Ücret öde, Hacca git</button>
     <button class="cont" id="endCont">İhya Etmeye Devam Et ➤</button>
     <button class="restart" id="endRestart">↺ Baştan Başla</button>
   </div>
@@ -1328,6 +1331,15 @@ const UI_STR={ en:{
   hac_tiras_btn:'✂️ Shave — complete the Umrah (+40 nur)', hac_exit:'🚪 Leave Mecca',
   hac_namaz_banner:'🧎 Two rak\'ahs complete', hac_say_verse:'"Indeed, Safa and Marwah are among the symbols of Allah." (Al-Baqarah 158)',
   hac_done_banner:'🕋 May your Umrah be accepted', hac_done_toast:'"One Umrah to the next is an expiation for the (minor) sins between them." (Bukhari, Umrah 1)',
+  // Full Hajj (Faz 6.24) — end-screen paid journey
+  hj_arafat_title:'Standing at Arafat', hj_arafat_sub:'The 9th of Dhul-Hijjah — stand in worship at Arafat; raise your hands, repent and supplicate. <i>«Hajj is Arafat.»</i> (Tirmidhi). Today is a day of answered prayers.', hj_arafat_btn:'🤲 Stand in worship, supplicate (+15 nur)', hj_arafat_banner:'🤲 The standing at Arafat — prayers answered', hj_arafat_toast:'«Hajj is Arafat.» (Tirmidhi) — make your supplications and repent.',
+  hj_muz_title:'Muzdalifah', hj_muz_sub:'Descend from Arafat to Muzdalifah; combine Maghrib and Isha, spend the night, and <b>gather pebbles</b> for the stoning. <i>«Remember Allah at the Sacred Monument (Mash\'ar al-Haram).»</i> (Al-Baqarah 198)', hj_muz_btn:'🌌 Spend the night, gather pebbles (+10 nur)', hj_muz_banner:'🌌 The night at Muzdalifah — pebbles gathered',
+  hj_cemre_title:'Stoning the Jamarah ', hj_cemre_sub:'On the day of Eid — cast seven pebbles at the <b>Jamarat al-Aqabah</b>, saying «Allahu akbar» with each. It is a sign of resolve against the self and Satan.', hj_cemre_btn:'🪨 Cast a pebble — «Allahu akbar» (', hj_cemre_done:'✅ Stoning complete — sacrifice',
+  hj_kurban_title:'The Sacrifice', hj_kurban_sub:'Offer your sacrifice in gratitude; distribute its meat to the poor and neighbors. <i>«So pray to your Lord and sacrifice.»</i> (Al-Kawthar 108/2) — what reaches Allah is your piety. (Al-Hajj 22/37)', hj_kurban_btn:'🐑 Sacrifice, distribute the meat (+20 nur)', hj_kurban_banner:'🐑 May your sacrifice be accepted', hj_kurban_toast:'«Neither their flesh nor their blood reaches Allah, but the piety from you reaches Him.» (Al-Hajj 22/37)',
+  hj_tiras_sub:'Shave or trim your hair; thus you exit ihram and your Hajj is complete. May Allah accept it.', hj_tiras_btn:'✂️ Shave — complete the Hajj (+60 nur)',
+  hj_done_banner:'🕋 A blessed Hajj — Hajj accepted', hj_done_toast:'«Whoever performs Hajj for Allah and commits no obscenity or sin returns as the day his mother bore him (free of sin).» (Bukhari)',
+  hj_fee_need:'Not enough dirhams for Hajj — needed: ',
+  end_rank:'Rank: ', end_nur:'Nur: ', end_dirhem:'Purse: ', end_streak:'Steadfastness: ', end_days:'days', end_hajj:'Hajj',
   // --- Faz 3: NPC ikram ---
   npc_cd_a:'🙏 You just gave — try again in ', npc_cd_b:' s', npc_food:'food',
   npc_need_a:'🔒 First gather ', npc_need_b:' (', npc_need_c:' needed', npc_need_food:'; dates/mulberries/milk',
@@ -1430,6 +1442,15 @@ ar:{
   hac_tiras_btn:'✂️ احلِق — أتمِمِ العُمرة (+٤٠ نور)', hac_exit:'🚪 اخرُج من مكة',
   hac_namaz_banner:'🧎 تمّت الركعتان', hac_say_verse:'﴿إِنَّ الصَّفَا وَالْمَرْوَةَ مِن شَعَائِرِ اللَّهِ﴾ (البقرة ١٥٨)',
   hac_done_banner:'🕋 تقبّل اللهُ عُمرتك', hac_done_toast:'«العُمرةُ إلى العُمرةِ كفّارةٌ لما بينهما». (البخاري، العمرة ١)',
+  // الحجّ الكامل (Faz 6.24) — رحلة من شاشة النهاية بأجرة
+  hj_arafat_title:'الوقوف بعرفة', hj_arafat_sub:'اليومُ التاسع من ذي الحجة — قِف بعرفة داعيًا؛ ارفع يديك، تُب وادعُ. <i>«الحجُّ عرفة.»</i> (الترمذي). اليومُ يومُ إجابة الدعاء.', hj_arafat_btn:'🤲 قِف بالدعاء (+١٥ نور)', hj_arafat_banner:'🤲 الوقوفُ بعرفة — تُستجابُ الأدعية', hj_arafat_toast:'«الحجُّ عرفة.» (الترمذي) — ادعُ وتُب.',
+  hj_muz_title:'المزدلفة', hj_muz_sub:'انزِل من عرفة إلى المزدلفة؛ اجمَعِ المغربَ والعشاء، وبِت، والتقِطِ <b>الحصى</b> للرمي. <i>﴿فَاذْكُرُوا اللَّهَ عِندَ الْمَشْعَرِ الْحَرَامِ﴾</i> (البقرة ١٩٨)', hj_muz_btn:'🌌 بِت والتقطِ الحصى (+١٠ نور)', hj_muz_banner:'🌌 ليلةُ المزدلفة — جُمِع الحصى',
+  hj_cemre_title:'رميُ الجمرة ', hj_cemre_sub:'يومَ العيد — ارمِ <b>جمرةَ العقبة</b> بسبعِ حصياتٍ، قائلًا مع كلٍّ «الله أكبر». وهو رمزُ العزم على النفس والشيطان.', hj_cemre_btn:'🪨 ارمِ حصاة — «الله أكبر» (', hj_cemre_done:'✅ تمّ الرمي — الأضحية',
+  hj_kurban_title:'الأضحية (الهَدي)', hj_kurban_sub:'اذبَح هَديَك شكرًا؛ ووزِّع لحمَه على الفقراء والجيران. <i>﴿فَصَلِّ لِرَبِّكَ وَانْحَرْ﴾</i> (الكوثر ١٠٨/٢) — الذي يبلغُ اللهَ تقواكم. (الحج ٢٢/٣٧)', hj_kurban_btn:'🐑 اذبَح ووزِّعِ اللحم (+٢٠ نور)', hj_kurban_banner:'🐑 تقبّل اللهُ أضحيتك', hj_kurban_toast:'﴿لَن يَنَالَ اللَّهَ لُحُومُهَا وَلَا دِمَاؤُهَا وَلَٰكِن يَنَالُهُ التَّقْوَىٰ مِنكُمْ﴾ (الحج ٢٢/٣٧)',
+  hj_tiras_sub:'احلِق شعرك أو قصِّره؛ بذلك تتحلّل من الإحرام ويتمُّ حجُّك. تقبّل الله.', hj_tiras_btn:'✂️ احلِق — أتمِمِ الحجّ (+٦٠ نور)',
+  hj_done_banner:'🕋 حجٌّ مبرور — تقبّل الله', hj_done_toast:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع كيومَ ولدته أمُّه.» (البخاري)',
+  hj_fee_need:'لا دراهم كافية للحجّ — يلزم: ',
+  end_rank:'الرتبة: ', end_nur:'النور: ', end_dirhem:'الكيس: ', end_streak:'الاستقامة: ', end_days:'يوم', end_hajj:'حجّ',
   load_txt:'إحياء العالم…',
   // panel gövdeleri (Dağarcık/Pazar/Senaryo) + ortak UI
   iv_carry:'الحمل', iv_nobag:' · لا جَعبة', iv_full:'ممتلئة',
@@ -2523,6 +2544,8 @@ function exitMosque(){
 
 /* ============ UMRE — Mekke: Kâbe, tavâf (7 şavt), sa'y (7 şavt), tıraş (Faz 11.21) ============ */
 let hacMode=false, hacGroup=null, hacPilgrim=null;
+let _hajjFull=false;   // enterHac(true) → tam Hac menâsiki (Umre değil); startHacScene'de hacState.full'e geçer
+const HAJJ_FEE=300;    // Hacca gitmek için ücret (dirhem) — "imkânı olana farz"; bitiş ekranından ödenir
 const KABE_IC=new THREE.Vector3(-150,0,-120);       // gizli Mekke sahnesi (uzakta, ada dünyasının dışı)
 const MATAF_R=4.0, SAY_HALF=8.0;
 const hacCamPos=new THREE.Vector3(-150,10.5,-107);  // Kâbe'ye yukarıdan bakış (tavâf görünür)
@@ -2561,15 +2584,16 @@ function startHacScene(){   // sahneyi Kâbe'ye çevir + 360° orbit sinematiği
   hacVortexT=0; document.body.classList.remove('warping'); warpBlock=false;
   if(player){ camera.up.set(0,1,0); player.rotation.x=0; player.rotation.z=0; player.position.y=0; player.scale.setScalar(1.95); }
   hacMode=true; if(hacGroup) hacGroup.visible=true; near=null;
-  hacState={phase:'ihram', tavaf:0, say:0, ang:Math.PI/4, angT:Math.PI/4, sayPos:-1, sayT:-1};
+  hacState={phase:'ihram', full:_hajjFull, tavaf:0, say:0, cemre:0, ang:Math.PI/4, angT:Math.PI/4, sayPos:-1, sayT:-1};
   hacIntroT=hacIntroDur;                                        // 360° dönüş + zoom-in
   const ab=document.getElementById('act'); if(ab) ab.style.display='none';
   const pe=document.getElementById('prompt'); if(pe){ pe.classList.remove('show'); pe.style.display='none'; }
   document.getElementById('hac').classList.remove('show');     // panel orbit bitince açılır
   renderHac(); banner('🕋 Kâbe\'ye yöneliyorsun…');
 }
-function enterHac(){
-  if(!isUnlocked('sehir')){ toast('🔒 Önce Medine (Şehir) açılmalı — Umre için oradan yola çıkılır'); return; }
+function enterHac(full){
+  _hajjFull=!!full;
+  if(!full && !isUnlocked('sehir')){ toast('🔒 Önce Medine (Şehir) açılmalı — Umre için oradan yola çıkılır'); return; }
   if(hacMode||hacVortexT>0) return;   // zaten geçişte/Mekke'de → tekrar tetikleme
   // GİRDAP GEÇİŞİ: adada kamera ÖNCE Z (roll) SONRA Y (orbit) döner + karakter Kâbe'nin girdabına kapılıp
   // dönerek/çekilerek aşağı iner → geçiş Kâbe etrafında dönen umreci (360° orbit) ile son bulur.
@@ -2589,6 +2613,19 @@ function renderHac(){
   if(P.phase==='ihram'){ title=tU('hac_ihram_title')||'İhrâm & Niyet';
     h+='<div class="sub" style="margin-bottom:8px">'+(tU('hac_ihram_sub')||'İki dikişsiz beyaz örtüye bürün, niyet et ve telbiye getir: <i>"Lebbeyk Allâhümme lebbeyk…"</i> — "Buyur Allah\'ım buyur." İhrâmlıyken saç/tırnak kesmek, koku sürünmek, avlanmak yasaktır.')+'</div>';
     h+='<button class="do" onclick="__hacAct(\'ihram\')">'+(tU('hac_ihram_btn')||'🤍 İhrâma gir ve telbiye getir')+'</button>'; }
+  else if(P.phase==='arafat'){ title=tU('hj_arafat_title')||'Arafat Vakfesi';
+    h+='<div class="sub" style="margin-bottom:8px">'+(tU('hj_arafat_sub')||'Zilhicce\'nin 9\'u — Arafat\'ta vakfeye dur; ellerini aç, tövbe ve duâ et. <i>«Hac Arafat\'tır.»</i> (Tirmizî). Bugün duâların kabul günüdür.')+'</div>';
+    h+='<button class="do" onclick="__hacAct(\'arafat\')">'+(tU('hj_arafat_btn')||'🤲 Vakfeye dur, duâ et (+15 nûr)')+'</button>'; }
+  else if(P.phase==='muzdelife'){ title=tU('hj_muz_title')||'Müzdelife';
+    h+='<div class="sub" style="margin-bottom:8px">'+(tU('hj_muz_sub')||'Arafat\'tan Müzdelife\'ye in; akşam ile yatsıyı birleştir, gecele ve cemreler için <b>taş topla</b>. <i>«Meş\'ar-i Harâm\'ın yanında Allah\'ı anın.»</i> (Bakara 198)')+'</div>';
+    h+='<button class="do" onclick="__hacAct(\'muzdelife\')">'+(tU('hj_muz_btn')||'🌌 Gecele, taş topla (+10 nûr)')+'</button>'; }
+  else if(P.phase==='cemre'){ title=(tU('hj_cemre_title')||'Şeytan Taşlama ')+P.cemre+'/7';
+    h+='<div class="sub" style="margin-bottom:8px">'+(tU('hj_cemre_sub')||'Bayram günü — <b>Akabe Cemresi</b>\'ne yedi taş at, her taşta «Allâhu ekber» de. Bu, nefse ve şeytana karşı kararlılığın nişânesidir.')+'</div>';
+    h+= P.cemre>=7 ? '<button class="do" onclick="__hacAct(\'toKurban\')">'+(tU('hj_cemre_done')||'✅ Taşlama tamam — kurban')+'</button>'
+      : '<button class="do" onclick="__hacAct(\'cemre\')">'+(tU('hj_cemre_btn')||'🪨 Taş at — «Allâhu ekber» (')+(P.cemre+1)+'/7)</button>'; }
+  else if(P.phase==='kurban'){ title=tU('hj_kurban_title')||'Kurban';
+    h+='<div class="sub" style="margin-bottom:8px">'+(tU('hj_kurban_sub')||'Şükür için kurbanını kes; etini fakirlere ve komşulara dağıt. <i>«Rabbin için namaz kıl ve kurban kes.»</i> (Kevser 108/2) — Allah\'a ulaşan, takvânızdır. (Hac 22/37)')+'</div>';
+    h+='<button class="do" onclick="__hacAct(\'kurban\')">'+(tU('hj_kurban_btn')||'🐑 Kurban kes, etini dağıt (+20 nûr)')+'</button>'; }
   else if(P.phase==='tavaf'){ title=(tU('hac_tavaf_title')||'Tavâf ')+P.tavaf+'/7';
     h+='<div class="sub" style="margin-bottom:8px">'+(tU('hac_tavaf_sub')||'Hacerü\'l-Esved hizasından başlayarak Kâbe\'yi <b>sola alarak</b> yedi kez dön; her şavtta zikret ve duâ et.')+'</div>';
     h+= P.tavaf>=7 ? '<button class="do" onclick="__hacAct(\'toNamaz\')">'+(tU('hac_tavaf_done')||'✅ Tavâf tamam — 2 rekât namaz')+'</button>'
@@ -2601,8 +2638,8 @@ function renderHac(){
     h+= P.say>=7 ? '<button class="do" onclick="__hacAct(\'toTiras\')">'+(tU('hac_say_done')||'✅ Sa\'y tamam — tıraş')+'</button>'
       : '<button class="do" onclick="__hacAct(\'say\')">🚶 '+(P.say%2===0?(tU('hac_say_go')||'Safâ → Merve (gidiş)'):(tU('hac_say_back')||'Merve → Safâ (geliş)'))+' — '+(P.say+1)+'/7</button>'; }
   else { title=tU('hac_tiras_title')||'Tıraş / Kısaltma';
-    h+='<div class="sub" style="margin-bottom:8px">'+(tU('hac_tiras_sub')||'Saçını tıraş et veya kısalt; böylece ihrâmdan çıkarsın ve Umre tamamlanır.')+'</div>';
-    h+='<button class="do" onclick="__hacAct(\'tiras\')">'+(tU('hac_tiras_btn')||'✂️ Tıraş ol — Umre\'yi tamamla (+40 nûr)')+'</button>'; }
+    h+='<div class="sub" style="margin-bottom:8px">'+(P.full ? (tU('hj_tiras_sub')||'Saçını tıraş et veya kısalt; böylece ihrâmdan çıkarsın ve haccın tamamlanır. Allah kabul etsin.') : (tU('hac_tiras_sub')||'Saçını tıraş et veya kısalt; böylece ihrâmdan çıkarsın ve Umre tamamlanır.'))+'</div>';
+    h+='<button class="do" onclick="__hacAct(\'tiras\')">'+(P.full ? (tU('hj_tiras_btn')||'✂️ Tıraş ol — Hac\'cı tamamla (+60 nûr)') : (tU('hac_tiras_btn')||'✂️ Tıraş ol — Umre\'yi tamamla (+40 nûr)'))+'</button>'; }
   if(st) st.textContent=title;
   h+='<button class="cl" onclick="__hacAct(\'exit\')">'+(tU('hac_exit')||'🚪 Mekke\'den ayrıl')+'</button>';
   body.innerHTML=h;
@@ -2610,7 +2647,14 @@ function renderHac(){
 window.__hacAct=function(kind){
   audio(); const P=hacState;
   if(kind==='exit'){ exitHac(); return; }
-  if(kind==='ihram'){ telbiye(); P.phase='tavaf'; renderHac(); return; }
+  if(kind==='ihram'){ telbiye(); P.phase=P.full?'arafat':'tavaf'; renderHac(); return; }
+  if(kind==='arafat'){ addNur(15); sndChime(); banner(tU('hj_arafat_banner')||'🤲 Arafat\'ta vakfe — duâların kabulü'); P.phase='muzdelife';
+    setTimeout(()=>toast(tU('hj_arafat_toast')||'«Hac Arafat\'tır.» (Tirmizî) — dualarını yap, tövbe et.'),400); renderHac(); return; }
+  if(kind==='muzdelife'){ addNur(10); sndChime(); banner(tU('hj_muz_banner')||'🌌 Müzdelife\'de gece — taşlar toplandı'); P.phase='cemre'; renderHac(); return; }
+  if(kind==='cemre'){ if(P.cemre<7){ P.cemre++; addNur(1); sndChime(); } renderHac(); return; }
+  if(kind==='toKurban'){ P.phase='kurban'; renderHac(); return; }
+  if(kind==='kurban'){ addNur(20); sndFanfare(); banner(tU('hj_kurban_banner')||'🐑 Kurban kabul olsun'); P.phase='tavaf';
+    setTimeout(()=>toast(tU('hj_kurban_toast')||'«Onların ne etleri ne kanları Allah\'a ulaşır; O\'na ulaşan takvânızdır.» (Hac 22/37)'),400); renderHac(); return; }
   if(kind==='tavaf'){ if(P.tavaf<7){ P.tavaf++; P.angT-=Math.PI*2; addNur(2); sndChime(); } renderHac(); return; }
   if(kind==='toNamaz'){ P.phase='namaz'; renderHac(); return; }
   if(kind==='namaz'){ addNur(6); sndChime(); banner(tU('hac_namaz_banner')||'🧎 İki rekât tamam'); P.phase='say'; P.sayPos=-1; P.sayT=-1; renderHac();
@@ -2618,8 +2662,11 @@ window.__hacAct=function(kind){
     setTimeout(()=>toast(tU('hac_say_verse')||'"Şüphesiz Safâ ile Merve, Allah\'ın nişânelerindendir." (Bakara 158)'),1700); return; }
   if(kind==='say'){ if(P.say<7){ P.say++; P.sayT=(P.say%2===1)?1:-1; addNur(2); sndChime(); } renderHac(); return; }
   if(kind==='toTiras'){ P.phase='tiras'; renderHac(); return; }
-  if(kind==='tiras'){ S.umreCount=(S.umreCount||0)+1; addNur(40); save(); refreshHUD(); sndFanfare(); banner(tU('hac_done_banner')||'🕋 Umre kabul olsun');
-    setTimeout(()=>toast(tU('hac_done_toast')||'"Bir umre, diğer umreye kadar aralarındaki (küçük) günahlara keffârettir." (Buhârî, Umre 1)'),1200);
+  if(kind==='tiras'){
+    if(P.full){ S.hajjCount=(S.hajjCount||0)+1; addNur(60); save(); refreshHUD(); sndFanfare(); banner(tU('hj_done_banner')||'🕋 Hac mübârek olsun — hac kabul');
+      setTimeout(()=>toast(tU('hj_done_toast')||'«Kim Allah için hacceder, kötü söz ve günah işlemezse, anasından doğduğu gün gibi (günahsız) döner.» (Buhârî)'),1200);
+    } else { S.umreCount=(S.umreCount||0)+1; addNur(40); save(); refreshHUD(); sndFanfare(); banner(tU('hac_done_banner')||'🕋 Umre kabul olsun');
+      setTimeout(()=>toast(tU('hac_done_toast')||'"Bir umre, diğer umreye kadar aralarındaki (küçük) günahlara keffârettir." (Buhârî, Umre 1)'),1200); }
     setTimeout(()=>exitHac(),700); return; }
 };
 function hacTick(dt){
@@ -4914,10 +4961,18 @@ function toast(msg){ const t=document.getElementById('toast'); t.innerHTML=emo(m
 function banner(txt){ const b=document.getElementById('banner'); b.innerHTML=emo(txt); b.classList.remove('show'); void b.offsetWidth; b.classList.add('show'); }
 function showEnd(){
   const st=document.getElementById('endStats');
-  if(st) st.innerHTML='Rütbe: <b>'+rankName(S.nur)+'</b> · Nûr: <b>'+S.nur+'</b>'+(S.streak>0?' · İstikamet: <b>'+S.streak+' gün 🔥</b>':'');
+  if(st) st.innerHTML=(tU('end_rank')||'Rütbe: ')+'<b>'+rankName(S.nur)+'</b> · '+(tU('end_nur')||'Nûr: ')+'<b>'+S.nur+'</b> · '+(tU('end_dirhem')||'Kese: ')+'<b>'+(S.dirhem||0)+' 💰</b>'+(S.streak>0?' · '+(tU('end_streak')||'İstikamet: ')+'<b>'+S.streak+' '+(tU('end_days')||'gün')+' 🔥</b>':'')+(S.hajjCount>0?' · <b>🕋 '+(tU('end_hajj')||'Hac')+' ×'+S.hajjCount+'</b>':'');
+  const fee=document.getElementById('endHajjFee'); if(fee) fee.textContent=HAJJ_FEE;
   document.getElementById('endscreen').classList.add('show');
 }
+function startFullHajj(){
+  if((S.dirhem||0)<HAJJ_FEE){ toast('🔒 '+(tU('hj_fee_need')||'Hac için yeterli dirhem yok — gerekli: ')+HAJJ_FEE+' 💰'); return; }
+  S.dirhem-=HAJJ_FEE; save(); refreshHUD();
+  document.getElementById('endscreen').classList.remove('show');
+  setTimeout(()=>enterHac(true), 250);   // girdap → tam Hac menâsiki
+}
 document.getElementById('endCont').onclick=()=>{ if(!S.profile.set){ openProfile(); } else { document.getElementById('endscreen').classList.remove('show'); } };
+document.getElementById('endHajj').onclick=startFullHajj;
 document.getElementById('profStart').onclick=startProfile;
 document.getElementById('profile').addEventListener('click',e=>{ if(e.target.id==='profile') document.getElementById('profile').classList.remove('show'); });
 document.getElementById('endRestart').onclick=()=>{ localStorage.removeItem('ihya3d_v1'); location.reload(); };
@@ -5946,7 +6001,7 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     sell:(k,all)=>sellGood(k,all), dirhem:()=>S.dirhem||0, prices:()=>PRICES,
     marketBuilt:()=>!!marketRec,
     enterMosque:()=>enterMosque(), exitMosque:()=>exitMosque(), mosqueAct:(k)=>window.__mosqueAct(k),
-    enterHac:()=>enterHac(), exitHac:()=>exitHac(), hacAct:(k)=>window.__hacAct(k), hacState:()=>({mode:hacMode, ...hacState}),
+    enterHac:(full)=>enterHac(full), exitHac:()=>exitHac(), hacAct:(k)=>window.__hacAct(k), hacState:()=>({mode:hacMode, ...hacState}), startFullHajj:()=>startFullHajj(),
     mosqueState:()=>({mode:mosqueMode, cumaDone:S.cumaDone, sat:S.mosqueSat, interiorNodes:mosqueGroup?mosqueGroup.children.length:0}),
     mosqueWeek:()=>({vDay:S.mosqueVDay, vSet:S.mosqueVSet.slice(), streak:S.mosqueStreak, streakDay:S.mosqueStreakDay, unlocked:S.mosqueUnlocked}),
     imamState:()=>({consec:S.mosqueConsec, mark:S.mosqueConsecMark, met:S.imamMet, ready:(!S.imamMet&&S.mosqueConsec>=5)}),
