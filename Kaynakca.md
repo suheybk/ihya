@@ -102,7 +102,46 @@ metnin kendisini, kaynağını ve derlenme/erişim tarihini listeler.
 
 ---
 
-## 4) Metodoloji & Uyarılar
+## 4) Ara Bulma (Sulh) & Hükmetme (Adalet) — Genişletilmiş Vaka Havuzları
+
+**Faz 6.21 (2026-07-09):** Barıştırma (sulh) ve Kadı-Adalet senaryolarının her biri **3 → 13 vakaya** çıkarıldı
+(10'ar yeni vaka). Vakalar oyunda **karışık sırayla** (rastgele, ardışık tekrar etmeden) sorulur. Kaynak seçiminde
+**önce Kur'ân âyeti, âyet yoksa sahih hadîs** esas alındı. Metinler TR/EN/AR üç dilde paraleldir; **AR ref'leri
+Kur'ân mushaf lafzı + muteber hadîs Arapça metnidir** (çeviri değil). Kitap/bab no ve tam tahriç uzman teyidine tâbidir.
+
+### 4a) Sulh (Ara Bulma) — yeni 10 vaka
+
+| Vaka | Âyet | Hadîs |
+|---|---|---|
+| Karı-koca dargınlığı | «Sulh (barış) daha hayırlıdır…» (Nisâ 4/128) | «Sizin en hayırlınız, ailesine en hayırlı olanınızdır.» (Tirmizî) |
+| İki topluluğun kavgası | «İki topluluk çarpışırsa aralarını düzeltin… adaletle davranın; Allah âdilleri sever.» (Hucurât 49/9) | «İnsanların arasını düzelten yalancı sayılmaz.» (Buhârî) |
+| Borç meselesi | «Borçlu darda ise… mühlet verin; bağışlamanız daha hayırlıdır.» (Bakara 2/280) | «Darda kalana mühlet veren/bağışlayanı Allah gölgesinde gölgelendirir.» (Müslim) |
+| Üç günden fazla küslük | — | «Kardeşine üç günden fazla küs durması helâl olmaz; hayırlıları önce selam verendir.» (Buhârî, Edeb; Müslim) |
+| Sıla-i rahim (küskün akrabalar) | — | «Rızkının genişlemesini isteyen sıla-i rahim yapsın.» (Buhârî) · «Asıl bağ kuran, kesildiğinde bağlayandır.» (Buhârî) |
+| Dedikodu (gıybet) kırgınlığı | «Gıybet etmeyin… zannın çoğundan sakının; bir kısım zan günahtır.» (Hucurât 49/12) · «…birbirinizi ayıplamayın.» (49/11) | — |
+| Ortakların anlaşmazlığı | «Mallarınızı aranızda haksızlıkla yemeyin.» (Bakara 2/188) | Hadîs-i kudsî: «İki ortak hıyanet etmedikçe üçüncüsü benim…» (Ebû Dâvûd) |
+| Kuyu paylaşımı | — | «Müslümanlar üç şeyde ortaktır: su, ot, ateş.» (Ebû Dâvûd) · «Fazla su men edilmez.» (Buhârî) |
+| Selamsız komşular | — | «…selamı aranızda yayın (tâ ki sevesiniz).» (Müslim) · «Hayırlınız önce selam verendir.» (Ebû Dâvûd) |
+| Komşu eziyeti | — | «Komşusu şerrinden emin olmayan (kâmil) iman etmez.» (Buhârî) · «Cebrâil komşuyu… tavsiye etti.» (Buhârî) |
+
+### 4b) Adalet (Hükmetme) — yeni 10 vaka
+
+| Vaka | Âyet | Hadîs |
+|---|---|---|
+| Emanet inkârı | «Allah emanetleri ehline vermenizi emreder.» (Nisâ 4/58) | «Beyyine davacıya, yemin inkâr edene düşer.» (Beyhakî; Tirmizî) |
+| Sınır taşını oynatma | «…adaletle hükmedin.» (Nisâ 4/58) | «Yerin sınır işaretlerini değiştirene Allah lânet etsin.» (Müslim) |
+| Buluntu (lukata) kese | «Emanetleri ehline verin.» (Nisâ 4/58) | «Bir yıl ilan et; sahibi kabını/bağını (alâmetini) söylerse ver.» (Buhârî; Müslim — Lukata) |
+| Ölçü-tartı hilesi | «Ölçüde hile yapanların vay hâline!…» (Mutaffifîn 83/1-3) | «Bizi aldatan bizden değildir.» (Müslim) |
+| Miras taksimi | «Allah çocuklarınız hakkında… (paylarını) emreder.» (Nisâ 4/11) · «Bunlar Allah'ın sınırlarıdır.» (Nisâ 4/13) | — |
+| Şahitlik / yalancı şahit | «Kendi aleyhinize de olsa adaleti ayakta tutan şahitler olun.» (Nisâ 4/135) | «En büyük günahlar… (biri) yalan şahitliktir.» (Buhârî) |
+| Ekine giren sürü (Dâvûd-Süleyman) | «Dâvûd ile Süleyman… ekin hakkında hüküm veriyorlardı… onu Süleyman'a kavrattık; her birine hüküm ve ilim verdik.» (Enbiyâ 21/78-79) | — |
+| Rüşvet ve kayırma | «…(malı) hâkimlere aktarıp insanların malından bir kısmını günahla yemeyin.» (Bakara 2/188) | «Rüşvet veren de alan da lânetlenmiştir.» (Ebû Dâvûd; Tirmizî) |
+| Şahitsiz (yazılmamış) borç | «Belli süreye borçlandığınızda onu yazın… iki şahit tutun.» (Bakara 2/282) | «Beyyine davacıya, yemin inkâr edene düşer.» (Beyhakî) |
+| Sözünden dönme (ahde vefa) | «Akitlerinizi (sözlerinizi) yerine getirin.» (Mâide 5/1) | «Münafığın alâmeti üçtür: …söz verince döner.» (Buhârî) |
+
+---
+
+## 5) Metodoloji & Uyarılar
 - Meâller **oyun içi kısaltılmış/sadeleştirilmiş** hâlleriyle listelenmiştir; **birebir lafız** için Diyanet
   meâli ve matbu hadîs külliyatları esas alınmalıdır.
 - Bazı hadîslerin farklı tariklerde farklı numaraları/lafızları vardır; `cite` alanları **yaklaşık** yer
