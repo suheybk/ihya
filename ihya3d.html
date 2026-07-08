@@ -420,7 +420,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.17</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.18</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -756,7 +756,8 @@ function questTopic(q){ return q.topic || q.id; }
 /* ============ EN İ18N — GÖREV/MÜFREDAT/ADIM ÇEVİRİLERİ (Faz 3) ============
    Dinî içerik; TERCUME_SOZLUGU.md'de uzman incelemesi için listelenir. */
 const TAG_EN={ 'Hadis':'Hadith', 'Ayet':'Verse', 'Fıkıh':'Fiqh' };
-function tagT(tag){ return (S.lang==='en' && TAG_EN[tag]) || tag; }
+const TAG_AR={ 'Hadis':'حديث', 'Ayet':'آية', 'Fıkıh':'فقه' };
+function tagT(tag){ return (S.lang==='ar' && TAG_AR[tag]) || (S.lang==='en' && TAG_EN[tag]) || tag; }
 const QUEST_EN={
   fidan:{nm:'Plant a sapling', rem:'Even if the Hour is about to strike, plant the sapling in your hand.',
     refs:[{tag:'Hadith',txt:'If a Muslim plants a tree and a living creature eats from it, it is charity for him.',cite:'Bukhari, Hars 1'}]},
@@ -831,30 +832,30 @@ const NAMAZ_STEPS_EN=[
 /* AR — görev ad+hatırlatma (oyun ipuçları, MSA). Âyet/hadîs REF'leri burada YOK → TR'ye düşer
    (AR'da dinî metin ASIL Arapça'dan alınacak; bkz. TERCUME_SOZLUGU.md §8). */
 const QUEST_AR={
-  fidan:{nm:'اغرِس فَسيلة', rem:'ولو قامت الساعة وفي يدك فَسيلة فاغرِسها.'},
-  canli:{nm:'اسقِ كائنًا حيًّا أو أطعِمه', rem:'في كل كبدٍ رطبةٍ أجر.'},
-  selam:{nm:'سلِّم على خمسة أشخاص', rem:'أفشوا السلام بينكم لتحابّوا.'},
-  komsu:{nm:'أكرِم الجار', rem:'صحن طعامٍ، أو سلامٌ، أو عون.'},
-  sadaka:{nm:'تصدّق', rem:'ما نقصت صدقةٌ من مال؛ بل تزيد البركة.'},
-  cemaat:{nm:'صلِّ في جماعة', rem:'صلاة الجماعة تفضل صلاة الفذّ بسبعٍ وعشرين درجة.'},
-  ilim:{nm:'احضُر مجلس العلم', rem:'من سلك طريقًا يلتمس فيه علمًا سهّل الله له طريقًا إلى الجنة.'},
-  davet:{nm:'ادعُ أحدًا إلى الخير', rem:'أن يهدي الله بك رجلًا واحدًا خيرٌ لك من الدنيا.'},
-  adalet:{nm:'كن عادلًا واحمِ حقًّا', rem:'احكم بالعدل؛ إن الله يحب المقسطين.'},
-  emanet:{nm:'أدِّ الأمانة إلى أهلها', rem:'أدِّ الأمانة إلى صاحبها، وأوفِ بوعدك.'},
-  hayir:{nm:'اعمل عملًا نافعًا للناس', rem:'خير الناس أنفعهم للناس.'},
-  ev_taharet:{nm:'آداب الخلاء', rem:'ادخل باليسرى مع البسملة، واخرج باليمنى قائلًا «غفرانك».'},
-  ev_abdest:{nm:'توضّأ', rem:'الطهور شطر الإيمان؛ ومع كل عضوٍ تتساقط الذنوب.'},
-  ev_quran:{nm:'اقرأ صفحةً من القرآن', rem:'قطرةٌ كل يوم تصير بحرًا في العام.'},
-  ev_dua:{nm:'اقرأ أذكار الصباح والمساء', rem:'انسج للنهار درعًا بالذكر؛ ليبقَ قلبك محفوظًا.'},
+  fidan:{nm:'اغرِس فَسيلة', rem:'ولو قامت الساعة وفي يدك فَسيلة فاغرِسها.', refs:[{tag:'حديث',txt:'«ما من مسلمٍ يغرِس غرسًا فيأكلَ منه إنسانٌ أو دابّةٌ إلا كان له به صدقة».',cite:'البخاري، الحرث ١'}]},
+  canli:{nm:'اسقِ كائنًا حيًّا أو أطعِمه', rem:'في كل كبدٍ رطبةٍ أجر.', refs:[{tag:'حديث',txt:'«غفر اللهُ لرجلٍ سقى كلبًا كان يلهثُ من العطش».',cite:'البخاري، الشرب ٩'}]},
+  selam:{nm:'سلِّم على خمسة أشخاص', rem:'أفشوا السلام بينكم لتحابّوا.', refs:[{tag:'حديث',txt:'«لا تدخلون الجنّة حتى تؤمنوا، ولا تؤمنوا حتى تحابّوا؛ أفشوا السلام بينكم».',cite:'مسلم، الإيمان ٩٣'}]},
+  komsu:{nm:'أكرِم الجار', rem:'صحن طعامٍ، أو سلامٌ، أو عون.', refs:[{tag:'حديث',txt:'«ما زال جبريلُ يوصيني بالجارِ حتى ظننتُ أنه سيُوَرِّثُه».',cite:'البخاري، الأدب ٢٨'}]},
+  sadaka:{nm:'تصدّق', rem:'ما نقصت صدقةٌ من مال؛ بل تزيد البركة.', refs:[{tag:'حديث',txt:'«ما نقصت صدقةٌ من مال».',cite:'مسلم، البر ٦٩'}]},
+  cemaat:{nm:'صلِّ في جماعة', rem:'صلاة الجماعة تفضل صلاة الفذّ بسبعٍ وعشرين درجة.', refs:[{tag:'حديث',txt:'«صلاةُ الجماعة تفضُلُ صلاةَ الفذِّ بسبعٍ وعشرين درجة».',cite:'البخاري، الأذان ٣٠'}]},
+  ilim:{nm:'احضُر مجلس العلم', rem:'من سلك طريقًا يلتمس فيه علمًا سهّل الله له طريقًا إلى الجنة.', refs:[{tag:'حديث',txt:'«من سلك طريقًا يلتمسُ فيه علمًا سهّل اللهُ له به طريقًا إلى الجنّة».',cite:'مسلم، الذكر ٣٨'}]},
+  davet:{nm:'ادعُ أحدًا إلى الخير', rem:'أن يهدي الله بك رجلًا واحدًا خيرٌ لك من الدنيا.', refs:[{tag:'حديث',txt:'«لأن يهديَ اللهُ بك رجلًا واحدًا خيرٌ لك من حُمرِ النَّعَم».',cite:'البخاري، الجهاد ١٠٢'}]},
+  adalet:{nm:'كن عادلًا واحمِ حقًّا', rem:'احكم بالعدل؛ إن الله يحب المقسطين.', refs:[{tag:'آية',txt:'﴿اعْدِلُوا هُوَ أَقْرَبُ لِلتَّقْوَىٰ﴾',cite:'المائدة ٥/٨'}]},
+  emanet:{nm:'أدِّ الأمانة إلى أهلها', rem:'أدِّ الأمانة إلى صاحبها، وأوفِ بوعدك.', refs:[{tag:'آية',txt:'﴿إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ أَهْلِهَا﴾',cite:'النساء ٤/٥٨'}]},
+  hayir:{nm:'اعمل عملًا نافعًا للناس', rem:'خير الناس أنفعهم للناس.', refs:[{tag:'حديث',txt:'«خيرُ الناس أنفعُهم للناس».',cite:'الطبراني، المعجم الأوسط'}]},
+  ev_taharet:{nm:'آداب الخلاء', rem:'ادخل باليسرى مع البسملة، واخرج باليمنى قائلًا «غفرانك».', refs:[{tag:'حديث',txt:'«كان النبيُّ ﷺ إذا خرج من الخلاء قال: غُفرانَك».',cite:'الترمذي، الطهارة ٥'}]},
+  ev_abdest:{nm:'توضّأ', rem:'الطهور شطر الإيمان؛ ومع كل عضوٍ تتساقط الذنوب.', refs:[{tag:'حديث',txt:'«الطُّهورُ شطرُ الإيمان».',cite:'مسلم، الطهارة ١'}]},
+  ev_quran:{nm:'اقرأ صفحةً من القرآن', rem:'قطرةٌ كل يوم تصير بحرًا في العام.', refs:[{tag:'حديث',txt:'«خيرُكم من تعلَّم القرآنَ وعلَّمه».',cite:'البخاري، فضائل القرآن ٢١'}]},
+  ev_dua:{nm:'اقرأ أذكار الصباح والمساء', rem:'انسج للنهار درعًا بالذكر؛ ليبقَ قلبك محفوظًا.', refs:[{tag:'آية',txt:'﴿أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ﴾',cite:'الرعد ١٣/٢٨'}]},
 };
 const NAMAZ_AR={
-  'Fecir':{nm:'صلِّ الفجر', rem:'افتح يومك بالفريضة؛ البركة تبدأ في الفجر.'},
-  'Kuşluk':{nm:'صلِّ الضحى', rem:'إذا ارتفعت الشمس فركعتان؛ سجدة شكر اليوم.'},
-  'Öğle':{nm:'صلِّ الظهر', rem:'قِف بين يدي ربك في وسط النهار.'},
-  'İkindi':{nm:'صلِّ العصر', rem:'حافظ على الصلاة الوسطى؛ أكثر الأوقات تفريطًا.'},
-  'Akşam':{nm:'صلِّ المغرب', rem:'اختم يومك بالشكر.'},
-  'Yatsı':{nm:'صلِّ العشاء', rem:'اختم الليل بالصلاة.'},
-  'Gece':{nm:'صلِّ التهجّد', rem:'آخر الليل وقت إجابة الدعاء.'},
+  'Fecir':{nm:'صلِّ الفجر', rem:'افتح يومك بالفريضة؛ البركة تبدأ في الفجر.', refs:[{tag:'حديث',txt:'«ركعتا الفجرِ خيرٌ من الدنيا وما فيها».',cite:'مسلم، المسافرين ٩٦'}]},
+  'Kuşluk':{nm:'صلِّ الضحى', rem:'إذا ارتفعت الشمس فركعتان؛ سجدة شكر اليوم.', refs:[{tag:'حديث',txt:'«ويُجزئُ من ذلك ركعتان يركعهما من الضحى» — عن صدقةِ كلِّ مفصل.',cite:'مسلم، المسافرين ٨٤'}]},
+  'Öğle':{nm:'صلِّ الظهر', rem:'قِف بين يدي ربك في وسط النهار.', refs:[{tag:'آية',txt:'﴿وَأَقِيمُوا الصَّلَاةَ﴾',cite:'البقرة ٢/٤٣'}]},
+  'İkindi':{nm:'صلِّ العصر', rem:'حافظ على الصلاة الوسطى؛ أكثر الأوقات تفريطًا.', refs:[{tag:'آية',txt:'﴿حَافِظُوا عَلَى الصَّلَوَاتِ وَالصَّلَاةِ الْوُسْطَىٰ﴾',cite:'البقرة ٢/٢٣٨'}]},
+  'Akşam':{nm:'صلِّ المغرب', rem:'اختم يومك بالشكر.', refs:[{tag:'آية',txt:'﴿أَقِمِ الصَّلَاةَ لِدُلُوكِ الشَّمْسِ إِلَىٰ غَسَقِ اللَّيْلِ﴾',cite:'الإسراء ١٧/٧٨'}]},
+  'Yatsı':{nm:'صلِّ العشاء', rem:'اختم الليل بالصلاة.', refs:[{tag:'حديث',txt:'«من صلّى العشاء في جماعةٍ فكأنما قام نصفَ الليل».',cite:'مسلم'}]},
+  'Gece':{nm:'صلِّ التهجّد', rem:'آخر الليل وقت إجابة الدعاء.', refs:[{tag:'آية',txt:'﴿وَمِنَ اللَّيْلِ فَتَهَجَّدْ بِهِ نَافِلَةً لَّكَ﴾',cite:'الإسراء ١٧/٧٩'}]},
 };
 const ABDEST_STEPS_AR=[
   {t:'1) النِّيّة',d:'«نويت أن أتوضّأ لله تعالى». النية بالقلب، والتلفّظ بها مستحب.'},
@@ -1285,7 +1286,7 @@ const UI_STR={ en:{
   // --- Faz 2b-2: ortak ---
   t_locked_place:'🔒 This place isn\'t open yet', dlg_ok:'OK', q_done:'Done ✓',
   q_didit:'Done ✓', q_undo:'Undo ↺', q_prereq:'🔒 First: ', q_nextstep:'the next step',
-  g_step:'Step ', g_next:'Next ▶', g_learned:'Learned ✓', g_learned_suf:' — learned',
+  g_step:'Step ', g_next:'Next ▶', g_prev:'◀ Back', g_learned:'Learned ✓', g_learned_suf:' — learned',
   q_undo10:'↺ Undone (−10 nur)', q_plus10:'+10 nur ✦',
   q_exam_open_a:'📝 ', q_exam_open_b:' Trial Grounds opened!', q_exam_ready:'📝 You\'re ready for the trial',
   // --- Faz 3: senaryo diyalog çerçevesi ---
@@ -1414,6 +1415,20 @@ ar:{
   market_sub:'بِع كسبك الحلال. <i>«من غشّنا فليس منّا.»</i> (مسلم) — كن صادقًا في الكيل والوزن.',
   mosque_sub:'كن مؤدَّبًا في المسجد؛ اجلس بسكينة، أنصِت للإمام، وشارك الجماعة.',
   hac_intro:'انوِ الإحرام من الميقات؛ طُف بالكعبة، واسعَ بين الصفا والمروة، ثم احلِق.',
+  // Umre ritüel paneli (Faz 6.18; âyet ASIL Arapça — Bakara 125/158 mushaf lafzı)
+  hac_ihram_title:'الإحرام والنِّيّة',
+  hac_ihram_sub:'التحِف بإزارٍ ورداءٍ أبيضين غير مخيطين، وانوِ، ولبِّ: <i>«لبَّيك اللّهمَّ لبَّيك…»</i> — وفي الإحرام يَحرُم قصُّ الشعر والأظفار والطِّيبُ والصيد.',
+  hac_ihram_btn:'🤍 أحرِم ولبِّ التلبية',
+  hac_tavaf_title:'الطواف ', hac_tavaf_sub:'ابدأ من محاذاة الحجر الأسود وطُف بالكعبة <b>جاعلًا إياها عن يسارك</b> سبعَ مرات؛ في كل شوطٍ اذكُر الله وادعُ.',
+  hac_tavaf_done:'✅ تمّ الطواف — صلاةُ ركعتين', hac_tavaf_btn_a:'🕋 طُف شوطًا (', hac_tavaf_btn_b:'/٧)',
+  hac_namaz_title:'صلاةُ الطواف (ركعتان)', hac_namaz_sub:'بعد الأشواط السبعة تُصلّى ركعتان خلف <b>مقام إبراهيم</b> (إن أمكن). <i>﴿وَاتَّخِذُوا مِن مَّقَامِ إِبْرَاهِيمَ مُصَلًّى﴾</i> (البقرة ١٢٥)',
+  hac_namaz_btn:'🧎 صلِّ ركعتين (+٦ نور)',
+  hac_say_title:'السعي ', hac_say_sub:'اسعَ الآن في <b>المسعى</b> (منفصلًا عن الكعبة) بين <b>الصفا والمروة</b>: <b>٤ ذهابًا + ٣ إيابًا = ٧</b>، متذكّرًا سعيَ أمِّنا هاجر تبحث عن الماء لإسماعيل.<div style="font-size:1.15em;margin:6px 0;direction:rtl">﴿إِنَّ الصَّفَا وَالْمَرْوَةَ مِن شَعَائِرِ اللَّهِ﴾</div><i>(البقرة ١٥٨)</i>',
+  hac_say_done:'✅ تمّ السعي — الحلق', hac_say_go:'الصفا ← المروة (ذهاب)', hac_say_back:'المروة ← الصفا (إياب)',
+  hac_tiras_title:'الحلق أو التقصير', hac_tiras_sub:'احلِق شعرك أو قصِّره؛ بذلك تتحلّل من الإحرام وتتمّ العُمرة.',
+  hac_tiras_btn:'✂️ احلِق — أتمِمِ العُمرة (+٤٠ نور)', hac_exit:'🚪 اخرُج من مكة',
+  hac_namaz_banner:'🧎 تمّت الركعتان', hac_say_verse:'﴿إِنَّ الصَّفَا وَالْمَرْوَةَ مِن شَعَائِرِ اللَّهِ﴾ (البقرة ١٥٨)',
+  hac_done_banner:'🕋 تقبّل اللهُ عُمرتك', hac_done_toast:'«العُمرةُ إلى العُمرةِ كفّارةٌ لما بينهما». (البخاري، العمرة ١)',
   load_txt:'إحياء العالم…',
   // panel gövdeleri (Dağarcık/Pazar/Senaryo) + ortak UI
   iv_carry:'الحمل', iv_nobag:' · لا جَعبة', iv_full:'ممتلئة',
@@ -1430,7 +1445,7 @@ ar:{
   sl_baris:'صُلح', sl_adalet:'عَدل', sl_emanet:'أمانة',
   q_didit:'تمّ ✓', q_undo:'تراجع ↺', q_done:'تمّ ✓', q_prereq:'🔒 أولًا: ', q_nextstep:'الخطوة التالية',
   dlg_ok:'حسنًا', t_locked_place:'🔒 هذا المكان لم يُفتَح بعد', t_locked_medina:'🔒 المدينة لم تُفتَح بعد',
-  g_step:'خطوة ', g_next:'التالي ▶', g_learned:'تعلّمت ✓', g_learned_suf:' — تعلّمت',
+  g_step:'خطوة ', g_next:'التالي ▶', g_prev:'رجوع ◀', g_learned:'تعلّمت ✓', g_learned_suf:' — تعلّمت',
   ex_prog:'سؤال ', ex_next:'التالي ➤', ex_result:'اعرض النتيجة',
   hd_map:'🗺️ خريطة المدينة', map_sub:'حوّل يثرب إلى المدينة: افتح كل جزيرة. 📍 نشطة · ✓ مفتوحة · 🔒 مقفلة.',
   map_locked:'مقفلة', map_locked_d:'افتح الجزيرة السابقة', map_open:'مفتوحة', map_atolye:'رحى · تنّور · نَول', map_sadaka:'أعمال الصدقة الجارية',
@@ -1501,7 +1516,16 @@ const HAYIR_REF_EN={
   sebil:'The best of people is the one most beneficial to people. (Tabarani) — the water flows, and so does your charity.',
   golge:'If a believer leaves shade or shelter along a road, everyone who benefits from it earns them reward. (Bukhari, in meaning)',
 };
-function hayirRef(h){ return (S.lang==='en' && h && HAYIR_REF_EN[h.id]) ? HAYIR_REF_EN[h.id] : (h&&h.ref)||''; }   // hayır ref (dil)
+// AR İ18N — Hayır kalemi ref hadîs/âyet (Faz 6.18; ASIL Arapça)
+const HAYIR_REF_AR={
+  agac:'«ما من مسلمٍ يغرِس غرسًا فيأكلَ منه إنسانٌ أو دابّةٌ إلا كان له به صدقة». (البخاري، الحرث ١)',
+  kandil:'﴿مَّثَلُ الَّذِينَ يُنفِقُونَ أَمْوَالَهُمْ فِي سَبِيلِ اللَّهِ كَمَثَلِ حَبَّةٍ أَنبَتَتْ سَبْعَ سَنَابِلَ﴾ (البقرة ٢/٢٦١)',
+  cesme:'«أفضلُ الصدقةِ سَقيُ الماء». (ابن ماجه، الأدب ٨)',
+  ilim:'«إذا مات الإنسانُ انقطع عنه عملُه إلا من ثلاث: صدقةٍ جارية، أو علمٍ يُنتفَعُ به، أو ولدٍ صالحٍ يدعو له». (مسلم، الوصية ١٤)',
+  sebil:'«خيرُ الناس أنفعُهم للناس». (الطبراني) — الماءُ يجري، وصدقتُك تجري.',
+  golge:'«كلُّ معروفٍ صدقة». (البخاري) — الظلُّ والمأوى على الطريق معروفٌ يجري أجرُه.',
+};
+function hayirRef(h){ const L=S.lang; if(h){ if(L==='ar'&&HAYIR_REF_AR[h.id]) return HAYIR_REF_AR[h.id]; if(L==='en'&&HAYIR_REF_EN[h.id]) return HAYIR_REF_EN[h.id]; } return (h&&h.ref)||''; }   // hayır ref (dil)
 // Faz 2b: senaryo unvanları — Türkçe başlık → İngilizce
 const SCEN_T_EN={
   'Barıştırıcı':'Reconciler','Muslih':'Peacemaker','Ara Bulan':'Mediator','Sulh Ustası':'Master of Reconciliation',
@@ -2242,8 +2266,15 @@ const ZEKAT_EN={
   sut:  {tur:'Goods', ref:'Zakat on trade goods; one-fortieth of the wealth (simplified in this game).'},
   yun:  {tur:'Goods', ref:'Zakat on accumulated wealth; given once it reaches the nisab.'},
 };
-function zekatTur(k){ return (S.lang==='en' && ZEKAT_EN[k]) ? ZEKAT_EN[k].tur : (ZEKAT[k]&&ZEKAT[k].tur)||''; }
-function zekatRef(k){ return (S.lang==='en' && ZEKAT_EN[k]) ? ZEKAT_EN[k].ref : (ZEKAT[k]&&ZEKAT[k].ref)||''; }
+// AR İ18N — zekât (Faz 6.18; ASIL Arapça hadîs lafzı)
+const ZEKAT_AR={
+  hurma:{tur:'العُشر', ref:'«فيما سقتِ السماءُ والعيونُ العُشر، وفيما سُقي بالنَّضح نصفُ العُشر». (البخاري، الزكاة ٥٥)'},
+  dut:  {tur:'العُشر', ref:'زكاةُ ما أخرجتِ الأرضُ العُشرُ (١/١٠). (البخاري، الزكاة ٥٥)'},
+  sut:  {tur:'مال', ref:'زكاةُ عروض التجارة والمال؛ رُبعُ العُشر (مبسَّطة في هذه اللعبة).'},
+  yun:  {tur:'مال', ref:'زكاةُ المال المُدَّخر؛ تُخرَج إذا بلغ النِّصاب.'},
+};
+function zekatTur(k){ const L=S.lang; if(L==='ar'&&ZEKAT_AR[k]) return ZEKAT_AR[k].tur; if(L==='en'&&ZEKAT_EN[k]) return ZEKAT_EN[k].tur; return (ZEKAT[k]&&ZEKAT[k].tur)||''; }
+function zekatRef(k){ const L=S.lang; if(L==='ar'&&ZEKAT_AR[k]) return ZEKAT_AR[k].ref; if(L==='en'&&ZEKAT_EN[k]) return ZEKAT_EN[k].ref; return (ZEKAT[k]&&ZEKAT[k].ref)||''; }
 // koyun nisabı (bilgi): 40 koyunda 1 koyun zekât. Educational.
 function checkZekat(){
   if(!zekatMukellef()) return;   // çocuk zekâtla mükellef değil
@@ -3034,8 +3065,14 @@ const PROFILE_Q_EN={
   gender:{q:'Gender?', opts:{erkek:'Male', kadin:'Female'}},
   quran:{q:'Can you read the Qur\'an?', opts:{evet:'I can read it', ogreniyor:'I\'m learning'}},
 };
-function profQ(q){ return (S.lang==='en' && PROFILE_Q_EN[q.key]) ? PROFILE_Q_EN[q.key].q : q.q; }
-function profOpt(q,o){ return (S.lang==='en' && PROFILE_Q_EN[q.key]) ? PROFILE_Q_EN[q.key].opts[o.v] : o.l; }
+// AR İ18N — profil soruları (Faz 6.18)
+const PROFILE_Q_AR={
+  ageGroup:{q:'ما الأقربُ إلى عمرك؟', opts:{cocuk:'طفل (قبل البلوغ)', yetiskin:'شابّ / بالغ (بعد البلوغ)'}},
+  gender:{q:'الجنس؟', opts:{erkek:'ذكر', kadin:'أنثى'}},
+  quran:{q:'هل تستطيع قراءة القرآن؟', opts:{evet:'أستطيع قراءته', ogreniyor:'أتعلّم'}},
+};
+function profQ(q){ const L=S.lang; if(L==='ar'&&PROFILE_Q_AR[q.key]) return PROFILE_Q_AR[q.key].q; if(L==='en'&&PROFILE_Q_EN[q.key]) return PROFILE_Q_EN[q.key].q; return q.q; }
+function profOpt(q,o){ const L=S.lang; if(L==='ar'&&PROFILE_Q_AR[q.key]) return PROFILE_Q_AR[q.key].opts[o.v]; if(L==='en'&&PROFILE_Q_EN[q.key]) return PROFILE_Q_EN[q.key].opts[o.v]; return o.l; }
 let profSel={};
 function openProfile(){ profSel = S.profile.set ? {ageGroup:S.profile.ageGroup,gender:S.profile.gender,quran:S.profile.quran} : {}; renderProfile(); document.getElementById('profile').classList.add('show'); }
 function renderProfile(){
@@ -3483,7 +3520,10 @@ function zulumEvent(total){   // yüksek mutsuzluk → yağma/eşkıya/saldırı
   const evsEN=['🗡️ Bandits appeared in the city — the poor were neglected, a caravan was plundered.',
     '🔥 The hungry stormed the market — looting broke out.',
     '⚔️ The weak were wronged — attacks in the streets increased.'];
-  const evs=(S.lang==='en')?evsEN:evsTR;
+  const evsAR=['🗡️ ظهر قُطّاعُ الطريق في المدينة — أُهمِل الفقيرُ ونُهبت قافلة.',
+    '🔥 اقتحم الجياعُ السوق — وقع النهب.',
+    '⚔️ أُكِل حقُّ الضعيف — وازدادت الاعتداءاتُ في الطرقات.'];
+  const evs=(S.lang==='ar')?evsAR:(S.lang==='en')?evsEN:evsTR;
   const ev=evs[S.zulum%evs.length]; const loss=Math.min(S.dirhem||0, 12+total*3);
   if(loss>0) S.dirhem=Math.max(0,(S.dirhem||0)-loss);
   save(); refreshHUD();
@@ -4681,6 +4721,7 @@ function renderGuide(){
   document.getElementById('gDesc').textContent=(es&&es.d)||s.d||'';
   document.getElementById('gPrev').style.visibility=guideIdx>0?'visible':'hidden';
   document.getElementById('gNext').textContent=(guideIdx<guideSteps.length-1)?(tU('g_next')||'Sonraki ▶'):(tU('g_learned')||'Öğrendim ✓');
+  document.getElementById('gPrev').textContent=(tU('g_prev')||'◀ Geri');
 }
 function guideNext(){
   if(!document.getElementById('guide').classList.contains('show')) return;   // kapandıysa çift-tetikleme yok
@@ -4846,7 +4887,17 @@ const TUT_EN=[
   {ic:'🕌',t:'Worship',b:'When the time comes, <b>🧎 pray</b>. On <b>Friday</b> go to the <b>Mosque</b> and pray in congregation. Pray <b>five prayers in a row</b> in congregation and <b>the imam opens duties</b> for you (reconcile·judge·trust).'},
   {ic:'🌍',t:'Goal: Ihya',b:'Learn each isle\'s lessons, pass the exam at the <b>Trial Grounds</b> → conquer the isle. Turn barren Yathrib into green <b>Medina</b>!'},
 ];
-function tutSteps(){ return S.lang==='en' ? TUT_EN : TUT_STEPS; }
+// AR İ18N — tutorial (Faz 6.18)
+const TUT_AR=[
+  {ic:'🕹️',t:'التحرّك',b:'اسحب الدائرة أسفل اليسار أو استخدم <b>WASD</b> للتجوّل في المدينة. اقترِب من شيءٍ فيتفاعل معه <b>الزرُّ أسفل اليمين</b>.'},
+  {ic:'🌴',t:'اعمل (الكسب الحلال)',b:'<b>اقطِف الثمر</b> من الأشجار، وخُذ <b>الحليب/الصوف</b> من الحيوانات، و<b>اسحب الماء</b> من البئر، و<b>احصُد القمح</b>، و<b>اصطَد السمك</b> في البركة. يظهر <b>وقتُ الانتظار</b> فوق ما فرغ.'},
+  {ic:'🔨',t:'اصنع',b:'في جزيرة <b>الورشة</b> جنوبَ بستان التمر، استخدم الرحى·التنّور·النَّول·القِدر لصنع الدقيق·الخبز·الأقراص·السجّادة·الجَعبة·الدِّبس.'},
+  {ic:'🛒',t:'السوق',b:'بِع ما جمعتَه أو صنعتَه في <b>سوق المدينة</b> (جزيرة المدينة) مقابل <b>الدراهم</b>.'},
+  {ic:'🤲',t:'الخير والصدقة',b:'<b>أطعِم المحتاجين</b> (يتيم·جار·مسافر·سائل)؛ وحوّل دراهمك إلى صدقة عبر <b>🤲 الخير</b> → تكسب <b>النور</b>.'},
+  {ic:'🕌',t:'العبادة',b:'إذا دخل الوقت <b>🧎 صلِّ</b>. ويوم <b>الجمعة</b> اذهب إلى <b>المسجد</b> وصلِّ جماعةً. وإذا صلّيتَ <b>خمسةَ أوقاتٍ متتاليةً</b> جماعةً <b>فتح لك الإمامُ وظائف</b> (إصلاح·قضاء·أمانة).'},
+  {ic:'🌍',t:'الهدف: الإحياء',b:'تعلَّم دروسَ كل جزيرة، واجتَز الامتحان في <b>ميدان الامتحان</b> → افتحِ الجزيرة. حوّل يثربَ القاحلة إلى <b>المدينة</b> الخضراء!'},
+];
+function tutSteps(){ return S.lang==='ar' ? TUT_AR : S.lang==='en' ? TUT_EN : TUT_STEPS; }
 let tutIdx=0;
 function openTut(i){ tutIdx=i||0; document.getElementById('tut').style.display='flex'; renderTut(); }
 function closeTut(){ document.getElementById('tut').style.display='none'; S.tutSeen=true; save(); }
@@ -5213,7 +5264,7 @@ function tick(){
         : near.animal
         ? ((animalReady(near.def)?near.q.ic+' '+animalLabel(near.def):(tU('pr_rest')||'🐑 dinleniyor')))
         : near.gather
-        ? (S.lang==='en'
+        ? ((S.lang==='en'||S.lang==='ar')
             ? (nodeReady(near.def) ? (near.q.ic+' '+(tU('pr_gatherv')||'Gather')+' '+goodName(near.def.item)) : ('🌱 '+goodName(near.def.item)+(tU('pr_ripen')||' — ripening')))
             : ((nodeReady(near.def)?near.q.ic+' ':'🌱 ')+near.q.nm+(nodeReady(near.def)?' topla':' — olgunlaşıyor')))
         : near.exam
