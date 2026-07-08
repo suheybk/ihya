@@ -420,7 +420,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.18</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.19</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -884,6 +884,7 @@ const NAMAZ_STEPS_AR=[
 function qEn(q){ if(!q) return null; const L=S.lang; if(L!=='en'&&L!=='ar') return null;
   if(q.topic==='namaz'||q.id==='ev_namaz'){ for(const v in NAMAZ_BY_VAKIT){ if(NAMAZ_BY_VAKIT[v].nm===q.nm) return (L==='ar'?NAMAZ_AR[v]:NAMAZ_EN[v]); } return null; }
   return (L==='ar'?QUEST_AR[q.id]:QUEST_EN[q.id])||null; }
+function qNmL(q){ const e=qEn(q); return (e&&e.nm)||(q&&q.nm)||''; }   // görev adının dile göre karşılığı (altyazı/HUD)
 function stepsEn(steps){ const L=S.lang; if((L!=='en'&&L!=='ar')||!steps) return null;
   if(steps===ABDEST_STEPS) return L==='ar'?ABDEST_STEPS_AR:ABDEST_STEPS_EN; if(steps===NAMAZ_STEPS) return L==='ar'?NAMAZ_STEPS_AR:NAMAZ_STEPS_EN; return null; }
 const ISLAND_EN={ ev:'Home', bahce:'Date Grove', mahalle:'Ansar Neighborhood', cami:'Mosque', sehir:'Medina', atolye:'Workshop', sadaka:'Charity Garden' };
@@ -5252,13 +5253,13 @@ function tick(){
         : near.hac
         ? (tU('pr_hac')||'🕋 Umre\'ye niyet')
         : near.muahat
-        ? ('🤝 '+near.q.nm)
+        ? ('🤝 '+qNmL(near.q))
         : near.station
         ? near.sTitle
         : near.scenario
         ? ((near.renew ? !scenArmed(near) : (near.q && S.done[near.q.id])) ? ('✓ '+near.sTitle) : near.sTitle)
         : near.npc
-        ? (near.q.ic+' '+near.q.nm+(npcReady(near.def)?'':(tU('pr_gave')||' — verdin')))
+        ? (near.q.ic+' '+npcNm(near.def)+(npcReady(near.def)?'':(tU('pr_gave')||' — verdin')))
         : near.market
         ? (tU('pr_market')||'🛒 Medine Pazarı')
         : near.animal
@@ -5269,7 +5270,7 @@ function tick(){
             : ((nodeReady(near.def)?near.q.ic+' ':'🌱 ')+near.q.nm+(nodeReady(near.def)?' topla':' — olgunlaşıyor')))
         : near.exam
         ? ((S.conquered[near.islId]?'✓ ':examReady(near.islId)?'📝 ':'🔒 ')+(tU('pr_exam')||'İmtihan Meydanı'))
-        : (!S.done[near.q.id]&&!questAvailable(near.q)?'🔒 ':'')+near.q.nm;
+        : (!S.done[near.q.id]&&!questAvailable(near.q)?'🔒 ':'')+qNmL(near.q);
       promptEl.innerHTML=emo(promptEl.textContent);   // altyazıdaki emojileri özel ikonlarla değiştir
     } else { actBtn.style.display='none'; promptEl.classList.remove('show'); promptEl.style.display='none'; }   // near BOŞSA her kare gizle → harici null'lama (ör. seccade alımı: removeLaidSeccade near=null) sonrası takılı yazı kalmaz
   }
