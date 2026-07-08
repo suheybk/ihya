@@ -723,6 +723,91 @@ function setVakitQuests(vname){
 function allQuests(){ return evQuests.concat(QUESTS); }
 function questTopic(q){ return q.topic || q.id; }
 
+/* ============ EN İ18N — GÖREV/MÜFREDAT/ADIM ÇEVİRİLERİ (Faz 3) ============
+   Dinî içerik; TERCUME_SOZLUGU.md'de uzman incelemesi için listelenir. */
+const TAG_EN={ 'Hadis':'Hadith', 'Ayet':'Verse', 'Fıkıh':'Fiqh' };
+function tagT(tag){ return (S.lang==='en' && TAG_EN[tag]) || tag; }
+const QUEST_EN={
+  fidan:{nm:'Plant a sapling', rem:'Even if the Hour is about to strike, plant the sapling in your hand.',
+    refs:[{tag:'Hadith',txt:'If a Muslim plants a tree and a living creature eats from it, it is charity for him.',cite:'Bukhari, Hars 1'}]},
+  canli:{nm:'Give a creature water/feed', rem:'There is reward in every kindness to a living being.',
+    refs:[{tag:'Hadith',txt:'Allah forgave a man who gave water to a thirsty dog.',cite:'Bukhari, Shirb 9'}]},
+  selam:{nm:'Greet 5 people', rem:'Spread the greeting of peace so that you may love one another.',
+    refs:[{tag:'Hadith',txt:'You will not enter Paradise until you love one another; spread the greeting of peace among yourselves.',cite:'Muslim, Iman 93'}]},
+  komsu:{nm:'Show kindness to a neighbor', rem:'A plate of food, a greeting, a helping hand.',
+    refs:[{tag:'Hadith',txt:'Gabriel kept urging kindness to the neighbor so much that I thought he would make him an heir.',cite:'Bukhari, Adab 28'}]},
+  sadaka:{nm:'Give a charity', rem:'Charity does not diminish wealth; it adds blessing.',
+    refs:[{tag:'Hadith',txt:'Charity does not diminish wealth.',cite:'Muslim, Birr 69'}]},
+  cemaat:{nm:'Pray in congregation', rem:'Congregational prayer is 27 degrees above praying alone.',
+    refs:[{tag:'Hadith',txt:'Prayer in congregation is twenty-seven degrees more virtuous than praying alone.',cite:'Bukhari, Adhan 30'}]},
+  ilim:{nm:'Join the circle of knowledge', rem:'Whoever walks a path seeking knowledge, Allah eases his path to Paradise.',
+    refs:[{tag:'Hadith',txt:'Whoever takes a path to seek knowledge, Allah makes the path to Paradise easy for him.',cite:'Muslim, Dhikr 38'}]},
+  davet:{nm:'Invite someone to good', rem:'To be a means of one person\'s guidance is better than the world.',
+    refs:[{tag:'Hadith',txt:'That Allah should guide one person through you is better than red camels.',cite:'Bukhari, Jihad 102'}]},
+  adalet:{nm:'Be just, protect a right', rem:'Judge with justice; Allah loves those who are just.',
+    refs:[{tag:'Verse',txt:'Be just; that is nearer to piety.',cite:'Al-Ma\'idah 5/8'}]},
+  emanet:{nm:'Deliver the trust to its owner', rem:'Give the trust to the one it belongs to; keep your word.',
+    refs:[{tag:'Verse',txt:'Allah commands you to render trusts to their rightful owners.',cite:'An-Nisa 4/58'}]},
+  hayir:{nm:'Do something beneficial for society', rem:'The best of people is the one most beneficial to people.',
+    refs:[{tag:'Hadith',txt:'The best of people is the one most beneficial to people.',cite:'Tabarani, al-Mu\'jam al-Awsat'}]},
+  ev_taharet:{nm:'Toilet etiquette', rem:'Enter with the left foot and the basmala; leave with the right foot and "ghufranaka".',
+    refs:[{tag:'Hadith',txt:'When the Prophet left the toilet he would say "Ghufranaka".',cite:'Tirmidhi, Taharah 5'}]},
+  ev_abdest:{nm:'Make ablution (wudu)', rem:'Cleanliness is half of faith; with every limb, sins fall away.',
+    refs:[{tag:'Hadith',txt:'Cleanliness is half of faith.',cite:'Muslim, Taharah 1'}]},
+  ev_quran:{nm:'Read a page of the Qur\'an', rem:'A drop each day becomes an ocean over the year.',
+    refs:[{tag:'Hadith',txt:'The best of you is the one who learns the Qur\'an and teaches it.',cite:'Bukhari, Fada\'il al-Qur\'an 21'}]},
+  ev_dua:{nm:'Read the morning & evening supplications', rem:'Weave a shield for the day with remembrance; may your heart stay guarded.',
+    refs:[{tag:'Verse',txt:'Hearts find rest only in the remembrance of Allah.',cite:'Ar-Ra\'d 13/28'}]},
+};
+const NAMAZ_EN={
+  'Fecir':{nm:'Pray the Fajr prayer', rem:'Open the day with the obligatory prayer; blessing begins at dawn.',
+    refs:[{tag:'Hadith',txt:'The two rak\'ahs of the dawn sunnah are better than the world and all it contains.',cite:'Muslim, Musafirin 96'}]},
+  'Kuşluk':{nm:'Pray the Duha prayer', rem:'When the sun has risen, 2 rak\'ahs — the day\'s prostration of thanks.',
+    refs:[{tag:'Hadith',txt:'The two rak\'ahs of Duha suffice as charity for every joint of the body.',cite:'Muslim, Musafirin 84'}]},
+  'Öğle':{nm:'Pray the Dhuhr prayer', rem:'Stand before your Lord at midday.',
+    refs:[{tag:'Verse',txt:'Establish the prayer.',cite:'Al-Baqarah 2/43'}]},
+  'İkindi':{nm:'Pray the Asr prayer', rem:'Guard the middle prayer; it is the most neglected time.',
+    refs:[{tag:'Verse',txt:'Guard the prayers, and the middle prayer.',cite:'Al-Baqarah 2/238'}]},
+  'Akşam':{nm:'Pray the Maghrib prayer', rem:'Close the day with gratitude.',
+    refs:[{tag:'Verse',txt:'Pray from the decline of the sun until the darkness of the night.',cite:'Al-Isra 17/78'}]},
+  'Yatsı':{nm:'Pray the Isha prayer', rem:'Seal the night with prayer.',
+    refs:[{tag:'Hadith',txt:'Whoever prays Isha in congregation is as though he spent half the night in worship.',cite:'Muslim'}]},
+  'Gece':{nm:'Pray the Tahajjud prayer', rem:'The end of the night is the time when supplications are answered.',
+    refs:[{tag:'Verse',txt:'And in part of the night, pray tahajjud as an extra offering for you.',cite:'Al-Isra 17/79'}]},
+};
+const ABDEST_STEPS_EN=[
+  {t:'1) Intention',d:'"I intend to make ablution for the sake of Allah." Intention is in the heart; saying it aloud is recommended.'},
+  {t:'2) Basmala',d:'Begin by saying "Bismillah ir-Rahman ir-Rahim."'},
+  {t:'3) Wash the hands',d:'Up to the wrists, 3 times; let the water reach between the fingers.'},
+  {t:'4) Rinse the mouth (madmadah)',d:'With the right hand, take water into the mouth and rinse, 3 times.'},
+  {t:'5) Sniff water into the nose (istinshaq)',d:'Draw water into the nose 3 times, clean with the left hand.'},
+  {t:'6) Wash the face — OBLIGATORY',d:'From the hairline to under the chin, and between the two ears, 3 times.'},
+  {t:'7) Wash the arms — OBLIGATORY',d:'First the right, then the left arm, including the elbows, 3 times each.'},
+  {t:'8) Wipe the head (masah) — OBLIGATORY',d:'With a wet hand, wipe (at least) a quarter of the head once.'},
+  {t:'9) Ears & neck',d:'With the same wetness, wipe the ears inside and out, and the neck.'},
+  {t:'10) Wash the feet — OBLIGATORY',d:'First the right, then the left foot, with the heels and between the toes, 3 times each. Then recite the Shahadah.'},
+];
+const NAMAZ_STEPS_EN=[
+  {t:'1) Face the qibla',d:'Turn toward the Kaaba; spread your rug on a clean place.'},
+  {t:'2) Intention',d:'"I intend to pray the obligatory prayer of this time for the sake of Allah."'},
+  {t:'3) Opening takbir',d:'Raise your hands and begin with "Allahu akbar," then fold your hands.'},
+  {t:'4) Standing (qiyam)',d:'Recite Subhanaka, the Ta\'awwudh-Basmala, al-Fatiha and a surah.'},
+  {t:'5) Bowing (ruku)',d:'Bow with "Allahu akbar"; say "Subhana Rabbiyal-azim" 3 times.'},
+  {t:'6) Prostration (sajdah)',d:'Prostrate to the ground; say "Subhana Rabbiyal-a\'la" 3 times; make two prostrations.'},
+  {t:'7) Second rak\'ah',d:'Rise; complete the second rak\'ah with al-Fatiha + a surah, bowing and two prostrations.'},
+  {t:'8) Sitting (qa\'dah)',d:'Recite At-tahiyyat, Allahumma salli-barik, and the Rabbana supplications.'},
+  {t:'9) Salam',d:'End by saying "As-salamu alaykum wa rahmatullah," first to the right, then to the left.'},
+];
+// accessor: görev/adım için EN payload (yoksa null → TR)
+function qEn(q){ if(S.lang!=='en'||!q) return null;
+  if(q.topic==='namaz'||q.id==='ev_namaz'){ for(const v in NAMAZ_BY_VAKIT){ if(NAMAZ_BY_VAKIT[v].nm===q.nm) return NAMAZ_EN[v]; } return null; }
+  return QUEST_EN[q.id]||null; }
+function stepsEn(steps){ if(S.lang!=='en'||!steps) return null;
+  if(steps===ABDEST_STEPS) return ABDEST_STEPS_EN; if(steps===NAMAZ_STEPS) return NAMAZ_STEPS_EN; return null; }
+const ISLAND_EN={ ev:'Home', bahce:'Date Grove', mahalle:'Ansar Neighborhood', cami:'Mosque', sehir:'Medina', atolye:'Workshop', sadaka:'Charity Garden' };
+function islandName(is){ return (S.lang==='en' && is && ISLAND_EN[is.id]) || (is&&is.name) || ''; }
+function questNmT(q){ const e=qEn(q); return (e&&e.nm)||(q&&q.nm)||''; }   // görev adı (dil) — kilit/prereq toast'ları için
+
 /* ============ İMTİHAN MEYDANI — SORU BANKASI (Hadis Okulu 🕌 / Fıkıh Okulu ⚖️) ============
    Her konu (topic) için sorular; okul rozeti s ile gösterilir. c = doğru şıkkın indeksi. */
 const QBANK={
@@ -958,6 +1043,9 @@ const UI_STR={ en:{
   // --- Faz 2b-2: ortak ---
   t_locked_place:'🔒 This place isn\'t open yet', dlg_ok:'OK', q_done:'Done ✓',
   q_didit:'Done ✓', q_undo:'Undo ↺', q_prereq:'🔒 First: ', q_nextstep:'the next step',
+  g_step:'Step ', g_next:'Next ▶', g_learned:'Learned ✓', g_learned_suf:' — learned',
+  q_undo10:'↺ Undone (−10 nur)', q_plus10:'+10 nur ✦',
+  q_exam_open_a:'📝 ', q_exam_open_b:' Trial Grounds opened!', q_exam_ready:'📝 You\'re ready for the trial',
 }};
 function hayirNm(h){ return tU('hy_'+h.id) || (h && h.nm) || ''; }   // hayır kalemi adı (dil)
 // Faz 2b: senaryo unvanları — Türkçe başlık → İngilizce
@@ -3399,7 +3487,7 @@ function doScenario(rec){
   // prereq kapısı: yalnız İLK KEZ (ada henüz fethedilmemiş VE senaryo hiç çözülmemiş) uygulanır.
   // Aksi hâlde günlük S.done sıfırlaması senaryoyu her gün yeniden kilitliyordu → tekrar barıştıramama/hükmedememe.
   const freeRepeat = rec.renew && (S.conquered[rec.islId] || (S.scen[rec.renew] && S.scen[rec.renew].n>0));
-  if(!freeRepeat && rec.q && QUESTS.some(x=>x.id===rec.q.id) && !S.done[rec.q.id] && !questAvailable(rec.q)){ const p=prereqOf(rec.q); toast('🔒 Önce: '+(p?p.nm:'sıradaki adım')); return; }
+  if(!freeRepeat && rec.q && QUESTS.some(x=>x.id===rec.q.id) && !S.done[rec.q.id] && !questAvailable(rec.q)){ const p=prereqOf(rec.q); toast((tU('q_prereq')||'🔒 Önce: ')+(p?questNmT(p):(tU('q_nextstep')||'sıradaki adım'))); return; }
   const fn=SCENE_DO[rec.sid]; if(fn) fn(rec);
 }
 function updateScenarios(dt,t){
@@ -3770,12 +3858,12 @@ function updateParticles(dt){
   }
 }
 function openSheet(q){
-  curQ=q;
+  curQ=q; const e=qEn(q);
   document.getElementById('sIc').textContent=q.ic;
-  document.getElementById('sT').textContent=q.nm;
-  document.getElementById('sS').textContent=q.rem;
+  document.getElementById('sT').textContent=(e&&e.nm)||q.nm;
+  document.getElementById('sS').textContent=(e&&e.rem)||q.rem;
   const w=document.getElementById('sRefs'); w.innerHTML='';
-  (q.refs||[]).forEach(rf=>{ const d=document.createElement('div'); d.className='ref';
+  ((e&&e.refs)||q.refs||[]).forEach(rf=>{ const d=document.createElement('div'); d.className='ref';
     d.innerHTML=`<div class="tag">${rf.tag}</div><div class="txt">${rf.txt}</div>${rf.cite?`<div class="cite">— ${rf.cite}</div>`:''}`; w.appendChild(d); });
   const done=!!S.done[q.id];
   const db=document.getElementById('sDo'); db.textContent=done?(tU('q_undo')||'Geri al ↺'):(tU('q_didit')||'Yaptım ✓'); db.style.background=done?'#9aa':'linear-gradient(135deg,#5fb98a,#2f8f63)';
@@ -3786,7 +3874,7 @@ function closeSheet(){ document.getElementById('veil').classList.remove('show');
 /* ---- ADIM ADIM ÖĞRETİM (abdest, namaz…) ---- */
 let guideQ=null, guideSteps=[], guideIdx=0;
 function interact(q){
-  if(!S.done[q.id] && !questAvailable(q)){ const p=prereqOf(q); toast((tU('q_prereq')||'🔒 Önce: ')+(p?p.nm:(tU('q_nextstep')||'sıradaki adım'))); return; }
+  if(!S.done[q.id] && !questAvailable(q)){ const p=prereqOf(q); toast((tU('q_prereq')||'🔒 Önce: ')+(p?questNmT(p):(tU('q_nextstep')||'sıradaki adım'))); return; }
   // Cuma günü öğle: namaz evde kılınmaz — sadece camide
   if(q.id==='ev_namaz' && !S.done[q.id] && vakitOf(gameTime)[1]==='Öğle' && isFriday() && cumaActive()){
     toast('🕌 Cuma günü öğle namazı evde değil, camide kılınır — Mescid\'e git'); return; }
@@ -3795,17 +3883,17 @@ function interact(q){
 }
 let guideDone=null;   // özel tamamlama callback'i (abdest tazeleme gibi) — yoksa finishLesson
 function openGuide(q, onDone){ guideQ=q; guideSteps=q.steps||[]; guideIdx=0; guideDone=onDone||null;
-  document.getElementById('gT').textContent=q.nm;
+  const ge=qEn(q); document.getElementById('gT').textContent=(ge&&ge.nm)||q.nm;
   document.getElementById('guide').classList.add('show'); renderGuide(); }
 function closeGuide(){ document.getElementById('guide').classList.remove('show'); }
 function renderGuide(){
-  const s=guideSteps[guideIdx]||{};
-  document.getElementById('gProg').textContent='Adım '+(guideIdx+1)+' / '+guideSteps.length;
+  const se=stepsEn(guideSteps), s=guideSteps[guideIdx]||{}, es=se?(se[guideIdx]||{}):null;
+  document.getElementById('gProg').textContent=(tU('g_step')||'Adım ')+(guideIdx+1)+' / '+guideSteps.length;
   document.getElementById('gIc').textContent=s.ic||guideQ.ic;
-  document.getElementById('gTitle').textContent=s.t||'';
-  document.getElementById('gDesc').textContent=s.d||'';
+  document.getElementById('gTitle').textContent=(es&&es.t)||s.t||'';
+  document.getElementById('gDesc').textContent=(es&&es.d)||s.d||'';
   document.getElementById('gPrev').style.visibility=guideIdx>0?'visible':'hidden';
-  document.getElementById('gNext').textContent=(guideIdx<guideSteps.length-1)?'Sonraki ▶':'Öğrendim ✓';
+  document.getElementById('gNext').textContent=(guideIdx<guideSteps.length-1)?(tU('g_next')||'Sonraki ▶'):(tU('g_learned')||'Öğrendim ✓');
 }
 function guideNext(){
   if(!document.getElementById('guide').classList.contains('show')) return;   // kapandıysa çift-tetikleme yok
@@ -3817,14 +3905,14 @@ function finishLesson(q){
   const first=!S.learned[q.id]; S.learned[q.id]=true;
   if(!S.done[q.id]){ curQ=q; doQuest(); }   // do-yolu: nûr, çınlama, meydan açılışı vb.
   else save();
-  if(first){ sndChime(); setTimeout(()=>banner('📖 '+q.nm.replace(/ (al|kıl|oku).*/,'')+' öğrenildi'),300); }
+  if(first){ sndChime(); const e=qEn(q); const nm=(e&&e.nm)||q.nm.replace(/ (al|kıl|oku).*/,''); setTimeout(()=>banner('📖 '+nm+(tU('g_learned_suf')||' öğrenildi')),300); }
 }
 function doQuest(){
   if(!curQ) return; const was=!!S.done[curQ.id];
-  if(!was && !questAvailable(curQ)){ const p=prereqOf(curQ); toast('🔒 Önce: '+(p?p.nm:'sıradaki adım')); return; }
+  if(!was && !questAvailable(curQ)){ const p=prereqOf(curQ); toast((tU('q_prereq')||'🔒 Önce: ')+(p?questNmT(p):(tU('q_nextstep')||'sıradaki adım'))); return; }
   const islId=questIslandId(curQ);
   const islDoneBefore=islandDone(islId);
-  if(was){ delete S.done[curQ.id]; S.nur=Math.max(0,S.nur-10); toast('↺ Geri alındı (−10 nûr)'); } else { S.done[curQ.id]=true; addNur(10); sndChime(); toast('+10 nûr ✦'); }
+  if(was){ delete S.done[curQ.id]; S.nur=Math.max(0,S.nur-10); toast(tU('q_undo10')||'↺ Geri alındı (−10 nûr)'); } else { S.done[curQ.id]=true; addNur(10); sndChime(); toast(tU('q_plus10')||'+10 nûr ✦'); }
   const rec=interactables.find(r=>r.q.id===curQ.id);
   if(rec){ rec.done=!was;
     if(!was && curQ.model==='plot'){ /* fidan: parseli filizliye çevir */ swapPlot(rec); } }
@@ -3836,8 +3924,8 @@ function doQuest(){
   if(!was && curQ.id==='ev_namaz'){ const ev=document.getElementById('vakit'); if(ev) ev.classList.remove('urgent'); }
   if(nowLessonsDone && !S.conquered[islId]){
     sndFanfare(); const is=WORLD.islands.find(i=>i.id===islId);
-    setTimeout(()=>toast('📝 '+(is?is.name:'')+' İmtihan Meydanı açıldı!'),700);
-    setTimeout(()=>banner('📝 İmtihana Hazırsın'),1200);
+    setTimeout(()=>toast((tU('q_exam_open_a')||'📝 ')+(is?islandName(is):'')+(tU('q_exam_open_b')||' İmtihan Meydanı açıldı!')),700);
+    setTimeout(()=>banner(tU('q_exam_ready')||'📝 İmtihana Hazırsın'),1200);
   }
   if(!was) closeSheet(); else openSheet(curQ);
 }
