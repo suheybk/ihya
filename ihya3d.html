@@ -400,7 +400,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.9</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.10</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -578,7 +578,7 @@
     <button class="restart" id="endRestart">↺ Baştan Başla</button>
   </div>
 </div>
-<div id="load">Dünya diriltiliyor…<div class="bar"><i id="loadBar"></i></div></div>
+<div id="load"><span data-i18n="load_txt">Dünya diriltiliyor…</span><div class="bar"><i id="loadBar"></i></div></div>
 
 <!--EMBEDDED_WORLD_MODELS--><script>
 window.IHYA_WORLD = {
@@ -805,7 +805,8 @@ function qEn(q){ if(S.lang!=='en'||!q) return null;
 function stepsEn(steps){ if(S.lang!=='en'||!steps) return null;
   if(steps===ABDEST_STEPS) return ABDEST_STEPS_EN; if(steps===NAMAZ_STEPS) return NAMAZ_STEPS_EN; return null; }
 const ISLAND_EN={ ev:'Home', bahce:'Date Grove', mahalle:'Ansar Neighborhood', cami:'Mosque', sehir:'Medina', atolye:'Workshop', sadaka:'Charity Garden' };
-function islandName(is){ return (S.lang==='en' && is && ISLAND_EN[is.id]) || (is&&is.name) || ''; }
+const ISLAND_AR={ ev:'الدار', bahce:'بستان التمر', mahalle:'حيّ الأنصار', cami:'المسجد', sehir:'المدينة', atolye:'الورشة', sadaka:'بستان الصدقة' };
+function islandName(is){ if(!is) return ''; if(S.lang==='en'&&ISLAND_EN[is.id]) return ISLAND_EN[is.id]; if(S.lang==='ar'&&ISLAND_AR[is.id]) return ISLAND_AR[is.id]; return is.name||''; }
 function questNmT(q){ const e=qEn(q); return (e&&e.nm)||(q&&q.nm)||''; }   // görev adı (dil) — kilit/prereq toast'ları için
 
 /* ============ İMTİHAN MEYDANI — SORU BANKASI (Hadis Okulu 🕌 / Fıkıh Okulu ⚖️) ============
@@ -1182,6 +1183,10 @@ const UI_STR={ en:{
   mu_t2:'Sa\'d ibn Rabi\' offered half his wealth to Abd al-Rahman ibn Awf. But he said, "Show me the way to the market" — he chose lawful earning. (Bukhari, Manaqib al-Ansar 3)',
   mu_reward:'✦ +25 nur — You have gained an Ansari brother',
   mu_greet:'🤝 Your Ansari brother greets you: "Seek your provision lawfully in the market, give from your earnings — brotherhood is sharing."',
+  // --- Faz 3: zekât toast/banner + intro ---
+  zk_due:'🕌 Zakat is due: ', zk_reached:' reached the nisab — give its zakat from your Satchel',
+  zk_notyet:'Not yet at the nisab', zk_given:'🤲 Zakat given', zk_toast_a:'Zakat: ', zk_toast_b:' nur, may it bring blessing',
+  load_txt:'Reviving the world…',
   // --- Faz 3: imtihan meydanı ---
   ex_title_suf:' Trial', ex_prog:'Question ', ex_lock_done:'✓ This isle is already conquered', ex_lock_first:'🔒 First complete the lessons on this isle',
   ex_school_fiqh:'⚖️ Fiqh School', ex_school_hadith:'🕌 Hadith School', ex_school_verse:'📖 Verse Council',
@@ -1197,18 +1202,89 @@ const UI_STR={ en:{
   ma_vazife_banner:'📜 The imam gave you a duty',
   ma_vazife_toast:'The imam: «I have seen justice and mercy in you. From now on, reconcile people (🕊️), judge injustice fairly (⚖️), and deliver trusts to their owners (📿). Your Case Ledger is now open.» (+15 nur)',
   ma_sohbet_banner:'💬 Talk with the imam', ma_sit_toast:'🤲 You sat quietly and listened — peace and light (+3)',
+},
+// ===== AR — Arapça (Faz 1: kabuk + dünya-içi etkileşim). Dinî içerik (QUEST/QBANK/diyalog) sonraki AR fazlarında; şimdilik TR'ye düşer. =====
+ar:{
+  rank_0:'النِّيّة', rank_1:'طالِب', rank_2:'أهل الاجتهاد', rank_3:'سالِك الإحياء', rank_4:'جُنديّ الإحياء', rank_5:'أستاذ الإحياء',
+  ad_ok:'سكينة', ad_warn:'اضطراب', ad_bad:'ظُلم',
+  isles:'جُزُر',
+  vz_head:'مهامّ الإمام', vz_baris:'صُلح', vz_adalet:'عَدل', vz_emanet:'أمانة',
+  vz_pending:'● قيد الانتظار', vz_done:'✓ تمّ', vz_locked:'🔒 مُقفَل', vz_given:'📜 أعطاك الإمام المهامّ: الصلح · القضاء · الأمانة ✓',
+  close:'إغلاق', mosque_exit:'🚪 اخرج من المسجد',
+  tut_next:'التالي ›', tut_start:'ابدأ ✓', tut_prev:'‹ رجوع', tut_skip:'تخطٍّ / إغلاق',
+  ab_seccade:'🧎 خُذ سجّادتك', ab_mosque:'🕌 ادخل المسجد', ab_hac:'🕋 انوِ العُمرة',
+  ab_greet:'🤝 سلِّم', ab_broth:'🤝 آخِ', ab_done:'✓ تمّ', ab_give:'أعطِ', ab_gave:'🙏 أعطيت',
+  ab_market:'🛒 السوق', ab_rest:'🐑 يستريح', ab_gather:'اجمع', ab_ripening:'🌱 يَنضج',
+  ab_exam_done:'الميدان ✓', ab_exam_enter:'📝 ادخل الامتحان', ab_exam_lock:'🔒 الدروس أولًا',
+  ab_look:'انظر ✓', ab_interact:'تفاعل', ab_notyet:'🔒 ليس بعد',
+  pr_seccade:'🧎 خُذ سجّادة الصلاة', pr_mosque:'🕌 ادخل المسجد', pr_hac:'🕋 انوِ العُمرة',
+  pr_market:'🛒 سوق المدينة', pr_rest:'🐑 يستريح', pr_gave:' — أُعطيت', pr_gatherv:'اجمع', pr_ripen:' — يَنضج', pr_exam:'ميدان الامتحان',
+  good_hurma:'تمر', good_dut:'توت', good_sut:'حليب', good_yun:'صوف', good_ekmek:'خبز',
+  good_su:'ماء', good_bal:'عسل', good_bugday:'قمح', good_un:'دقيق', good_yumurta:'بيض',
+  good_corek:'أقراص', good_pekmez:'دِبس', good_balik:'سمك', good_izgara:'سمك مشوي',
+  gv_su:'💧 استقِ الماء', gv_bal:'🍯 خُذ العسل', gv_yumurta:'🥚 اجمع البيض', gv_bugday:'🌾 احصُد القمح', gv_balik:'🎣 اصطَد',
+  rg_su:'💧 البئر تمتلئ', rg_bugday:'🌾 القمح يَنضج', rg_yumurta:'🥚 الدجاج يبيض',
+  rg_bal:'🍯 النحل يصنع العسل', rg_hurma:'🌴 التمر يَنضج', rg_dut:'🍇 التوت يَنضج',
+  rg_balik:'🎣 السمك يَلقَم', rg_generic:'🌱 يَنضج',
+  anim_yun:'جُزّ الصوف', anim_sut:'احلِب',
+  t_locked_here:'🔒 هذا المكان لم يُفتَح بعد', t_sec:' ث', t_bagfull:'🎒 الجَعبة ممتلئة', t_bagfilled:' (الجعبة ممتلئة)', t_gathered:' جُمِع',
+  day_0:'الأحد', day_1:'الاثنين', day_2:'الثلاثاء', day_3:'الأربعاء', day_4:'الخميس', day_5:'الجمعة', day_6:'السبت', day_friday:'🕌 الجُمُعة',
+  'vk_Gece':'الليل', 'vk_Fecir':'الفجر', 'vk_Kuşluk':'الضحى', 'vk_Öğle':'الظهر', 'vk_İkindi':'العصر', 'vk_Akşam':'المغرب', 'vk_Yatsı':'العشاء',
+  'nml_Fecir':'الفجر', 'nml_Öğle':'الظهر', 'nml_İkindi':'العصر', 'nml_Akşam':'المغرب', 'nml_Yatsı':'العشاء',
+  hd_inv:'🎒 الجَعبة', hd_scen:'📖 دفتر القضايا', hd_market:'🛒 سوق المدينة', hd_mosque:'🕌 المسجد',
+  hd_hayir:'🤲 نبع الخير', hd_hac:'🕋 العُمرة', hd_ezber:'📖 دفتر الحِفظ',
+  u_close:'إغلاق', u_dirhem:'دراهم', u_meselesuf:'قضايا', u_steps:'📖 اعرض الخطوات',
+  scen_sub:'احلُل قضايا المدينة: احكُم بالعدل، أصلِح بين المتخاصمين، وأدِّ الأمانة. كل قضية تقودك إلى لقب.',
+  hayir_sub:'حوّل درهمك الحلال إلى صدقة جارية؛ يزداد العالم جمالًا ويدوم أجرها (النور).',
+  inv_sub:'ما جمعتَه بالكسب الحلال. يُباع في السوق ويُحوَّل إلى خير.',
+  market_sub:'بِع كسبك الحلال. <i>«من غشّنا فليس منّا.»</i> (مسلم) — كن صادقًا في الكيل والوزن.',
+  mosque_sub:'كن مؤدَّبًا في المسجد؛ اجلس بسكينة، أنصِت للإمام، وشارك الجماعة.',
+  hac_intro:'انوِ الإحرام من الميقات؛ طُف بالكعبة، واسعَ بين الصفا والمروة، ثم احلِق.',
+  load_txt:'إحياء العالم…',
+  // panel gövdeleri (Dağarcık/Pazar/Senaryo) + ortak UI
+  iv_carry:'الحمل', iv_nobag:' · لا جَعبة', iv_full:'ممتلئة',
+  iv_baghint:'لحمل المزيد، اذهب إلى النَّول في جزيرة الورشة (انسِج بالصوف).',
+  iv_empty:'لم تجمع شيئًا بعد. اجمع من الأشجار والحيوانات في الجزر 🌴🐑',
+  iv_prod_head:'التصنيع: في جزيرة الورشة', iv_prod_body:'اعبُر الجسر جنوب بستان التمر إلى الورشة: 🌾 الرحى (دقيق)، 🍞 التنّور (خبز)، 🧶 النَّول (سجّادة).',
+  iv_zekat_head:'🕌 <b>الزكاة</b> — الأموال التي بلغت النِّصاب (العُشر 1/10). نِصاب الغنم: 40 رأسًا.', iv_zekat_suf:' زكاة',
+  mk_empty:'لا شيء لديك للبيع. اجمع وارعَ في الجزر، ثم أحضِرها إلى هنا 🌴🐑',
+  mk_seccade:'سجّادة الصلاة', mk_seccade_ref:'بِع سجّادتك التي بيدك', mk_sell:'بِع ', mk_unit:'سعر الوحدة: ',
+  mk_sell1:'بِع 1', mk_all:'الكل (', mk_lock:'🔒 المدينة لم تُفتَح بعد', mk_earn_a:'💰 +', mk_earn_b:' درهم (',
+  sc_notitle:'لا لقب بعد', sc_next:' · التالي: ', sc_top:' · <b>أعلى لقب!</b>', sc_cases:' قضية',
+  sc_ledger:'دفتر القضايا', sc_open:'افتح ▸', sc_total:' — المجموع ', sc_totcases:' قضية',
+  sm_adalet:'عَدل — القاضي', sm_baris:'صُلح — أصلِح', sm_emanet:'أمانة — أدِّ',
+  sl_baris:'صُلح', sl_adalet:'عَدل', sl_emanet:'أمانة',
+  q_didit:'تمّ ✓', q_undo:'تراجع ↺', q_done:'تمّ ✓', q_prereq:'🔒 أولًا: ', q_nextstep:'الخطوة التالية',
+  dlg_ok:'حسنًا', t_locked_place:'🔒 هذا المكان لم يُفتَح بعد', t_locked_medina:'🔒 المدينة لم تُفتَح بعد',
+  g_step:'خطوة ', g_next:'التالي ▶', g_learned:'تعلّمت ✓',
+  ex_prog:'سؤال ', ex_next:'التالي ➤', ex_result:'اعرض النتيجة',
 }};
 function hayirNm(h){ return tU('hy_'+h.id) || (h && h.nm) || ''; }   // hayır kalemi adı (dil)
+// EN İ18N — Hayır kalemi ref hadîsleri (Faz 3; TERCUME_SOZLUGU.md)
+const HAYIR_REF_EN={
+  agac:'When a Muslim plants a tree and something is eaten from it, it is charity for him. (Bukhari, Hars 1)',
+  kandil:'The likeness of those who spend their wealth in the way of Allah is that of a seed that grows seven ears. (Al-Baqarah 2/261)',
+  cesme:'The most virtuous charity is giving water (to the thirsty). (Ibn Majah, Adab 8)',
+  ilim:'When a person dies, their deeds cease — except ongoing charity, beneficial knowledge, and a righteous child. (Muslim, Wasiyyah 14)',
+  sebil:'The best of people is the one most beneficial to people. (Tabarani) — the water flows, and so does your charity.',
+  golge:'If a believer leaves shade or shelter along a road, everyone who benefits from it earns them reward. (Bukhari, in meaning)',
+};
+function hayirRef(h){ return (S.lang==='en' && h && HAYIR_REF_EN[h.id]) ? HAYIR_REF_EN[h.id] : (h&&h.ref)||''; }   // hayır ref (dil)
 // Faz 2b: senaryo unvanları — Türkçe başlık → İngilizce
 const SCEN_T_EN={
   'Barıştırıcı':'Reconciler','Muslih':'Peacemaker','Ara Bulan':'Mediator','Sulh Ustası':'Master of Reconciliation',
   'Hakem':'Arbiter','Âdil Hakem':'Just Arbiter','Adaletli Kadı':'Just Judge','Adalet Ustası':'Master of Justice',
   'Emin':'Trustworthy','Emanet Ehli':'Keeper of Trust','Emanet Bekçisi':'Guardian of Trust','Emanet Ustası':'Master of Trust',
 };
-function scenTName(t){ return (S.lang==='en' && t && SCEN_T_EN[t]) || t; }   // unvan adı (dil)
+const SCEN_T_AR={
+  'Barıştırıcı':'مُصلِح','Muslih':'ساعٍ في الصلح','Ara Bulan':'الوسيط','Sulh Ustası':'أستاذ الصُّلح',
+  'Hakem':'حَكَم','Âdil Hakem':'حَكَم عادل','Adaletli Kadı':'قاضٍ عادل','Adalet Ustası':'أستاذ العدل',
+  'Emin':'أمين','Emanet Ehli':'أهل الأمانة','Emanet Bekçisi':'حارس الأمانة','Emanet Ustası':'أستاذ الأمانة',
+};
+function scenTName(t){ if(!t) return t; if(S.lang==='en'&&SCEN_T_EN[t]) return SCEN_T_EN[t]; if(S.lang==='ar'&&SCEN_T_AR[t]) return SCEN_T_AR[t]; return t; }   // unvan adı (dil)
 function scenMetaNm(k){ return tU('sm_'+k) || (typeof SCEN_META!=='undefined' && SCEN_META[k] && SCEN_META[k].nm) || k; }
 function scenLabelNm(k){ return tU('sl_'+k) || (typeof SCEN_LABEL!=='undefined' && SCEN_LABEL[k]) || k; }
-function tU(k){ return (S.lang==='en' && UI_STR.en[k]!=null) ? UI_STR.en[k] : null; }
+function tU(k){ const L=S.lang; return (L && L!=='tr' && UI_STR[L] && UI_STR[L][k]!=null) ? UI_STR[L][k] : null; }   // çok-dilli: en/ar/… → değer, tr → null (çağrı yerinde ||TR)
 function vakitName(vn){ return tU('vk_'+vn) || vn; }   // vakit adı (dil)
 function goodName(item){ return tU('good_'+item) || (GOODS[item]&&GOODS[item].nm) || item; }   // item adı (dil)
 function namazLabel(vn){ return tU('nml_'+vn) || (typeof NAMAZ_LABEL!=='undefined' && NAMAZ_LABEL[vn]) || vn; }   // namaz adı (dil)
@@ -1881,22 +1957,31 @@ const ZEKAT={
   sut:  {nisab:20, rate:0.1, tur:'Mal', ref:'Ticaret ve mal zekâtı; malın kırkta biri (bu oyunda basitleştirildi).'},
   yun:  {nisab:20, rate:0.1, tur:'Mal', ref:'Biriken malın zekâtı; nisaba ulaşınca verilir.'},
 };
+// EN İ18N — zekât (Faz 3; TERCUME_SOZLUGU.md)
+const ZEKAT_EN={
+  hurma:{tur:'Tithe (ushr)', ref:'Crops watered by rain give 1/10, those watered by labor 1/20 (ushr). (Bukhari, Zakat 55)'},
+  dut:  {tur:'Tithe (ushr)', ref:'The zakat on produce of the land is the tithe (ushr, 1/10). (Bukhari, Zakat 55)'},
+  sut:  {tur:'Goods', ref:'Zakat on trade goods; one-fortieth of the wealth (simplified in this game).'},
+  yun:  {tur:'Goods', ref:'Zakat on accumulated wealth; given once it reaches the nisab.'},
+};
+function zekatTur(k){ return (S.lang==='en' && ZEKAT_EN[k]) ? ZEKAT_EN[k].tur : (ZEKAT[k]&&ZEKAT[k].tur)||''; }
+function zekatRef(k){ return (S.lang==='en' && ZEKAT_EN[k]) ? ZEKAT_EN[k].ref : (ZEKAT[k]&&ZEKAT[k].ref)||''; }
 // koyun nisabı (bilgi): 40 koyunda 1 koyun zekât. Educational.
 function checkZekat(){
   if(!zekatMukellef()) return;   // çocuk zekâtla mükellef değil
   for(const k in ZEKAT){ const z=ZEKAT[k], have=S.inv[k]||0;
     if(have>=z.nisab && !S.zekat[k]){ S.zekat[k]=true;
-      const g=GOODS[k]; banner('🕌 Zekât vakti: '+g.ic+' '+g.nm);
-      setTimeout(()=>toast(g.nm+' nisaba ulaştı — Dağarcık\'tan zekâtını ver'),900); }
+      const g=GOODS[k]; banner((tU('zk_due')||'🕌 Zekât vakti: ')+g.ic+' '+goodName(k));
+      setTimeout(()=>toast(goodName(k)+(tU('zk_reached')||' nisaba ulaştı — Dağarcık\'tan zekâtını ver')),900); }
     if(have<z.nisab && S.zekat[k]) S.zekat[k]=false;   // altına düşünce sıfırla
   }
 }
 function giveZekat(k){
-  const z=ZEKAT[k], have=S.inv[k]||0; if(have<z.nisab){ toast('Nisaba ulaşmadı'); return; }
+  const z=ZEKAT[k], have=S.inv[k]||0; if(have<z.nisab){ toast(tU('zk_notyet')||'Nisaba ulaşmadı'); return; }
   const amt=Math.max(1,Math.ceil(have*z.rate));
   S.inv[k]=have-amt; const nur=amt*4; addNur(nur);
   S.zekat[k]=false; save(); refreshHUD(); renderInv(); sndChime();
-  banner('🤲 Zekât verildi'); toast('Zekât: '+amt+' '+GOODS[k].ic+' → +'+nur+' nûr, bereket olsun');
+  banner(tU('zk_given')||'🤲 Zekât verildi'); toast((tU('zk_toast_a')||'Zekât: ')+amt+' '+GOODS[k].ic+' → +'+nur+(tU('zk_toast_b')||' nûr, bereket olsun'));
 }
 
 /* ============ GÜN SİSTEMİ + CUMA ============ */
@@ -3113,7 +3198,7 @@ function renderHayir(){
     const card=document.createElement('div'); card.className='hcard';
     card.innerHTML='<div class="hic">'+h.ic+'</div>'+
       '<div class="hbody"><div class="hnm">'+hayirNm(h)+' <span class="hcnt">'+have+'/'+h.max+'</span></div>'+
-      '<div class="href">'+h.ref+'</div></div>'+
+      '<div class="href">'+hayirRef(h)+'</div></div>'+
       '<button class="hbuy'+(maxed||poor?' off':'')+'">'+(maxed?(tU('q_done')||'Tamam ✓'):'💰 '+h.cost+' → ✦'+h.reward)+'</button>';
     const btn=card.querySelector('.hbuy');
     if(!maxed) btn.onclick=()=>donateHayir(h.id);
@@ -3150,7 +3235,7 @@ function renderInv(){
     const zt=document.createElement('div'); zt.className='sub'; zt.innerHTML=(tU('iv_zekat_head')||'🕌 <b>Zekât</b> — nisaba ulaşan mallar (öşür 1/10). Koyun nisabı: 40 baş.'); w.appendChild(zt);
     for(const k of zk){ const z=ZEKAT[k], have=S.inv[k], amt=Math.max(1,Math.ceil(have*z.rate));
       const card=document.createElement('div'); card.className='hcard';
-      card.innerHTML='<div class="hic">'+GOODS[k].ic+'</div><div class="hbody"><div class="hnm">'+goodName(k)+(tU('iv_zekat_suf')||' zekâtı')+' <span class="hcnt">'+z.tur+'</span></div><div class="href">'+z.ref+'</div></div><button class="hbuy">🤲 '+amt+'</button>';
+      card.innerHTML='<div class="hic">'+GOODS[k].ic+'</div><div class="hbody"><div class="hnm">'+goodName(k)+(tU('iv_zekat_suf')||' zekâtı')+' <span class="hcnt">'+zekatTur(k)+'</span></div><div class="href">'+zekatRef(k)+'</div></div><button class="hbuy">🤲 '+amt+'</button>';
       card.querySelector('.hbuy').onclick=()=>giveZekat(k); w.appendChild(card);
     }
   }
@@ -4715,8 +4800,12 @@ function applyLang(){ const L=(S.lang&&I18N[S.lang])?S.lang:'tr';
   // statik panel kabuğu (data-i18n): en → tU(key), tr → orijinal (i18nTr cache)
   try{ document.querySelectorAll('[data-i18n]').forEach(el=>{
     if(el.dataset.i18nTr==null) el.dataset.i18nTr=el.innerHTML;
-    el.innerHTML=(S.lang==='en' && tU(el.dataset.i18n)) || el.dataset.i18nTr;
+    el.innerHTML=tU(el.dataset.i18n) || el.dataset.i18nTr;   // çok-dilli: tU en/ar döndürür, tr→null→orijinal
   }); }catch(e){}
+  // saat pilini (gün·vakit) dil değişince HEMEN yeniden çiz (lastVakit change-guard'ı yoksa bayat kalır)
+  try{ lastVakit=null; const el2=document.getElementById('vakit');
+    if(el2 && typeof vakitOf==='function'){ const v=vakitOf(gameTime); const icon=(v[2]==='☾')?moonPhase().e:v[2];
+      el2.textContent=(isFriday()?(tU('day_friday')||'🕌 Cuma'):dayName())+' · '+icon+' '+vakitName(v[1]); } }catch(e){}
   if(typeof refreshHUD==='function'){ try{ refreshHUD(); }catch(e){} }   // rütbe/adalet/ada/vazife dil ile güncellensin
   try{ if(document.getElementById('tut').style.display==='flex') renderTut(); }catch(e){}
 }
