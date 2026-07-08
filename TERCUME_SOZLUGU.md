@@ -177,3 +177,18 @@ metinlerini ve şıkları o kaynaklarla teyit etmeli. (Tam liste kaynak kodda `Q
 
 *Bu belge oyunla birlikte güncel tutulmalıdır: `ihya3d.html` içinde yeni bir `*_EN` tablosu veya
 `UI_STR.en` anahtarı eklendiğinde ilgili satır buraya işlenmelidir.*
+
+---
+
+## 8) العربية (AR) — durum ve KRİTİK not
+
+**AR Faz 1 (kabuk) tamam** (v1175, Faz 6.10): `UI_STR.ar` — rütbe, adalet, panel başlıkları/gövdeleri
+(Dağarcık/Pazar/Senaryo), butonlar, gün/vakit/namaz adları, item adları, senaryo unvanları (`SCEN_T_AR`),
+ada adları (`ISLAND_AR`). `tU()` çok-dilli yapıldı; RTL (`dir=rtl`) + saat pili dil-fix. Preview'da doğrulandı.
+
+**⚠️ AR için dinî içerik kuralı (EN'den FARKLI):** Arapça, Kur'ân ve hadîsin **asıl dilidir**. Bu yüzden
+AR'da âyet/hadîs/zikir metinleri **çevrilmeyecek; doğrudan ASIL ARAPÇA metinleri** kullanılacak
+(ör. âyetin mushaf lafzı, hadîsin muteber Arapça metni — Sahîh el-Buhârî/Müslim Arapça asılları).
+Bu, EN'deki "geçici çeviri" yaklaşımından farklıdır ve daha da hassastır. Sonraki AR fazlarında
+(QUEST/QBANK/diyalog/zikir/Umre) bu metinler asıllarından derlenecek; şu an bu içerik TR'ye düşüyor.
+Sıradaki diller (Endonezyaca/Malayca vb.) yine EN gibi "hedef dilde muteber meâl" yaklaşımıyla.
