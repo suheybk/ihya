@@ -413,7 +413,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.14</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.15</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1038,6 +1038,84 @@ const QBANK_EN={
     {q:'"Religion is sincere counsel," it was said. Counsel to whom?',o:['To Allah, His Book, His Messenger and the Muslims','Only to scholars','Only to the state'],cite:'Muslim, Iman 95'},
   ],
 };
+/* AR İ18N — imtihan soru bankası (Faz 6.15). QBANK ile AYNI konu/soru/şık sırası → doğru indeks (c=0) korunur.
+   Âyet/hadîs iktibasları ASIL Arapça (mushaf lafzı); soru gövdesi/şıklar MSA. */
+const QBANK_AR={
+  taharet:[
+    {q:'بأيِّ قدمٍ يُسنُّ دخولُ الخلاء؟',o:['بالقدم اليسرى','بالقدم اليمنى','لا فرق'],cite:'يدخل باليسرى ويخرج باليمنى (من الآداب).'},
+    {q:'ماذا كان النبيُّ ﷺ يقول عند الخروج من الخلاء؟',o:['«غُفرانَك»','«بسم الله»','«الحمد لله»'],cite:'الترمذي، الطهارة ٥'},
+  ],
+  abdest:[
+    {q:'ما أوّلُ فرائض الوضوء؟',o:['غسلُ الوجه','غسلُ القدمين','مسحُ الرأس'],cite:'فرائض الوضوء: الوجه، اليدان، مسحُ الرأس، القدمان.'},
+    {q:'في الوضوء، بعد غسل الوجه، ماذا يأتي؟',o:['غسلُ اليدين (مع المرفقين)','غسلُ القدمين','مسحُ الرأس'],cite:'الترتيب: الوجه ← اليدان ← مسحُ الرأس ← القدمان.'},
+    {q:'«الطُّهورُ ... الإيمان». كيف يُتمُّ الحديث؟',o:['شطرُ','شرطُ','كلُّ'],cite:'مسلم، الطهارة ١'},
+  ],
+  namaz:[
+    {q:'كم ركعةً فرضُ صلاة الفجر؟',o:['٢','٤','٣'],cite:'الفجر: ركعتان سنّة + ركعتان فرض.'},
+    {q:'بأيِّ عملٍ تُختَمُ الصلاة؟',o:['بالسلام','بالركوع','بالتكبير'],cite:'بالتسليم يمينًا وشمالًا.'},
+    {q:'ما أوّلُ ما يُحاسَبُ عليه العبدُ يوم القيامة؟',o:['الصلاة','الصوم','الزكاة'],cite:'الترمذي، الصلاة ١٨٨'},
+  ],
+  quran:[
+    {q:'«خيرُكم من ... القرآن». تتمّةُ الحديث؟',o:['تعلَّمه وعلَّمه','أكثرَ قراءةً له','حفِظه'],cite:'البخاري، فضائل القرآن ٢١'},
+    {q:'أيُّ سورةٍ يُستحبُّ قراءتُها قبل النوم وتكون حرزًا من عذاب القبر؟',o:['المُلك','الكوثر','الفيل'],cite:'الترمذي، فضائل القرآن ٩'},
+    {q:'كم أجرًا لمن يقرأ القرآنَ متتعتِعًا (بمشقّة)؟',o:['أجران','أجرٌ واحد','لا أجر'],cite:'البخاري، التوحيد ٥٢؛ مسلم، المسافرين ٢٤٣'},
+  ],
+  dua:[
+    {q:'﴿أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ﴾ — بماذا تطمئنُّ القلوب؟ (الرعد ٢٨)',o:['بذكر الله','بالمال','بالعلم'],cite:'الرعد ١٣/٢٨'},
+    {q:'المُعوِّذتان اللّتان تُقرآن صباحًا ومساءً للحفظ، ما هما؟',o:['الفلق والناس','الفيل وقريش','الإخلاص والكوثر'],cite:'سورتا الفلق والناس.'},
+    {q:'عند البدء بالدعاء، ما الأدبُ أوّلًا؟',o:['الحمدُ والصلاةُ على النبي','رفعُ الصوت','العجلة'],cite:'الترمذي، الدعوات ٦٦'},
+  ],
+  fidan:[
+    {q:'«إن قامت الساعةُ وبيدِ أحدِكم ... فليغرِسها». ما الفراغ؟',o:['فسيلة','بذرة','زهرة'],cite:'أحمد بن حنبل'},
+    {q:'إذا أكل من شجرةٍ غرسها المسلمُ كائنٌ حيّ، فماذا تكون له؟',o:['صدقة','دَينًا','وِزرًا'],cite:'البخاري، الحرث ١'},
+  ],
+  canli:[
+    {q:'ماذا حدث للرجل الذي سقى كلبًا عطشانًا؟',o:['غفر اللهُ له','عُوقِب','لم يحدث شيء'],cite:'البخاري، الشرب ٩'},
+    {q:'في كلِّ إحسانٍ إلى كلِّ ذي كبدٍ (حيّ) ماذا يكون؟',o:['أجرٌ','عقوبة','لا شيء'],cite:'البخاري، الشرب ٩'},
+  ],
+  selam:[
+    {q:'«لا ... حتى تحابُّوا». إلى أين؟',o:['تدخلون الجنّة','تدخلون المسجد','تبلغون السلام'],cite:'مسلم، الإيمان ٩٣'},
+    {q:'ما الذي إذا أفشيتموه بينكم تحاببتم (حديث)؟',o:['السلام','المال','الكلام'],cite:'مسلم، الإيمان ٩٣'},
+    {q:'إذا التقى مسلمان، فما لمن بدأ بالسلام؟',o:['هو أفضلُهما','لا شيء له','عليه أن ينتظر'],cite:'أبو داود، الأدب ١٣٣'},
+  ],
+  komsu:[
+    {q:'بحقِّ من أوصى جبريلُ حتى ظُنَّ أنه سيُوَرِّثُه؟',o:['الجار','التاجر','المسافر'],cite:'البخاري، الأدب ٢٨'},
+    {q:'«... الذي لا يأمنُ جارُه بوائقَه». كيف يُتمُّ الحديث؟',o:['لا يؤمنُ (إيمانًا كاملًا)','يصيرُ غنيًّا','يطولُ عمرُه'],cite:'البخاري، الأدب ٢٩'},
+    {q:'بأيِّ الجيران يُبدأُ في الإكرام؟',o:['أقربُهم بابًا','أغناهم','أبعدُهم'],cite:'البخاري، الشفعة ٣'},
+  ],
+  sadaka:[
+    {q:'«ما نقصت صدقةٌ من مالٍ» — الصدقةُ من المال ...',o:['لا تُنقِصه','تُذهِبه','تُخفيه'],cite:'مسلم، البر ٦٩'},
+    {q:'وتبسُّمُك في وجه أخيك يُعَدُّ ...',o:['صدقة','دَينًا','واجبًا'],cite:'الترمذي، البر ٣٦'},
+    {q:'إعطاءُ الصدقة سرًّا، مقارنةً بإعطائها علانيةً، كيف هو؟',o:['خيرٌ لكم','أقلُّ','لا فرق'],cite:'البقرة ٢/٢٧١'},
+  ],
+  cemaat:[
+    {q:'صلاةُ الجماعة أفضلُ من صلاة الفذِّ بكم درجة؟',o:['٢٧','٧','١٧'],cite:'البخاري، الأذان ٣٠'},
+    {q:'كم أقلُّ عددٍ تنعقدُ به الجماعة؟',o:['٢ (إمام + واحد)','٣ أشخاص','٥ أشخاص'],cite:'يكفي إمامٌ ومأمومٌ واحد.'},
+  ],
+  ilim:[
+    {q:'من سلك طريقًا يلتمسُ فيه علمًا، ماذا يُسهِّلُ اللهُ له؟',o:['طريقًا إلى الجنّة','الغنى','الشهرة'],cite:'مسلم، الذكر ٣٨'},
+    {q:'العلماءُ ورثةُ مَن؟',o:['الأنبياء','الملوك','الأغنياء'],cite:'أبو داود، العلم ١'},
+    {q:'إذا مات الإنسانُ انقطع عملُه إلا من ثلاث؛ واحدةٌ منها؟',o:['علمٌ يُنتفَعُ به','مالٌ مُدَّخَر','شهرة'],cite:'مسلم، الوصية ١٤'},
+  ],
+  davet:[
+    {q:'لِمَ كان أن يهديَ اللهُ بك رجلًا واحدًا خيرًا؟',o:['من حُمرِ النَّعَم (الدنيا)','من عبادة شهر','من صيام سنة'],cite:'البخاري، الجهاد ١٠٢'},
+    {q:'«الدالُّ على الخير ...». كيف يُتمُّ الحديث؟',o:['كفاعله','يبقى مَدينًا','لا يكسبُ شيئًا'],cite:'مسلم، الإمارة ١٣٣'},
+  ],
+  adalet:[
+    {q:'﴿اعْدِلُوا هُوَ أَقْرَبُ لِ...﴾ (المائدة ٨)',o:['التقوى','الغنى','الشهرة'],cite:'المائدة ٥/٨'},
+    {q:'﴿وَلَا يَجْرِمَنَّكُمْ شَنَآنُ قَوْمٍ﴾ — ألّا يحملَكم بغضُ قومٍ على ماذا؟ (المائدة ٨)',o:['ألّا تعدلوا (الظلم)','الكرم','الصبر'],cite:'المائدة ٥/٨'},
+    {q:'من السبعة الذين يُظِلُّهم اللهُ في ظلِّه يوم القيامة؟',o:['إمامٌ عادل','تاجرٌ غنيّ','شاعرٌ مشهور'],cite:'البخاري، الأذان ٣٦'},
+  ],
+  emanet:[
+    {q:'﴿إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ ...﴾ (النساء ٥٨)',o:['أهلها','الأغنياء','العلماء'],cite:'النساء ٤/٥٨'},
+    {q:'من علامات المنافق: إذا اؤتُمِن ...',o:['خان','حفِظ الأمانة','قدَّرها'],cite:'البخاري، الإيمان ٢٤'},
+  ],
+  hayir:[
+    {q:'«خيرُ الناس ...؟»',o:['أنفعُهم للناس','أغناهم','أعلمُهم'],cite:'الطبراني، المعجم الأوسط'},
+    {q:'ما لمن دلَّ على خير؟',o:['مثلُ أجرِ فاعله','عقوبة','لا شيء'],cite:'مسلم، الإمارة ١٣٣'},
+    {q:'«الدِّينُ النصيحة» قيل: لمن؟',o:['لله ولكتابه ولرسوله وللمسلمين','للعلماء فقط','للدولة فقط'],cite:'مسلم، الإيمان ٩٥'},
+  ],
+};
 // bir adanın konuları (o adadaki derslerden türetilir)
 function islandTopics(id){ const t=[]; for(const q of islandQuests(id)){ const tp=questTopic(q); if(QBANK[tp]&&!t.includes(tp)) t.push(tp); } return t; }
 // ilk ada (öğrenme temeli) için sınavda mutlaka bulunması istenenler
@@ -1046,9 +1124,9 @@ const EXAM_N=4;   // sınavdaki soru sayısı (yeterince konu varsa)
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 // bir ada için sınav sorularını kur (okul karışık, şıklar karışık)
 function buildExam(islId){
-  const EN=(S.lang==='en');
+  const EN=(S.lang==='en'), AR=(S.lang==='ar');
   const topics=islandTopics(islId);
-  const pool=[]; for(const tp of topics){ const arr=QBANK[tp]||[], enArr=(typeof QBANK_EN!=='undefined'&&QBANK_EN[tp])||[]; arr.forEach((qq,i)=>pool.push(Object.assign({topic:tp,_en:(EN?enArr[i]:null)},qq))); }
+  const pool=[]; for(const tp of topics){ const arr=QBANK[tp]||[], enArr=(typeof QBANK_EN!=='undefined'&&QBANK_EN[tp])||[], arArr=(typeof QBANK_AR!=='undefined'&&QBANK_AR[tp])||[]; arr.forEach((qq,i)=>pool.push(Object.assign({topic:tp,_loc:(EN?enArr[i]:AR?arArr[i]:null)},qq))); }
   const must=EXAM_MUST[islId]||[];
   const chosen=[];
   // önce zorunlu konulardan birer soru
@@ -1057,7 +1135,7 @@ function buildExam(islId){
   for(const p of shuffle(pool.slice())){ if(chosen.length>=EXAM_N) break; if(!chosen.includes(p)) chosen.push(p); }
   // her soru için şıkları karıştır (TR/EN paralel permütasyon → doğru indeks korunur), dile göre metin
   return shuffle(chosen).slice(0,Math.max(1,Math.min(EXAM_N,chosen.length))).map(p=>{
-    const e=(p._en)||p; const perm=shuffle(p.o.map((_,i)=>i));
+    const e=(p._loc)||p; const perm=shuffle(p.o.map((_,i)=>i));
     const opts=perm.map(i=>e.o[i]), c=perm.indexOf(p.c);
     return {s:p.s, q:e.q, o:opts, c, cite:e.cite};
   });
@@ -2489,7 +2567,16 @@ const IMAM_SOZ_EN=[
   '"A person is with the one he loves." (Bukhari) — love the righteous and join their gatherings.',
   '"The Muslim is the one from whose hand and tongue other Muslims are safe." (Bukhari)',
 ];
-function imamSoz(i){ return (S.lang==='en' && IMAM_SOZ_EN[i]) || IMAM_SOZ[i]; }
+// AR İ18N — imam sözleri (Faz 6.15; hadîs ASIL Arapça muteber lafzı)
+const IMAM_SOZ_AR=[
+  '«الدِّينُ النصيحة» قلنا: لمن يا رسولَ الله؟ قال: «لله ولكتابه ولرسوله ولأئمّة المسلمين وعامّتهم». (مسلم)',
+  '«نعمتان مغبونٌ فيهما كثيرٌ من الناس: الصحّةُ والفراغ». (البخاري)',
+  '«يسِّروا ولا تعسِّروا، وبشِّروا ولا تنفِّروا». (البخاري)',
+  '«خيرُكم من تعلَّم القرآنَ وعلَّمه». (البخاري)',
+  '«المرءُ مع من أحبَّ». (البخاري) — فأحبِبِ الصالحين واحضُر مجالسهم.',
+  '«المسلمُ من سلِم المسلمون من لسانه ويده». (البخاري)',
+];
+function imamSoz(i){ return (S.lang==='ar' && IMAM_SOZ_AR[i]) || (S.lang==='en' && IMAM_SOZ_EN[i]) || IMAM_SOZ[i]; }
 // ZİKİR: mescitte (özellikle kerahat / namaz kılınmayan vakitlerde) — vakit başına bir kez her biri
 const ZIKIR=[
   {id:'hamdele', ad:'Hamdele', ic:'🌿', nur:3, txt:'Elhamdü lillâhi Rabbil âlemîn — Hamd, âlemlerin Rabbi Allah\'a mahsustur. Şükrün başıdır.'},
@@ -2506,15 +2593,24 @@ const ZIKIR_EN={
   esma:{ad:'The Beautiful Names', txt:'Ya Rahman, ya Rahim, ya Quddus, ya Salam, ya \'Aziz, ya Ghaffar, ya Razzaq, ya Latif... "To Allah belong the most beautiful names, so call upon Him by them." (Al-A\'raf 180)'},
 };
 const TESBIHAT_EN={ad:'Post-prayer Tasbih', txt:'33 Subhanallah · 33 Alhamdulillah · 33 Allahu akbar, then "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamd..." and Ayat al-Kursi. "Whoever says these after every prayer, his sins are forgiven." (Muslim)'};
-function zikirAd(z){ return (S.lang==='en' && z && ZIKIR_EN[z.id]) ? ZIKIR_EN[z.id].ad : (z&&z.ad)||''; }
-function zikirTxt(z){ return (S.lang==='en' && z && ZIKIR_EN[z.id]) ? ZIKIR_EN[z.id].txt : (z&&z.txt)||''; }
+// AR İ18N — zikir (Faz 6.15; ASIL Arapça lafzı + hadîs/âyet mushaf metni)
+const ZIKIR_AR={
+  hamdele:{ad:'الحمدلة', txt:'الحمدُ لله ربِّ العالمين. وهي رأسُ الشكر.'},
+  salvele:{ad:'الصلاة على النبي ﷺ', txt:'اللّهمّ صلِّ على محمدٍ وعلى آلِ محمد. «من صلّى عليّ صلاةً صلّى اللهُ عليه بها عشرًا». (مسلم)'},
+  istigfar:{ad:'الاستغفار', txt:'أستغفرُ اللهَ العظيمَ وأتوبُ إليه.'},
+  esma:{ad:'الأسماء الحسنى', txt:'يا رحمنُ يا رحيمُ يا قدّوسُ يا سلامُ يا عزيزُ يا غفّارُ يا رزّاقُ يا لطيف... ﴿وَلِلَّهِ الْأَسْمَاءُ الْحُسْنَىٰ فَادْعُوهُ بِهَا﴾ (الأعراف ١٨٠)'},
+};
+const TESBIHAT_AR={ad:'تسبيحُ ما بعد الصلاة', txt:'٣٣ سبحان الله · ٣٣ الحمد لله · ٣٣ الله أكبر، ثم «لا إله إلا الله وحده لا شريك له، له المُلكُ وله الحمدُ...» وآيةُ الكرسي. «من قالهنّ دُبُرَ كلِّ صلاةٍ غُفرت خطاياه». (مسلم)'};
+function zikirAd(z){ const L=S.lang; if(z){ if(L==='ar'&&ZIKIR_AR[z.id]) return ZIKIR_AR[z.id].ad; if(L==='en'&&ZIKIR_EN[z.id]) return ZIKIR_EN[z.id].ad; } return (z&&z.ad)||''; }
+function zikirTxt(z){ const L=S.lang; if(z){ if(L==='ar'&&ZIKIR_AR[z.id]) return ZIKIR_AR[z.id].txt; if(L==='en'&&ZIKIR_EN[z.id]) return ZIKIR_EN[z.id].txt; } return (z&&z.txt)||''; }
 let zikirDone={};   // vakit başına sıfırlanır (onVakitChange)
 window.__zikir=function(id){
   if(zikirDone[id]){ renderMosque(); return; }
   const z=(id==='tesbihat')?{id:'tesbihat',ad:'Namaz Tesbihâtı',nur:8,txt:TESBIHAT_TXT}:ZIKIR.find(x=>x.id===id);
   if(!z) return; zikirDone[id]=true; addNur(z.nur); save(); refreshHUD(); sndChime();
-  const ad=(id==='tesbihat')?((S.lang==='en')?TESBIHAT_EN.ad:z.ad):zikirAd(z);
-  const txt=(id==='tesbihat')?((S.lang==='en')?TESBIHAT_EN.txt:z.txt):zikirTxt(z);
+  const tesb=(S.lang==='ar')?TESBIHAT_AR:(S.lang==='en')?TESBIHAT_EN:z;
+  const ad=(id==='tesbihat')?tesb.ad:zikirAd(z);
+  const txt=(id==='tesbihat')?tesb.txt:zikirTxt(z);
   banner((id==='tesbihat'?'📿 ':'')+ad); setTimeout(()=>toast(txt+' (+'+z.nur+(tU('nur_suffix')||' nûr')+')'),200); renderMosque();
 };
 function renderMosque(){
@@ -2883,6 +2979,12 @@ function renderProfile(){
   document.getElementById('profSummary').innerHTML = all ? obligationsText(profSel) : (tU('prof_answer_all')||'Üç soruyu da yanıtla.');
 }
 function obligationsText(p){
+  if(S.lang==='ar'){
+    if(p.ageGroup==='cocuk') return '🌱 <b>لستَ مكلّفًا بعد</b> — ولكن لتعتاد على العبادة يوجِّهك اللعبُ إلى <b>الصلاة والسور والأدعية</b>. سجّادتُك جاهزة، تستطيع أن تصلّي فورًا.'+(p.quran==='ogreniyor'?' وأوّلًا حاوِل أن تتعلّم قراءة القرآن.':'');
+    const cumaA = p.gender==='erkek' ? ' <b>صلاةُ الجمعة</b> (جماعةً)،' : '';
+    const cumaNotA = p.gender==='kadin' ? ' <i>(الجمعةُ ليست فرضًا عليكِ؛ تصلّين الظهر.)</i>' : '';
+    return '🕌 ممّا فُرِض عليك: <b>الصلواتُ الخمس</b>،'+cumaA+' والصوم، <b>والزكاة</b> (إذا بلغتَ النصاب)، والحجّ. يوجِّهك اللعبُ ويُذكِّرك في الصلاة والكسب الحلال والزكاة والصدقة.'+cumaNotA+(p.quran==='ogreniyor'?' وركِّز أيضًا على تعلّم قراءة القرآن.':'');
+  }
   if(S.lang==='en'){
     if(p.ageGroup==='cocuk') return '🌱 <b>You are not yet accountable (mukallaf)</b> — but to help you get used to it, the game guides you toward <b>prayer, surahs and supplications</b>. Your prayer rug is ready; you can pray right away.'+(p.quran==='ogreniyor'?' First, try to learn to read the Qur\'an.':'');
     const cumaE = p.gender==='erkek' ? ' <b>the Friday prayer</b> (in congregation),' : '';
@@ -2962,8 +3064,14 @@ const NPC_EN={
   komsu1:{nm:'Show kindness to a neighbor', ref:'Gabriel urged the neighbor\'s right so much that (the Prophet) thought he would make him an heir. (Bukhari)'},
   misafir1:{nm:'Honor a guest', ref:'"Whoever believes in Allah and the Last Day, let him honor his guest." (Bukhari, Adab 85)'},
 };
-function npcNm(def){ return (S.lang==='en' && def && NPC_EN[def.id]) ? NPC_EN[def.id].nm : (def&&def.nm)||''; }
-function npcRef(def){ return (S.lang==='en' && def && NPC_EN[def.id]) ? NPC_EN[def.id].ref : (def&&def.ref)||''; }
+// AR İ18N — muhtaç NPC ikram görevleri (Faz 6.15; hadîs ASIL Arapça mushaf/muteber lafzı)
+const NPC_AR={
+  yetim1:{nm:'أطعِمِ اليتيم', ref:'«أنا وكافلُ اليتيمِ في الجنّةِ هكذا» وأشار بالسبّابة والوسطى. (البخاري)'},
+  komsu1:{nm:'أحسِن إلى الجار', ref:'«ما زال جبريلُ يوصيني بالجارِ حتى ظننتُ أنه سيُوَرِّثُه». (البخاري)'},
+  misafir1:{nm:'أكرِمِ الضيف', ref:'«من كان يؤمن بالله واليوم الآخر فليُكرِم ضيفَه». (البخاري، الأدب ٨٥)'},
+};
+function npcNm(def){ const L=S.lang; if(def){ if(L==='ar'&&NPC_AR[def.id]) return NPC_AR[def.id].nm; if(L==='en'&&NPC_EN[def.id]) return NPC_EN[def.id].nm; } return (def&&def.nm)||''; }
+function npcRef(def){ const L=S.lang; if(def){ if(L==='ar'&&NPC_AR[def.id]) return NPC_AR[def.id].ref; if(L==='en'&&NPC_EN[def.id]) return NPC_EN[def.id].ref; } return (def&&def.ref)||''; }
 let npcNodes=[], npcWander=[];
 // ★ NPC RENKLERİ — Suheyb'in referans görsellerine (models/*.glb.jpg) göre sıcak Medine paleti.
 // Mesh'ler <model>_<n> isimli: _1=cübbe/gövde, _2=ten(baş/el), _3=başörtü/saç, _4=koyu aksan(saç/kaş), _5/_6=ekstra.
@@ -4547,7 +4655,14 @@ const STORY_EN={
   cami:'🕌 The Mosque rose; the People of the Suffa devote themselves to knowledge. Increase your learning, hasten to the congregation.',
   sehir:'🏙️ Medina became a city: the market was built and justice spread. Earn from what is lawful, and give from your earnings.',
 };
-function storyEn(id){ return (S.lang==='en' && STORY_EN[id]) || STORY[id]; }
+// AR İ18N — ada açılış sîret satırları (Faz 6.15; TERCUME_SOZLUGU.md §8 — MSA prose)
+const STORY_AR={
+  bahce:'🌱 أحيا المهاجرون أرضَ المدينة القاحلة بأشجار النخيل — اعمل واحصُد وعِش من الكسب الحلال.',
+  mahalle:'🤝 آوى الأنصارُ إخوانَهم المهاجرين في بيوتهم. في الحيّ، ابحث عن أخيك في المؤاخاة (🤝)، وتعهَّد الجارَ واليتيم.',
+  cami:'🕌 ارتفع المسجد، وأهلُ الصُّفّة منشغلون بالعلم. زِد من علمك، وسارِع إلى الجماعة.',
+  sehir:'🏙️ صارت المدينةُ مدينةً عامرة: أُقيم السوقُ وانتشر العدل. اكسب من الحلال، وأنفِق من كسبك.',
+};
+function storyEn(id){ return (S.lang==='en' && STORY_EN[id]) || (S.lang==='ar' && STORY_AR[id]) || STORY[id]; }
 function passExam(islId){
   const before=WORLD.islands.map(i=>isUnlocked(i.id));
   const firstConquer=!S.conquered[islId];
