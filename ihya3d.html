@@ -886,6 +886,83 @@ const QBANK={
     {s:'Hadis',q:'"Din nasihattir" buyruldu. Nasihat kimedir?',o:['Allah\'a, Kitabına, Rasûlüne ve müslümanlara','Sadece âlimlere','Sadece devlete'],c:0,cite:'Müslim, Îmân 95'},
   ],
 };
+/* EN İ18N — imtihan soru bankası (Faz 3; TERCUME_SOZLUGU.md). QBANK ile AYNI konu/soru/şık sırası → doğru indeks (c) korunur. */
+const QBANK_EN={
+  taharet:[
+    {q:'Which foot is it sunnah to enter the toilet with?',o:['The left foot','The right foot','It does not matter'],cite:'Enter with the left foot, leave with the right (etiquette).'},
+    {q:'What supplication did the Prophet (pbuh) say when leaving the toilet?',o:['"Ghufranaka"','"Bismillah"','"Alhamdulillah"'],cite:'Tirmidhi, Taharah 5'},
+  ],
+  abdest:[
+    {q:'Which is the first obligatory act (fard) of ablution?',o:['Washing the face','Washing the feet','Wiping the head'],cite:'The fard of wudu: face, arms, wiping the head, feet.'},
+    {q:'In ablution, after washing the face, what comes next?',o:['Washing the arms (with the elbows)','Washing the feet','Wiping the head'],cite:'Order: face → arms → wiping the head → feet.'},
+    {q:'"Cleanliness is ... of faith." How is the hadith completed?',o:['half','a condition','the whole'],cite:'Muslim, Taharah 1'},
+  ],
+  namaz:[
+    {q:'How many rak\'ahs is the fard of the dawn (Fajr) prayer?',o:['2','4','3'],cite:'Fajr: 2 sunnah + 2 fard.'},
+    {q:'With which act is the prayer ended?',o:['Giving salam','Bowing (ruku)','The takbir'],cite:'By giving salam to the right and left.'},
+    {q:'On the Day of Judgment, which deed is a servant first called to account for?',o:['The prayer','Fasting','Zakat'],cite:'Tirmidhi, Salat 188'},
+  ],
+  quran:[
+    {q:'"The best of you is the one who ... the Qur\'an." Completion?',o:['learns and teaches','recites the most','memorizes'],cite:'Bukhari, Fada\'il al-Qur\'an 21'},
+    {q:'Which surah, recommended before sleep, is a shield against the torment of the grave?',o:['Al-Mulk','Al-Kawthar','Al-Fil'],cite:'Tirmidhi, Fada\'il al-Qur\'an 9'},
+    {q:'How many rewards are there for one who recites the Qur\'an haltingly (with difficulty)?',o:['Two rewards','One reward','No reward'],cite:'Bukhari, Tawhid 52; Muslim, Musafirin 243'},
+  ],
+  dua:[
+    {q:'"Hearts find rest only in what?" (Ar-Ra\'d 28)',o:['The remembrance of Allah','Wealth','Knowledge'],cite:'Ar-Ra\'d 13/28'},
+    {q:'The Mu\'awwidhatayn, recited morning and evening for protection, are which surahs?',o:['Al-Falaq and An-Nas','Al-Fil and Quraysh','Al-Ikhlas and Al-Kawthar'],cite:'Surahs Al-Falaq and An-Nas.'},
+    {q:'When beginning a supplication, what is the etiquette to do first?',o:['Praise and blessings (hamd & salawat)','Shout loudly','Rush'],cite:'Tirmidhi, Da\'awat 66'},
+  ],
+  fidan:[
+    {q:'"Even if the Hour strikes, plant the ... in your hand." Fill the blank.',o:['sapling','seed','flower'],cite:'Ahmad ibn Hanbal'},
+    {q:'If a living creature eats from a tree a Muslim planted, what does it become for him?',o:['Charity','A debt','A sin'],cite:'Bukhari, Hars 1'},
+  ],
+  canli:[
+    {q:'What happened to the man who gave water to a thirsty dog?',o:['Allah forgave him','He was punished','Nothing happened'],cite:'Bukhari, Shirb 9'},
+    {q:'In every kindness to a living being, what is there?',o:['Reward','Punishment','Nothing'],cite:'Bukhari, Shirb 9'},
+  ],
+  selam:[
+    {q:'"You will not ... until you love one another." What?',o:['enter Paradise','enter the mosque','reach peace'],cite:'Muslim, Iman 93'},
+    {q:'What, when spread among you, makes you love one another (hadith)?',o:['The greeting of peace (salam)','Wealth','Words'],cite:'Muslim, Iman 93'},
+    {q:'When two Muslims meet, what is there for the one who gives salam first?',o:['He is more virtuous','There is nothing','He must wait'],cite:'Abu Dawud, Adab 133'},
+  ],
+  komsu:[
+    {q:'Whose right did Gabriel (as) urge so much that (the Prophet) thought he would make him an heir?',o:['The neighbor\'s','The merchant\'s','The traveler\'s'],cite:'Bukhari, Adab 28'},
+    {q:'"The one whose neighbor is not safe from his harm ..." How is it completed?',o:['has not (truly) believed','becomes rich','lives long'],cite:'Bukhari, Adab 29'},
+    {q:'When giving to neighbors, which one do you begin with?',o:['The one whose door is nearest','The wealthiest','The farthest'],cite:'Bukhari, Shuf\'a 3'},
+  ],
+  sadaka:[
+    {q:'"Charity does not ... wealth." How does the hadith end?',o:['diminish','take away','hide'],cite:'Muslim, Birr 69'},
+    {q:'Smiling at your brother is also counted as a ...',o:['charity','debt','duty'],cite:'Tirmidhi, Birr 36'},
+    {q:'Giving charity in secret, compared to giving openly, is how?',o:['Better for you','Less','No difference'],cite:'Al-Baqarah 2/271'},
+  ],
+  cemaat:[
+    {q:'How many degrees more virtuous is congregational prayer than praying alone?',o:['27','7','17'],cite:'Bukhari, Adhan 30'},
+    {q:'What is the minimum number needed to form a congregation?',o:['2 (imam + 1 person)','3 people','5 people'],cite:'An imam and one follower suffice.'},
+  ],
+  ilim:[
+    {q:'For one who sets out to seek knowledge, what does Allah make easy?',o:['The path to Paradise','Wealth','Fame'],cite:'Muslim, Dhikr 38'},
+    {q:'The scholars are the heirs of whom?',o:['The prophets','The kings','The wealthy'],cite:'Abu Dawud, Ilm 1'},
+    {q:'When a person dies their deeds cease; one of the three that continue?',o:['Beneficial knowledge','Hoarded wealth','Fame'],cite:'Muslim, Wasiyyah 14'},
+  ],
+  davet:[
+    {q:'Why is being a means of one person\'s guidance better?',o:['Better than red camels (the world)','Than a month\'s worship','Than a year\'s fasting'],cite:'Bukhari, Jihad 102'},
+    {q:'"The one who guides to good is ..." How is the hadith completed?',o:['like the one who does it','left in debt','gains nothing'],cite:'Muslim, Imarah 133'},
+  ],
+  adalet:[
+    {q:'"Be just; that is nearer to ..." (Al-Ma\'idah 8)',o:['Piety (taqwa)','Wealth','Fame'],cite:'Al-Ma\'idah 5/8'},
+    {q:'Let your hatred of a people not lead you to what? (Al-Ma\'idah 8)',o:['Injustice','Generosity','Patience'],cite:'Al-Ma\'idah 5/8'},
+    {q:'One of the seven shaded in the shade of the Throne on the Day of Judgment?',o:['A just ruler','A rich merchant','A famous poet'],cite:'Bukhari, Adhan 36'},
+  ],
+  emanet:[
+    {q:'"Allah commands you to render trusts to ...?" (An-Nisa 58)',o:['their rightful owners','the wealthy','the scholars'],cite:'An-Nisa 4/58'},
+    {q:'One of the signs of a hypocrite: he ... a trust.',o:['betrays','safeguards','values'],cite:'Bukhari, Iman 24'},
+  ],
+  hayir:[
+    {q:'"Who is the best of people?"',o:['The one most beneficial to people','The wealthiest','The most learned'],cite:'Tabarani, al-Mu\'jam al-Awsat'},
+    {q:'What is there for the one who leads others to a good deed?',o:['Reward like the doer\'s','Punishment','Nothing'],cite:'Muslim, Imarah 133'},
+    {q:'"Religion is sincere counsel," it was said. Counsel to whom?',o:['To Allah, His Book, His Messenger and the Muslims','Only to scholars','Only to the state'],cite:'Muslim, Iman 95'},
+  ],
+};
 // bir adanın konuları (o adadaki derslerden türetilir)
 function islandTopics(id){ const t=[]; for(const q of islandQuests(id)){ const tp=questTopic(q); if(QBANK[tp]&&!t.includes(tp)) t.push(tp); } return t; }
 // ilk ada (öğrenme temeli) için sınavda mutlaka bulunması istenenler
@@ -894,18 +971,20 @@ const EXAM_N=4;   // sınavdaki soru sayısı (yeterince konu varsa)
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 // bir ada için sınav sorularını kur (okul karışık, şıklar karışık)
 function buildExam(islId){
+  const EN=(S.lang==='en');
   const topics=islandTopics(islId);
-  const pool=[]; for(const tp of topics) for(const qq of (QBANK[tp]||[])) pool.push(Object.assign({topic:tp},qq));
+  const pool=[]; for(const tp of topics){ const arr=QBANK[tp]||[], enArr=(typeof QBANK_EN!=='undefined'&&QBANK_EN[tp])||[]; arr.forEach((qq,i)=>pool.push(Object.assign({topic:tp,_en:(EN?enArr[i]:null)},qq))); }
   const must=EXAM_MUST[islId]||[];
   const chosen=[];
   // önce zorunlu konulardan birer soru
   for(const tp of must){ const cand=shuffle(pool.filter(p=>p.topic===tp)); if(cand[0]) chosen.push(cand[0]); }
   // kalanları rastgele doldur
   for(const p of shuffle(pool.slice())){ if(chosen.length>=EXAM_N) break; if(!chosen.includes(p)) chosen.push(p); }
-  // her soru için şıkları karıştır, doğru indeksi güncelle
+  // her soru için şıkları karıştır (TR/EN paralel permütasyon → doğru indeks korunur), dile göre metin
   return shuffle(chosen).slice(0,Math.max(1,Math.min(EXAM_N,chosen.length))).map(p=>{
-    const correct=p.o[p.c]; const opts=shuffle(p.o.slice());
-    return {s:p.s, q:p.q, o:opts, c:opts.indexOf(correct), cite:p.cite};
+    const e=(p._en)||p; const perm=shuffle(p.o.map((_,i)=>i));
+    const opts=perm.map(i=>e.o[i]), c=perm.indexOf(p.c);
+    return {s:p.s, q:e.q, o:opts, c, cite:e.cite};
   });
 }
 
@@ -1070,6 +1149,13 @@ const UI_STR={ en:{
   sc_title_a:'🏅 Title: ', sc_title_toast_a:'🏅 ', sc_title_toast_b:' title: «', sc_title_toast_c:'» — +', sc_title_toast_d:' nur',
   sc_ledger_a:'📖 ', sc_ledger_b:' ledger: case #', sc_ledger_c:' solved',
   nur_suffix:' nur',
+  // --- Faz 3: imtihan meydanı ---
+  ex_title_suf:' Trial', ex_prog:'Question ', ex_lock_done:'✓ This isle is already conquered', ex_lock_first:'🔒 First complete the lessons on this isle',
+  ex_school_fiqh:'⚖️ Fiqh School', ex_school_hadith:'🕌 Hadith School', ex_school_verse:'📖 Verse Council',
+  ex_next:'Next ➤', ex_result:'See result',
+  ex_pass_t:'You Passed the Trial!', ex_fail_t:'Let\'s Learn Again',
+  ex_correct:'Correct: ', ex_pass_s:' — ready to conquer the isle (+30 nur)', ex_fail_s:' — not enough, review the topics.',
+  ex_conquer:'Conquer ✦', ex_retry:'↺ Try Again', ex_review:'📕 Review the lessons', ex_review_toast:'📕 Review the lessons again',
   // --- Faz 3: cami eylem toast/banner ---
   m_next_prayer:'⏳ Next prayer: ',
   ma_cuma_banner:'🕌 May your Jumu\'ah prayer be accepted', ma_cuma_toast:'You listened to the sermon and prayed with the congregation (+30 nur)',
@@ -4072,12 +4158,12 @@ let examIslId=null, examQs=[], examIdx=0, examWrong=0, examLock=false;
 function sndBuzz(){ audio(); beep(180,0,0.16,'square',0.07); beep(120,0.11,0.22,'square',0.06); }
 function openExam(islId){
   if(!examReady(islId)){
-    if(S.conquered[islId]) toast('✓ Bu ada zaten fethedildi'); else toast('🔒 Önce bu adadaki dersleri tamamla');
+    if(S.conquered[islId]) toast(tU('ex_lock_done')||'✓ Bu ada zaten fethedildi'); else toast(tU('ex_lock_first')||'🔒 Önce bu adadaki dersleri tamamla');
     return;
   }
   examIslId=islId; examQs=buildExam(islId); examIdx=0; examWrong=0;
   const is=WORLD.islands.find(i=>i.id===islId);
-  document.getElementById('exTitle').textContent=(is?is.name:'')+' İmtihanı';
+  document.getElementById('exTitle').textContent=islandName(is)+(tU('ex_title_suf')||' İmtihanı');
   document.getElementById('exQuiz').style.display='block';
   document.getElementById('exResult').style.display='none';
   document.getElementById('exam').classList.add('show');
@@ -4087,8 +4173,8 @@ function closeExam(){ document.getElementById('exam').classList.remove('show'); 
 function renderExamQ(){
   examLock=false;
   const q=examQs[examIdx];
-  document.getElementById('exProg').textContent='Soru '+(examIdx+1)+' / '+examQs.length;
-  const sc = q.s==='Fıkıh'?{t:'⚖️ Fıkıh Okulu',bg:'#3a6ea5'} : q.s==='Hadis'?{t:'🕌 Hadis Okulu',bg:'#2f8f63'} : {t:'📖 Âyet Meclisi',bg:'#9a6a2f'};
+  document.getElementById('exProg').textContent=(tU('ex_prog')||'Soru ')+(examIdx+1)+' / '+examQs.length;
+  const sc = q.s==='Fıkıh'?{t:tU('ex_school_fiqh')||'⚖️ Fıkıh Okulu',bg:'#3a6ea5'} : q.s==='Hadis'?{t:tU('ex_school_hadith')||'🕌 Hadis Okulu',bg:'#2f8f63'} : {t:tU('ex_school_verse')||'📖 Âyet Meclisi',bg:'#9a6a2f'};
   const badge=document.getElementById('exSchool'); badge.textContent=sc.t; badge.style.background=sc.bg;
   document.getElementById('exQ').textContent=q.q;
   document.getElementById('exCite').textContent='';
@@ -4104,7 +4190,7 @@ function answerExam(i,btn){
   if(i!==q.c){ btn.classList.add('wrong'); examWrong++; sndBuzz(); } else { sndChime(); }
   document.getElementById('exCite').textContent='— '+q.cite;
   const nb=document.getElementById('exNext'); nb.style.display='block';
-  nb.textContent=(examIdx<examQs.length-1)?'Sıradaki ➤':'Sonucu Gör';
+  nb.textContent=(examIdx<examQs.length-1)?(tU('ex_next')||'Sıradaki ➤'):(tU('ex_result')||'Sonucu Gör');
 }
 function nextExam(){ if(examIdx<examQs.length-1){ examIdx++; renderExamQ(); } else finishExam(); }
 function finishExam(){
@@ -4112,12 +4198,12 @@ function finishExam(){
   document.getElementById('exQuiz').style.display='none';
   document.getElementById('exResult').style.display='block';
   document.getElementById('exResIc').textContent=passed?'✦':'↺';
-  document.getElementById('exResT').textContent=passed?'İmtihanı Geçtin!':'Tekrar Öğrenelim';
-  document.getElementById('exResS').textContent='Doğru: '+correct+' / '+total+(passed?' — ada fethine hazır (+30 nûr)':' — eksik kaldı, konuları tekrar et.');
+  document.getElementById('exResT').textContent=passed?(tU('ex_pass_t')||'İmtihanı Geçtin!'):(tU('ex_fail_t')||'Tekrar Öğrenelim');
+  document.getElementById('exResS').textContent=(tU('ex_correct')||'Doğru: ')+correct+' / '+total+(passed?(tU('ex_pass_s')||' — ada fethine hazır (+30 nûr)'):(tU('ex_fail_s')||' — eksik kaldı, konuları tekrar et.'));
   const a=document.getElementById('exResA'), b=document.getElementById('exResB');
-  if(passed){ sndFanfare(); a.textContent='Fethet ✦'; a.onclick=()=>{ const id=examIslId; closeExam(); passExam(id); }; b.style.display='none'; }
-  else { sndBuzz(); a.textContent='↺ Tekrar Dene'; a.onclick=()=>openExam(examIslId);
-    b.style.display='block'; b.textContent='📕 Dersleri Tekrar Et'; b.onclick=()=>{ const id=examIslId; closeExam(); failExam(id); toast('📕 Dersleri tekrar gözden geçir'); }; }
+  if(passed){ sndFanfare(); a.textContent=tU('ex_conquer')||'Fethet ✦'; a.onclick=()=>{ const id=examIslId; closeExam(); passExam(id); }; b.style.display='none'; }
+  else { sndBuzz(); a.textContent=tU('ex_retry')||'↺ Tekrar Dene'; a.onclick=()=>openExam(examIslId);
+    b.style.display='block'; b.textContent=tU('ex_review')||'📕 Dersleri Tekrar Et'; b.onclick=()=>{ const id=examIslId; closeExam(); failExam(id); toast(tU('ex_review_toast')||'📕 Dersleri tekrar gözden geçir'); }; }
 }
 document.getElementById('exNext').onclick=nextExam;
 document.getElementById('exam').addEventListener('click',e=>{ if(e.target.id==='exam') closeExam(); });
