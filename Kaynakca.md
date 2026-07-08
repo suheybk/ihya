@@ -13,6 +13,14 @@ metnin kendisini, kaynağını ve derlenme/erişim tarihini listeler.
 > - Çeviri (AR/EN) yapılırken dinî metinler **çevrilmeyecek**; hedef dildeki muteber meâl/hadîs
 >   kaynaklarından **doğrudan alınacak** (kullanıcı talimatı).
 
+> **✅ İÇ DOĞRULUK TARAMASI (2026-07-08):** Oyundaki **~19 Kur'ân âyet atıfının tamamı** (sûre adı +
+> âyet no) meâl ile karşılaştırıldı ve **doğru** bulundu — Bakara 2/43·125·158·238·261·271,
+> Nisâ 4/58 (emanet+adalet ibaresi ikisi de 4/58'de)·4/135, Mâide 5/8, A'râf 7/180, Enfâl 8/1,
+> İsrâ 17/35·78·79, Hucurât 49/10, Rahmân 55/9, Ra'd 13/28, Duhâ 93/10, Cum'a 62/9. TR↔EN
+> atıflar tutarlı. **Hadîs koleksiyon atıfları** meşhur rivayetler için doğru; **kitap/bab
+> numaraları** (ör. "Ezân 30") uzman/matbu külliyat teyidine bırakıldı. Meâller kısaltılmıştır;
+> birebir lafız için muteber meâl esas alınmalı.
+
 ---
 
 ## 1) Kur'ân-ı Kerîm Âyetleri (meâl)
