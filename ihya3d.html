@@ -420,7 +420,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.19</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.20</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1202,7 +1202,7 @@ const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
 const UI_STR={ en:{
   rank_0:'Intention', rank_1:'Seeker', rank_2:'Diligent', rank_3:'Ihya Wayfarer', rank_4:'Ihya Devotee', rank_5:'Ihya Master',
   rank_6:'Ihya Guide', rank_7:'Ihya Teacher', rank_8:'People of Light', rank_9:'Ihya Elder',
-  dg_head:'Daily Goal', dg_done:'🎯 Daily goal complete', dg_pray:'Congregational prayers', dg_zikir:'Remembrances (dhikr)', dg_hayir:'Ongoing charity', dg_sell:'Market earnings (dirhem)',
+  dg_head:'Daily Goal', dg_done:'🎯 Daily goal complete', dg_pray:'Congregational prayers', dg_zikir:'Remembrances (dhikr)', dg_hayir:'Ongoing charity', dg_sell:'Market earnings (dirhem)', dg_case:'Resolve a case', dg_ikram:'Give to those in need', dg_exam:'Pass a trial',
   ad_ok:'Peace', ad_warn:'Unrest', ad_bad:'Injustice',
   isles:'isles',
   vz_head:'Imam\'s Duties', vz_baris:'Reconcile', vz_adalet:'Justice', vz_emanet:'Trust',
@@ -1381,7 +1381,7 @@ const UI_STR={ en:{
 ar:{
   rank_0:'النِّيّة', rank_1:'طالِب', rank_2:'أهل الاجتهاد', rank_3:'سالِك الإحياء', rank_4:'جُنديّ الإحياء', rank_5:'أستاذ الإحياء',
   rank_6:'مُرشِد الإحياء', rank_7:'مُعلِّم الإحياء', rank_8:'أهل النور', rank_9:'شيخ الإحياء',
-  dg_head:'هدف اليوم', dg_done:'🎯 تمّ هدف اليوم', dg_pray:'صلوات جماعة', dg_zikir:'أذكار', dg_hayir:'صدقة جارية', dg_sell:'كسب في السوق (درهم)',
+  dg_head:'هدف اليوم', dg_done:'🎯 تمّ هدف اليوم', dg_pray:'صلوات جماعة', dg_zikir:'أذكار', dg_hayir:'صدقة جارية', dg_sell:'كسب في السوق (درهم)', dg_case:'احلُل قضيّة', dg_ikram:'أطعِم محتاجًا', dg_exam:'اجتَز امتحانًا',
   ad_ok:'سكينة', ad_warn:'اضطراب', ad_bad:'ظُلم',
   isles:'جُزُر',
   vz_head:'مهامّ الإمام', vz_baris:'صُلح', vz_adalet:'عَدل', vz_emanet:'أمانة',
@@ -1560,9 +1560,12 @@ const DAILY_GOALS=[
   {id:'zikir', ic:'📿', n:3,  evt:'zikir', bonus:20},   // 3 zikir/tesbihat
   {id:'hayir', ic:'🤲', n:1,  evt:'hayir', bonus:25},   // 1 sadaka-i câriye
   {id:'sell',  ic:'🛒', n:15, evt:'sell',  bonus:20},   // pazarda 15 dirhem kazanç
+  {id:'case',  ic:'⚖️', n:1,  evt:'case',  bonus:25},   // 1 senaryo/vazife (sulh/adalet/emanet) çöz
+  {id:'ikram', ic:'🤝', n:2,  evt:'ikram', bonus:22},   // 2 muhtaca ikram (yetim/komşu/misafir)
+  {id:'exam',  ic:'📝', n:1,  evt:'exam',  bonus:30},   // 1 imtihanı geç
 ];
 function dgToday(){ return DAILY_GOALS[(S.dayNum||0) % DAILY_GOALS.length]; }
-function dgLabel(g){ return tU('dg_'+g.id) || ({pray:'Cemaatle namaz',zikir:'Zikir çek',hayir:'Sadaka-i câriye',sell:'Pazarda kazanç (dirhem)'}[g.id]); }
+function dgLabel(g){ return tU('dg_'+g.id) || ({pray:'Cemaatle namaz',zikir:'Zikir çek',hayir:'Sadaka-i câriye',sell:'Pazarda kazanç (dirhem)',case:'Bir mesele çöz',ikram:'Muhtaca ikram et',exam:'İmtihanı geç'}[g.id]); }
 function dgBump(evt, amount){
   if(!S.dg) S.dg={prog:0,done:false};
   const g=dgToday(); if(g.evt!==evt || S.dg.done) return;
@@ -3294,7 +3297,7 @@ function doGiveHayir(rec){
   if(have<def.need){ toast((tU('npc_need_a')||'🔒 Önce ')+(item?goodName(item):(tU('npc_food')||'yiyecek'))+(tU('npc_need_b')||' topla (')+def.need+(tU('npc_need_c')||' gerek')+(item?'':(tU('npc_need_food')||'; hurma/dut/süt'))+')'); return; }
   facePlayer(rec.g.position); playAction(1.5,'give');   // #1 ikram: iki elle uzatıp hafif eğilme jesti
   if(item){ S.inv[item]-=def.need; if(S.inv[item]<=0) delete S.inv[item]; } else takeFood(def.need);
-  addNur(def.nur);
+  addNur(def.nur); dgBump('ikram');
   S.gather['npc_'+def.id]=Date.now()+def.cd;
   careNeedy(def.id);   // bu muhtaç bu hafta gözetildi → mutsuzluğu azalır
   save(); refreshHUD(); sndChime();
@@ -4038,7 +4041,7 @@ function scenSolve(key,rec,nur,bannerTxt,toastTxt){
   if(rec && rec.q){ S.done[rec.q.id]=true; rec.done=true; }   // bu vaka çözüldü (💢/armed sinyali; onNewDay silinir)
   addNur(nur); sndFanfare(); banner(bannerTxt); if(toastTxt) setTimeout(()=>toast(toastTxt),1450);
   if(firstEver) applyIslandLock();   // ilk kez → ada görsel kilidi
-  st.n++; st.idx=(st.idx+1)%(SCEN_POOL[key]||1); st.cd=Date.now()+SCEN_CD; save(); refreshHUD();
+  st.n++; st.idx=(st.idx+1)%(SCEN_POOL[key]||1); st.cd=Date.now()+SCEN_CD; dgBump('case'); save(); refreshHUD();
   const hit=(SCEN_TITLES[key]||[]).find(t=>t.n===st.n);   // bu mesele bir kilometre taşı mı?
   if(hit){ const bonus=15+st.n; setTimeout(()=>{ banner((tU('sc_title_a')||'🏅 Unvan: ')+scenTName(hit.t)); sndFanfare(); addNur(bonus); toast((tU('sc_title_toast_a')||'🏅 ')+scenLabelNm(key)+(tU('sc_title_toast_b')||' unvanı: «')+scenTName(hit.t)+(tU('sc_title_toast_c')||'» — +')+bonus+(tU('sc_title_toast_d')||' nûr')); },3300); }
   else setTimeout(()=>toast((tU('sc_ledger_a')||'📖 ')+scenLabelNm(key)+(tU('sc_ledger_b')||' defteri: ')+st.n+(tU('sc_ledger_c')||'. mesele çözüldü')),2500);
@@ -4784,7 +4787,7 @@ function storyEn(id){ return (S.lang==='en' && STORY_EN[id]) || (S.lang==='ar' &
 function passExam(islId){
   const before=WORLD.islands.map(i=>isUnlocked(i.id));
   const firstConquer=!S.conquered[islId];
-  S.conquered[islId]=true; addNur(30); save();
+  S.conquered[islId]=true; addNur(30); dgBump('exam'); save();
   const after=WORLD.islands.map(i=>isUnlocked(i.id));
   applyIslandLock(); refreshHUD();
   WORLD.islands.forEach((is,idx)=>{ if(!before[idx]&&after[idx]){ setTimeout(()=>toast('🔓 '+islandName(is)+(tU('px_opened')||' açıldı!')),1900);
