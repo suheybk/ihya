@@ -189,6 +189,22 @@ ada adları (`ISLAND_AR`). `tU()` çok-dilli yapıldı; RTL (`dir=rtl`) + saat p
 **⚠️ AR için dinî içerik kuralı (EN'den FARKLI):** Arapça, Kur'ân ve hadîsin **asıl dilidir**. Bu yüzden
 AR'da âyet/hadîs/zikir metinleri **çevrilmeyecek; doğrudan ASIL ARAPÇA metinleri** kullanılacak
 (ör. âyetin mushaf lafzı, hadîsin muteber Arapça metni — Sahîh el-Buhârî/Müslim Arapça asılları).
-Bu, EN'deki "geçici çeviri" yaklaşımından farklıdır ve daha da hassastır. Sonraki AR fazlarında
-(QUEST/QBANK/diyalog/zikir/Umre) bu metinler asıllarından derlenecek; şu an bu içerik TR'ye düşüyor.
+Bu, EN'deki "geçici çeviri" yaklaşımından farklıdır ve daha da hassastır.
 Sıradaki diller (Endonezyaca/Malayca vb.) yine EN gibi "hedef dilde muteber meâl" yaklaşımıyla.
+
+**AR Faz 2 part 1 (v1178, Faz 6.13):** görev adı/hatırlatma + adım-adım abdest/namaz öğretimi Arapça
+(`QUEST_AR`, `NAMAZ_AR`, `ABDEST/NAMAZ_STEPS_AR` — MSA oyun ipuçları/fıkıh adımları).
+
+**AR Faz 2 part 2 (v1179, Faz 6.14) — SENARYO DİYALOGLARI + ASIL ARAPÇA:** `SULH/ADALET/EMANET_CASES_AR`
++ `DILENCI_AR`. Anlatı MSA; **âyet/hadîs ref'leri ASIL ARAPÇA (mushaf lafzı)** kullanıldı:
+- Hucurât 49/10 «إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ فَأَصْلِحُوا بَيْنَ أَخَوَيْكُمْ»
+- Enfâl 8/1 «فَاتَّقُوا اللَّهَ وَأَصْلِحُوا ذَاتَ بَيْنِكُمْ» · İsrâ 17/35 «وَأَوْفُوا الْكَيْلَ إِذَا كِلْتُمْ...»
+- Nisâ 4/135 «كُونُوا قَوَّامِينَ بِالْقِسْطِ شُهَدَاءَ لِلَّهِ...» · Nisâ 4/58 «...أَن تَحْكُمُوا بِالْعَدْلِ» / «تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ أَهْلِهَا»
+- Rahmân 55/9 «وَأَقِيمُوا الْوَزْنَ بِالْقِسْطِ...» · Duhâ 93/10 «وَأَمَّا السَّائِلَ فَلَا تَنْهَرْ»
+> **Hadîs Arapça lafızları** (أفضل الصدقة إصلاح ذات البين / لا تدابروا... / من غشّنا فليس منّا / البيّنة على المدّعي /
+> المسلمون شركاء في ثلاث / أعطوا الأجير أجره... / لا إيمان لمن لا أمانة له / صدقة السرّ تطفئ غضب الرب) **meşhur
+> rivayetlerdir; uzman muteber matbu külliyattan (lafız + tam tahriç) TEYİT ETMELİ.**
+
+**KALAN AR (sonraki):** görev sheet ref'leri (âyet/hadîs asıl Arapça), zikir metinleri, imtihan bankası
+(QBANK_AR), Umre/hac, NPC/hayır/zekât ref, STORY/obligations — accessor'lar (`zikirAd`/`npcNm`/`storyEn`/
+`buildExam`/`obligationsText`/`imamSoz`) hâlâ `S.lang==='en'`; AR için genelleştir + `*_AR` (âyet/hadîs ASIL Arapça).
