@@ -539,7 +539,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.57</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.58</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1424,6 +1424,7 @@ const UI_STR={ en:{
   hd_hayir:'🤲 Fountain of Good', hd_hac:'🕋 Umrah', hd_ezber:'📖 Memorization Book',
   guard_leave:'🕊️ You did wrong — the guarding angel left your side', guard_leave_ref:'«When a servant sins, a black spot is placed on his heart; if he repents and desists, his heart is polished.» (Tirmidhi — hasan)',
   shot_saved:'📷 Screenshot saved', shot_share:'İhya — revive your world · ihyagame.com', shot_fail:'📷 Could not capture', set_shot:'📷 Screenshot / share',
+  host_eve:'until the evening', host_morn:'until the morning',
   hd_settings:'⚙️ Settings', set_controls_h:'🎮 Controls', set_move:'Move (direction keys)', set_act:'Interact · advance dialog', set_esc:'Close panel / go back', set_nums:'Action bar: prayer·water·food·wudu·fast·memorize·satchel·charity·cases·qibla', set_mc:'M map · C modern city', set_touch:'Touch: joystick + 🔘 action button', set_prefs_h:'Preferences', spacekey_s:'Space', set_sound:'🔊 Sound', set_guide:'💡 Guide light', set_lang:'🌐 Language', set_on:'On', set_off:'Off',
   u_close:'Close', u_dirhem:'dirhams', u_meselesuf:'cases', u_steps:'📖 Show steps',
   scen_sub:'Solve Medina\'s cases: judge with justice, reconcile the estranged, deliver the trust. Each case leads to a title.',
@@ -1593,6 +1594,7 @@ ar:{
   hd_inv:'🎒 الجَعبة', hd_scen:'📖 دفتر القضايا', hd_market:'🛒 سوق المدينة', hd_mosque:'🕌 المسجد',
   guard_leave:'🕊️ أخطأتَ — فارقك الملَكُ الحافظ', guard_leave_ref:'«إنّ العبد إذا أذنب نُكتت في قلبه نكتةٌ سوداء، فإن تاب ونزع صُقل قلبه.» (الترمذي — حسن)',
   shot_saved:'📷 حُفظت لقطة الشاشة', shot_share:'إحياء — أحيِ عالمك · ihyagame.com', shot_fail:'📷 تعذّر الالتقاط', set_shot:'📷 لقطة شاشة / مشاركة',
+  host_eve:'حتى المساء', host_morn:'حتى الصباح',
   hd_settings:'⚙️ الإعدادات', set_controls_h:'🎮 التحكّم', set_move:'الحركة (مفاتيح الاتجاه)', set_act:'التفاعل · متابعة الحوار', set_esc:'إغلاق اللوحة / رجوع', set_nums:'شريط الإجراءات: صلاة·ماء·طعام·وضوء·صوم·حفظ·جَعبة·صدقة·قضايا·قبلة', set_mc:'M الخريطة · C المدينة العصرية', set_touch:'اللمس: عصا التحكّم + زر 🔘', set_prefs_h:'التفضيلات', spacekey_s:'المسافة', set_sound:'🔊 الصوت', set_guide:'💡 ضوء الإرشاد', set_lang:'🌐 اللغة', set_on:'مُفعّل', set_off:'مُغلق',
   hd_hayir:'🤲 نبع الخير', hd_hac:'🕋 العُمرة', hd_ezber:'📖 دفتر الحِفظ',
   u_close:'إغلاق', u_dirhem:'دراهم', u_meselesuf:'قضايا', u_steps:'📖 اعرض الخطوات',
@@ -3250,11 +3252,11 @@ ar:{
 function moHosta(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return MODERN_HOSTA[L]||MODERN_HOSTA.tr; }
 function openHastaZiyareti(rec){ const H=moHosta(); audio(); const onCd=()=>S.hastaCd&&Date.now()<S.hastaCd;
   openDialog({ ic:'🏥', title:H.t, start:'s0', steps:{ s0:{ who:H.who, txt:H.x, opts:[
-    { l:H.visit, act:()=>{ if(onCd()){ toast(H.cd); return; } addNur(20); S.hastaCd=Date.now()+HASTA_CD; save(); refreshHUD(); sndFanfare(); spawnAngelHost(7); banner(H.okb); setTimeout(()=>toast(H.okd),650); if(typeof closeDialog==='function') closeDialog(); } },
+    { l:H.visit, act:()=>{ if(onCd()){ toast(H.cd); return; } addNur(20); S.hastaCd=Date.now()+HASTA_CD; save(); refreshHUD(); sndFanfare(); spawnAngelHost(); banner(H.okb+' · '+hostUntilLabel()); setTimeout(()=>toast(H.okd),650); if(typeof closeDialog==='function') closeDialog(); } },
     { l:H.skip } ] } }});
 }
 // ---- MELEK ORDUSU (70.000 temsili) — ziyaret sonrası oyuncunun etrafında ışıklı halka ----
-let angelHost=null, hostUntil=0, hostAngels=[];
+let angelHost=null, hostUntil=0, hostStart=0, hostAngels=[];
 function buildAngelHost(){ if(angelHost) return angelHost; const g=new THREE.Group(); const N=14, R=4.4;
   for(let i=0;i<N;i++){ const a=(i/N)*Math.PI*2; const m=new THREE.Group();
     const robe=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.28,0.9,10), new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xfff2cc,emissiveIntensity:0.6})); robe.position.y=0.45; m.add(robe);
@@ -3265,18 +3267,27 @@ function buildAngelHost(){ if(angelHost) return angelHost; const g=new THREE.Gro
   const light=new THREE.PointLight(0xffe9b0,0,22,2); light.position.y=4.2; g.add(light); g.userData.light=light;
   g.visible=false; scene.add(g); angelHost=g; return g;
 }
-function spawnAngelHost(sec){ buildAngelHost(); hostUntil=Date.now()+(sec||6)*1000; if(player) angelHost.position.set(player.position.x,0,player.position.z); }
+// SÜRE: sabah/gündüz ziyaret → AKŞAMA kadar; akşam/gece ziyaret → SABAHA kadar (Tirmizî lafzına sadık)
+function hostDurationSec(){ const t=gameTime, SUNRISE=0.24, SUNSET=0.72;
+  let target = (t>=SUNRISE && t<SUNSET) ? SUNSET : ((t<SUNRISE)?SUNRISE:(1+SUNRISE));   // gündüz→gün batımı · gece→sonraki gün doğumu
+  let dg=target-t; if(dg<0) dg+=1; return Math.max(10, dg*DAY_LEN); }
+function hostUntilLabel(){ const day=(gameTime>=0.24 && gameTime<0.72); return day ? (tU('host_eve')||'akşama kadar') : (tU('host_morn')||'sabaha kadar'); }
+function spawnAngelHost(){ buildAngelHost(); hostStart=Date.now(); hostUntil=Date.now()+hostDurationSec()*1000; if(player) angelHost.position.set(player.position.x,0,player.position.z); }
 function updateAngelHost(dt){ if(!angelHost) return;
   const active=hostUntil>Date.now() && !!player;
   if(!active){ if(angelHost.visible){ angelHost.visible=false; if(angelHost.userData.light) angelHost.userData.light.intensity=0; } return; }
-  angelHost.visible=true; const t=clock.elapsedTime;
+  angelHost.visible=true; const t=clock.elapsedTime, L=(a,b,e)=>a+(b-a)*e;
   angelHost.position.x += (player.position.x-angelHost.position.x)*Math.min(1,dt*4);
   angelHost.position.z += (player.position.z-angelHost.position.z)*Math.min(1,dt*4);
-  angelHost.rotation.y += dt*0.5;                                        // yavaş dönen ışık halkası
-  const rem=(hostUntil-Date.now())/1000, fade=rem<1.5?Math.max(0,rem/1.5):1;
-  angelHost.scale.setScalar(0.7+0.35*fade);
+  const elapsed=(Date.now()-hostStart)/1000, rem=(hostUntil-Date.now())/1000;
+  const revealK=Math.min(1,elapsed/1.2);                                   // giriş: hızlı belir
+  const canopyK=Math.max(0,Math.min(1,(elapsed-5)/2.5));                    // 5-7.5sn: yakın halka → yüksek nazik KANOPİye çıkar (akşama/sabaha dek eşlik)
+  const fade=rem<2.5?Math.max(0,rem/2.5):1;                                 // son 2.5sn süzülerek söner
+  angelHost.position.y = L(0, 3.2, canopyK);                               // grup yükselir (kanopi, oyunu kapatmaz)
+  angelHost.scale.setScalar(L(0.75,0.5,canopyK) * (0.35+0.65*revealK) * (0.45+0.55*fade));
+  angelHost.rotation.y += dt*(0.5 - canopyK*0.34);                          // kanopide daha yavaş döner
   for(const h of hostAngels){ h.m.position.y = 3.4 + Math.sin(t*2+h.a*3)*0.35; }
-  if(angelHost.userData.light) angelHost.userData.light.intensity=(1.8+Math.sin(t*4)*0.5)*fade;
+  if(angelHost.userData.light) angelHost.userData.light.intensity=(L(1.9,0.85,canopyK)+Math.sin(t*4)*0.35)*fade;
 }
 // ---- MODERN KOMŞULAR: meydanda dolaşan kişiler; selâmlaşınca karşılıklı tek-el selâm ----
 let modernNeighborsBuilt=false;
