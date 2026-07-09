@@ -541,7 +541,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.63</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.64</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1493,6 +1493,7 @@ const UI_STR={ en:{
   sc_title_a:'🏅 Title: ', sc_title_toast_a:'🏅 ', sc_title_toast_b:' title: «', sc_title_toast_c:'» — +', sc_title_toast_d:' nur',
   sc_ledger_a:'📖 ', sc_ledger_b:' ledger: case #', sc_ledger_c:' solved',
   disc_sabr:'💪 Your strong, disciplined body resisted the ego — it blessed your patience.',
+  disc_haram:'💪 Your strong, disciplined will resisted the forbidden — it blessed your light.',
   nur_suffix:' nur',
   // --- Faz 3: Umre (renderHac) ---
   hac_ihram_title:'Ihram & Intention',
@@ -1700,6 +1701,7 @@ ar:{
   sc_title_a:'🏅 لقب: ', sc_title_toast_a:'🏅 ', sc_title_toast_b:' لقب: «', sc_title_toast_c:'» — +', sc_title_toast_d:' نور',
   sc_ledger_a:'📖 ', sc_ledger_b:' دفتر: القضية #', sc_ledger_c:' حُلّت',
   disc_sabr:'💪 بدنك القويّ المنضبط قاوم هوى النفس — فبارك في صبرك.',
+  disc_haram:'💪 إرادتك القويّة المنضبطة قاومت الحرام — فبارك في نورك.',
   // Mescid paneli (m_*) + aksiyonları (ma_*) — Faz 6.15; âyet ASIL Arapça (mushaf lafzı)
   m_next_prayer:'⏳ الصلاة القادمة: ',
   m_cuma_desc:'اليومُ جُمُعة. تُلقى الخطبة — أنصِت بسكينة، ثم صلِّ ركعتين مع الجماعة. <i>﴿إِذَا نُودِيَ لِلصَّلَاةِ مِن يَوْمِ الْجُمُعَةِ فَاسْعَوْا إِلَىٰ ذِكْرِ اللَّهِ﴾</i> (الجمعة ٩)',
@@ -3147,6 +3149,8 @@ function openWalletEvent(rec){ const M=moWallet();
     { l:M.keep, act:()=>{ S.walletCd=Date.now()+WALLET_CD; save(); toast(M.keepd); if(typeof dismissGuardian==='function') dismissGuardian(); despawnModernWallet(); if(typeof closeDialog==='function') closeDialog(); } }   // emanete hıyanet → melek ayrılır
   ] } }});
 }
+// DİSİPLİN BONUSU: güçlü/disiplinli beden-irade nefse (sabır) ve harama direnişte daha güçlü → +0..6 bereket (kondisyonla ölçekli)
+function discBonus(){ return Math.round((S.fitness||0)/100*6); }
 // ---- HARAMDAN KAÇINMA: FAİZLİ BANKA (uzak dur) ----
 const BANKA_EV={ tr:{ t:'Banka', who:'Gişede…', x:'Bu banka <b>faizli (ribâ)</b> işlem yapıyor; faizsiz bir seçenek de sunmuyor. Ne yaparsın?', ref:'«Allah alışverişi helâl, faizi (ribâyı) haram kıldı.» (Bakara 2/275)', avoid:'🚫 Faizden uzak dur, çık', enter:'Yine de faizli hesap aç', avoidd:'Faizsiz olmadığı için uzak durdun — haramdan sakınmak nûrdur (+15 nûr).', enterd:'Faiz bereketi götürür; düştüğün şüpheden huzursuzsun.' },
   en:{ t:'Bank', who:'At the counter…', x:'This bank deals in <b>interest (riba)</b> and offers no interest-free option. What do you do?', ref:'«Allah has permitted trade and forbidden interest (riba).» (al-Baqara 2/275)', avoid:'🚫 Avoid interest, leave', enter:'Open an interest account anyway', avoidd:'You stayed away because it was not interest-free — guarding against the forbidden is light (+15 nur).', enterd:'Interest strips away blessing; the doubt you fell into leaves you uneasy.' },
@@ -3154,7 +3158,7 @@ const BANKA_EV={ tr:{ t:'Banka', who:'Gişede…', x:'Bu banka <b>faizli (ribâ)
 function moBanka(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return BANKA_EV[L]||BANKA_EV.tr; }
 function openBankaEvent(rec){ const M=moBanka();
   openDialog({ ic:'🏦', title:M.t, start:'s0', steps:{ s0:{ who:M.who, txt:M.x, ref:M.ref, opts:[
-    { l:M.avoid, act:()=>{ addNur(15); save(); refreshHUD(); sndChime(); banner('🚫 '+M.t+' — +15'+(tU('nur_suffix')||' nûr')); setTimeout(()=>toast(M.avoidd),400); if(typeof closeDialog==='function') closeDialog(); } },
+    { l:M.avoid, act:()=>{ const d=discBonus(); addNur(15+d); save(); refreshHUD(); sndChime(); banner('🚫 '+M.t+' — +'+(15+d)+(tU('nur_suffix')||' nûr')+(d>0?' · 💪':'')); setTimeout(()=>toast(M.avoidd),400); if(d>0) setTimeout(()=>toast(tU('disc_haram')||'💪 Güçlü/disiplinli iraden harama direndi — nûruna bereket kattı'),950); if(typeof closeDialog==='function') closeDialog(); } },
     { l:M.enter, act:()=>{ toast(M.enterd); if(typeof dismissGuardian==='function') dismissGuardian(); if(typeof closeDialog==='function') closeDialog(); } }   // faizli hesap → melek ayrılır
   ] } }});
 }
@@ -3174,7 +3178,7 @@ const JOBS={ tr:{ t:'İş İlanları', intro:'Geçimini <b>helâlden</b> ara. He
     halal:{ btn:'🔨 تجارة/حرفة أمينة', who:'المُعلّم', x:'حرفةٌ أمينةٌ بعرق الجبين، بلا غش. تحتاج جهدًا وصبرًا — لكنها حلالٌ طيّب.', ref:'«ما أكل أحدٌ طعامًا أطيبَ من عمل يده.» (البخاري)', do:'💪 اعمل واكسِب من الحلال', done:'كسبتَ بعرق الجبين (+٨ دراهم، +٦ نور).', cd:'بذلتَ جهدك لهذا اليوم — استرِح قليلًا ثم تابع.' } } };
 function moJobs(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return JOBS[L]||JOBS.tr; }
 function openJobBoard(rec){ const J=moJobs(); const onCd=()=>S.jobCd&&Date.now()<S.jobCd;
-  const refuse=(k)=>()=>{ if(!onCd()){ addNur(15); S.jobCd=Date.now()+HALAL_JOB_CD; save(); refreshHUD(); sndChime(); banner('🚫 +15'+(tU('nur_suffix')||' nûr')); } setTimeout(()=>toast(J[k].nod),300); };
+  const refuse=(k)=>()=>{ if(!onCd()){ const d=discBonus(); addNur(15+d); S.jobCd=Date.now()+HALAL_JOB_CD; save(); refreshHUD(); sndChime(); banner('🚫 +'+(15+d)+(tU('nur_suffix')||' nûr')+(d>0?' · 💪':'')); if(d>0) setTimeout(()=>toast(tU('disc_haram')||'💪 Güçlü/disiplinli iraden harama direndi — nûruna bereket kattı'),850); } setTimeout(()=>toast(J[k].nod),300); };
   const sub=(k)=>({ who:J[k].who, txt:J[k].x, ref:J[k].ref, opts:[
     { l:J[k].no, act:refuse(k), go:'s0' }, { l:J[k].yes, act:()=>{ toast(J[k].yesd); if(typeof dismissGuardian==='function') dismissGuardian(); }, go:'s0' }, { l:J.back, go:'s0' } ] });   // haram işi kabul → melek ayrılır
   openDialog({ ic:'💼', title:J.t, start:'s0', steps:{
@@ -3474,7 +3478,7 @@ const SABIR_EVENTS={ tr:[
 function openSabirEvent(rec){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; const pool=SABIR_EVENTS[L]||SABIR_EVENTS.tr;
   let i; do{ i=Math.floor(Math.random()*pool.length); }while(pool.length>1 && i===_sabirLast); _sabirLast=i; const ev=pool[i];
   openDialog({ ic:ev.ic, title:(tU('mo_durak')||'Otobüs Durağı')+' · '+ev.who, start:'s0', steps:{ s0:{ who:ev.who, txt:ev.x, ref:ev.ref, opts:[
-    { l:ev.p, act:()=>{ if(!(S.sabirCd&&Date.now()<S.sabirCd)){ const disc=Math.round((S.fitness||0)/100*6); addNur(15+disc); S.sabirCd=Date.now()+SABIR_CD; save(); refreshHUD(); sndChime(); banner('⏳ +'+(15+disc)+(tU('nur_suffix')||' nûr')+(disc>0?' · 💪':'')); if(disc>0) setTimeout(()=>toast((tU('disc_sabr')||'💪 Güçlü/disiplinli bedenin nefse direndi — sabrına bereket kattı')),700); } setTimeout(()=>toast(ev.pd),350); if(typeof closeDialog==='function') closeDialog(); } },
+    { l:ev.p, act:()=>{ if(!(S.sabirCd&&Date.now()<S.sabirCd)){ const disc=discBonus(); addNur(15+disc); S.sabirCd=Date.now()+SABIR_CD; save(); refreshHUD(); sndChime(); banner('⏳ +'+(15+disc)+(tU('nur_suffix')||' nûr')+(disc>0?' · 💪':'')); if(disc>0) setTimeout(()=>toast((tU('disc_sabr')||'💪 Güçlü/disiplinli bedenin nefse direndi — sabrına bereket kattı')),700); } setTimeout(()=>toast(ev.pd),350); if(typeof closeDialog==='function') closeDialog(); } },
     { l:ev.i, act:()=>{ toast(ev.id); if(typeof dismissGuardian==='function') dismissGuardian(); if(typeof closeDialog==='function') closeDialog(); } }   // sabırsızlık/öfke → melek ayrılır
   ] } }});
 }
