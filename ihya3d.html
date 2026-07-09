@@ -462,7 +462,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.32</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.33</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1907,13 +1907,16 @@ for(let i=0;i<WORLD.islands.length-1;i++){
   if(A.side||B.side) continue;   // yan (side) adalar ana köprü hattına dahil değil
   WORLD.bridges.push({ a:[A.c[0]+A.r-0.7, A.c[1]], b:[B.c[0]-B.r+0.7, B.c[1]], w:2.0, isl:[A.id,B.id] });
 }
-// Atölye yan köprüsü: Hurma Bahçesi güneyi ↔ Atölye kuzeyi (Z yönü; köprü render'ı rastgele yönü destekler)
-WORLD.bridges.push({ a:[16.5,-6.3], b:[16.5,-8.7], w:2.0, isl:['bahce','atolye'] });
-// Sadaka Bahçesi yan köprüsü: Hâne kuzeyi ↔ Sadaka güneyi
-WORLD.bridges.push({ a:[0,-7.3], b:[0,-9.3], w:2.0, isl:['ev','sadaka'] });
-// Genişletme bahçe köprüleri (batıya zincir; satın alınınca açılır/görünür)
-WORLD.bridges.push({ a:[-6.3,-15], b:[-8.7,-15], w:2.0, isl:['sadaka','sadaka2'], garden:true });
-WORLD.bridges.push({ a:[-21.3,-15], b:[-23.7,-15], w:2.0, isl:['sadaka2','sadaka3'], garden:true });
+// YAN-ADA KÖPRÜSÜ: uçlar HER İKİ adanın yürünebilir alanına GİRSİN (su boşluğu/takılma olmasın) — herhangi yön.
+// (Eski elle-girilen koordinatlar garden köprülerinde adanın 0.3 DIŞINDA kalıyordu → satın alınan adaya geçilemiyordu.)
+function sideBridge(idA,idB,garden){ const A=WORLD.islands.find(i=>i.id===idA), B=WORLD.islands.find(i=>i.id===idB); if(!A||!B) return;
+  const dx=B.c[0]-A.c[0], dz=B.c[1]-A.c[1], L=Math.hypot(dx,dz)||1, ux=dx/L, uz=dz/L, o=0.9;   // 0.9 = ada içine girme (yürünebilir kenar r-0.5'in içi)
+  const br={ a:[A.c[0]+ux*(A.r-o), A.c[1]+uz*(A.r-o)], b:[B.c[0]-ux*(B.r-o), B.c[1]-uz*(B.r-o)], w:2.4, isl:[idA,idB] };
+  if(garden) br.garden=true; WORLD.bridges.push(br); }
+sideBridge('bahce','atolye');           // Hurma Bahçesi ↔ Atölye
+sideBridge('ev','sadaka');              // Hâne ↔ Sadaka Bahçesi
+sideBridge('sadaka','sadaka2',true);    // genişletme (satın alınınca açılır)
+sideBridge('sadaka2','sadaka3',true);
 const SADAKA_CAP=12, MAX_GARDEN_BUY=2;   // her bahçe adası ~12 eser; en çok 2 ek ada
 function sadakaCost(){ return 200*Math.pow(2,(S.sadakaBought||0)); }   // 200, 400 (diğer hayırlardan çok pahalı)
 function gardenIslands(){ const g=['sadaka']; if((S.sadakaBought||0)>=1) g.push('sadaka2'); if((S.sadakaBought||0)>=2) g.push('sadaka3'); return g; }
