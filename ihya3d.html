@@ -539,7 +539,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.59</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.60</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1876,9 +1876,19 @@ const VAKIT=[[0.20,'Gece','☾'],[0.27,'Fecir','☾'],[0.45,'Kuşluk','☀'],[0.
 function vakitOf(t){ for(const v of VAKIT){ if(t<v[0]) return v; } return VAKIT[VAKIT.length-1]; }
 function isNight(){ return gameTime<0.24 || gameTime>=0.72; }
 let lastVakit=null;
+// ZAMAN DURSUN: panel/diyalog/iç-mekân/mescit açıkken vakit akışı ve ihtiyaçlar donar
+// (kullanıcı: nereye girersek girelim zaman dursun — namaza acele ettirmemek, ilim/etkinliğe vakit tanımak için)
+function timeFrozen(){
+  if(introMode||hacMode) return false;                                        // özel sekanslar kendi akışını yönetir
+  if(inHome||mosqueMode) return true;                                          // evin içi / mescit
+  if(document.querySelector('.veil.show')) return true;                        // açık panel/diyalog (market·pazar·hayır·imtihan·ev-aksiyon·ilim meclisi…)
+  const tut=document.getElementById('tut'); if(tut && getComputedStyle(tut).display!=='none') return true;   // tutorial
+  return false;
+}
 function updateDayNight(dt){
-  gameTime=(gameTime+dt/DAY_LEN)%1;
-  if(dt>0 && gameTime<lastGT-0.5) onNewDay();   // gün/gece döngüsü tamamlandı → yeni gün
+  const adv = timeFrozen() ? 0 : dt;                                            // panel/iç-mekân açıkken vakit ilerlemez
+  gameTime=(gameTime+adv/DAY_LEN)%1;
+  if(adv>0 && gameTime<lastGT-0.5) onNewDay();   // gün/gece döngüsü tamamlandı → yeni gün
   lastGT=gameTime;
   const s=dnSample(gameTime);
   scene.background.copy(s.sky); if(scene.fog) scene.fog.color.copy(s.sky);
@@ -3694,6 +3704,7 @@ const THIRST_RATE=0.14, HUNGER_RATE=0.095, TOILET_RATE=0.07;   // /sn (susuzluk 
 let needsAcc=0, thirstWarned=false, hungerWarned=false, toiletWarned=false;
 function fastingAbstain(){ return fastPhase()==='fasting'; }   // oruçluyken yeme/içme yok (iftara kadar) — tuvalet/abdest serbest
 function updateNeeds(dt){
+  if(timeFrozen()) dt=0;                                    // zaman donduysa ihtiyaçlar da ilerlemez (panel/iç-mekân)
   S.thirst=Math.min(100, S.thirst + THIRST_RATE*dt);
   S.hunger=Math.min(100, S.hunger + HUNGER_RATE*dt);
   S.toilet=Math.min(100, (S.toilet||0) + TOILET_RATE*dt);
