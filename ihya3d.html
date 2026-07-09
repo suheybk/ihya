@@ -520,6 +520,7 @@
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
   <button class="iconbtn" id="scenBtn" title="Senaryo Defteri — sulh · adalet · emanet meseleleri">📜</button>
   <button class="iconbtn" id="modernBtn" title="İhya — Bugün (modern şehir)" style="display:none">🏙️</button>
+  <button class="iconbtn" id="cumaBtn" title="Cuma Sünnetleri (gusül · koku · Kehf…)" style="display:none">🌿</button>
   <button class="iconbtn" id="shotBtn" title="Ekran görüntüsü kaydet / paylaş (P)">📷</button>
   <button class="iconbtn" id="helpBtn" title="Nasıl oynanır?">❓</button>
   <button class="iconbtn" id="settingsBtn" title="Ayarlar (kontroller · ses · dil)">⚙️</button>
@@ -539,7 +540,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.60</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.61</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -593,6 +594,16 @@
       <button class="cl" id="gPrev" style="flex:1;margin:0">◀ Geri</button>
       <button class="do" id="gNext" style="flex:2;margin:0">Sonraki ▶</button>
     </div>
+  </div>
+</div>
+
+<div class="veil" id="cuma">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="exhead"><h3 data-i18n="hd_cuma">🌿 Cuma Sünnetleri</h3><span class="exprog"><b id="cumaProg">0/6</b></span></div>
+    <div class="sub" data-i18n="cuma_sub" style="margin-bottom:10px">Cuma, günlerin efendisi. Gusül, temizlik, güzel koku ve Kehf sûresi ile Cuma'yı ihyâ et — iki Cuma arası bağışlanır. (Buhârî)</div>
+    <div id="cumaList"></div>
+    <button class="cl" data-i18n="u_close" id="cumaClose">Kapat</button>
   </div>
 </div>
 
@@ -1425,6 +1436,7 @@ const UI_STR={ en:{
   guard_leave:'🕊️ You did wrong — the guarding angel left your side', guard_leave_ref:'«When a servant sins, a black spot is placed on his heart; if he repents and desists, his heart is polished.» (Tirmidhi — hasan)',
   shot_saved:'📷 Screenshot saved', shot_share:'İhya — revive your world · ihyagame.com', shot_fail:'📷 Could not capture', set_shot:'📷 Screenshot / share',
   host_eve:'until the evening', host_morn:'until the morning', home_enter:'You entered your home — find peace',
+  hd_cuma:'🌿 Friday Sunnahs', cuma_sub:'Friday is the master of days. Revive it with ghusl, cleanliness, fragrance and Surah al-Kahf — forgiveness between the two Fridays. (Bukhari)', cuma_do:'🌿 Done', cuma_notfri:'🌿 These sunnahs are special to Friday', cuma_full:'🌿 You completed the Friday sunnahs — blessing! (+10)',
   hd_settings:'⚙️ Settings', set_controls_h:'🎮 Controls', set_move:'Move (direction keys)', set_act:'Interact · advance dialog', set_esc:'Close panel / go back', set_nums:'Action bar: prayer·water·food·wudu·fast·memorize·satchel·charity·cases·qibla', set_mc:'M map · C modern city', set_touch:'Touch: joystick + 🔘 action button', set_prefs_h:'Preferences', spacekey_s:'Space', set_sound:'🔊 Sound', set_guide:'💡 Guide light', set_lang:'🌐 Language', set_on:'On', set_off:'Off',
   u_close:'Close', u_dirhem:'dirhams', u_meselesuf:'cases', u_steps:'📖 Show steps',
   scen_sub:'Solve Medina\'s cases: judge with justice, reconcile the estranged, deliver the trust. Each case leads to a title.',
@@ -1595,6 +1607,7 @@ ar:{
   guard_leave:'🕊️ أخطأتَ — فارقك الملَكُ الحافظ', guard_leave_ref:'«إنّ العبد إذا أذنب نُكتت في قلبه نكتةٌ سوداء، فإن تاب ونزع صُقل قلبه.» (الترمذي — حسن)',
   shot_saved:'📷 حُفظت لقطة الشاشة', shot_share:'إحياء — أحيِ عالمك · ihyagame.com', shot_fail:'📷 تعذّر الالتقاط', set_shot:'📷 لقطة شاشة / مشاركة',
   host_eve:'حتى المساء', host_morn:'حتى الصباح', home_enter:'دخلتَ بيتك — تجد السكينة',
+  hd_cuma:'🌿 سُنن الجمعة', cuma_sub:'الجمعةُ سيّدُ الأيام. أحيِها بالغُسل والنظافة والطِّيب وسورة الكهف — يُغفر لك ما بين الجمعتين. (البخاري)', cuma_do:'🌿 فعلتُ', cuma_notfri:'🌿 هذه السُّنن خاصّةٌ بيوم الجمعة', cuma_full:'🌿 أتممتَ سُنن الجمعة — بركة! (+10)',
   hd_settings:'⚙️ الإعدادات', set_controls_h:'🎮 التحكّم', set_move:'الحركة (مفاتيح الاتجاه)', set_act:'التفاعل · متابعة الحوار', set_esc:'إغلاق اللوحة / رجوع', set_nums:'شريط الإجراءات: صلاة·ماء·طعام·وضوء·صوم·حفظ·جَعبة·صدقة·قضايا·قبلة', set_mc:'M الخريطة · C المدينة العصرية', set_touch:'اللمس: عصا التحكّم + زر 🔘', set_prefs_h:'التفضيلات', spacekey_s:'المسافة', set_sound:'🔊 الصوت', set_guide:'💡 ضوء الإرشاد', set_lang:'🌐 اللغة', set_on:'مُفعّل', set_off:'مُغلق',
   hd_hayir:'🤲 نبع الخير', hd_hac:'🕋 العُمرة', hd_ezber:'📖 دفتر الحِفظ',
   u_close:'إغلاق', u_dirhem:'دراهم', u_meselesuf:'قضايا', u_steps:'📖 اعرض الخطوات',
@@ -2996,10 +3009,11 @@ const MODERN_BLD={ tr:{
   market:{t:'السوق · البقالة'}, banka:{t:'المصرف (البنك)'}, durak:{t:'موقف الحافلة'}, klinik:{t:'العيادة · عيادة المريض'},
 } };
 function moBld(k){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return (MODERN_BLD[L]&&MODERN_BLD[L][k])||MODERN_BLD.tr[k]; }
-function modernBldNm(rec){ if(rec.modern==='wallet') return moWallet().t; if(rec.modern==='komsu') return tU('mo_greet_lbl')||'Selâm ver'; return moBld(rec.modern).t; }
+function modernBldNm(rec){ if(rec.modern==='wallet') return moWallet().t; if(rec.modern==='komsu') return tU('mo_greet_lbl')||'Selâm ver'; if(rec.modern==='dilenci') return tU('dl_title')||'Bir Muhtaç'; return moBld(rec.modern).t; }
 function openModernBuilding(rec){
   if(rec.modern==='ev'){ enterHome(); return; }                 // EV: girilebilir oda (içeride seccade·yatak·kanepe·rahle·mutfak + kapıda çıkış duası)
   if(rec.modern==='klinik'){ openHastaZiyareti(rec); return; }   // KLİNİK: hasta ziyareti → 70.000 melek (Tirmizî)
+  if(rec.modern==='dilenci'){ const t=S.gather['dilenci']; if(t&&Date.now()<t){ toast(tU('dl_justgave')||'🤲 Az önce verdin — biraz sonra tekrar.'); return; } openDialog(dlgDilenci()); return; }   // modern dilenci → gizli sadaka
   if(rec.modern==='market'){ openModernMarket(rec); return; }   // Faz B: market/manav/bakkal alışveriş paneli
   if(rec.modern==='wallet'){ openWalletEvent(rec); return; }    // modern olay: bulunan cüzdan (emanet)
   if(rec.modern==='banka'){ openBankaEvent(rec); return; }      // haramdan kaçınma: faizli banka (uzak dur)
@@ -3389,6 +3403,16 @@ function greetModernNeighbor(rec){ const now=Date.now();
   rec.greetCd=now+60000; addNur(1); dgBump('m_greet'); save(); sndChime();
   toast(tU('mo_greet_toast')||'✋ Selâm verdin — «Selâmı aranızda yayın ki birbirinizi sevesiniz.» (Müslim)');
 }
+// ---- MODERN DİLENCİ: sokak kenarında bir muhtaç → gizli sadaka (Medine dlgDilenci reuse) ----
+let modernBeggarBuilt=false;
+function spawnModernBeggar(){ if(modernBeggarBuilt) return; modernBeggarBuilt=true;
+  const ox=MODERN_ORIGIN[0], oz=MODERN_ORIGIN[2], bx=ox-15, bz=oz+21;   // meydan kenarı (market yakını), duvar dibi
+  let it; try{ it=instance('beggar'); }catch(e){ try{ it=instance('neighbor'); }catch(e2){ return; } }
+  if(typeof tintNpc==='function') tintNpc(it.g,'beggar');
+  it.g.position.set(bx,0,bz); it.g.rotation.order='YXZ'; it.g.rotation.y=Math.PI*0.15; it.g.scale.setScalar(1.8); scene.add(it.g);
+  const rec={ modern:'dilenci', q:{id:'m_dilenci', pos:[bx,0,bz+1.7], nm:'', ic:'🤲'}, g:it.g, meshes:it.meshes, reach:2.9 };
+  modernRecs.push(rec); interactables.push(rec);
+}
 // ---- MODERN OLAY: SABIR İMTİHANLARI (otobüs/sıra/trafik — günlük hayatta sabır) ----
 const SABIR_CD=150000; let _sabirLast=-1;
 const SABIR_EVENTS={ tr:[
@@ -3483,6 +3507,7 @@ function enterModern(){
   camera.position.copy(player.position).add(CAM_OFF); wake(); hacFade();
   banner('🏙️ '+(tU('mo_enter')||'İhya — Bugün: şehrine döndün')); updateModernBtn();
   spawnModernNeighbors();   // meydanda dolaşan komşular (selâmlaşma)
+  spawnModernBeggar();      // sokak kenarında bir muhtaç → gizli sadaka
   buildBus();   // şehir çevresinde dolaşan gerçek otobüs (durakta durur, komşular biner)
   spawnModernWallet();   // modern olay: cooldown geçtiyse cüzdan belirir
   if(!S.modernJobAsked) setTimeout(openJobAsk, 900);
@@ -4461,6 +4486,50 @@ function renderSettings(){ const p=document.getElementById('setPrefs'); if(!p) r
 }
 function openSettings(){ audio(); renderSettings(); document.getElementById('settings').classList.add('show'); }
 function closeSettings(){ document.getElementById('settings').classList.remove('show'); }
+// 🌿 CUMA SÜNNETLERİ — Cuma günü gusül·temizlik·koku·Kehf → bonus nûr (günde bir, iki Cuma arası bağışlanır)
+const CUMA_ACTS={ tr:[
+  {id:'ghusl', ic:'🚿', nm:'Gusül abdesti al', nur:6, ref:'«Cuma günü gusletmek bulûğa ermiş herkese (te\'kitli sünnet/vâciptir).» (Buhârî · Müslim)'},
+  {id:'clean', ic:'👕', nm:'Temiz, güzel elbise giy', nur:3, ref:'«Sizden birinin iş elbisesinden başka Cuma için iki elbise edinmesinde ne zarar var!» (İbn Mâce · Ebû Dâvûd)'},
+  {id:'nail',  ic:'✂️', nm:'Tırnaklarını kes', nur:3, ref:'Cuma günü temizlik ve bakım sünnettir; selef Cuma\'dan önce tırnaklarını keser, temizlenirdi.'},
+  {id:'comb',  ic:'💈', nm:'Saç ve sakalını tara', nur:3, ref:'«Kimin saçı varsa ona ikram etsin (bakımını yapsın).» (Ebû Dâvûd)'},
+  {id:'scent', ic:'🌹', nm:'Güzel koku sürün', nur:4, ref:'«Cuma günü gusleden, elinden geldiğince temizlenen, yağ/koku sürünen… iki Cuma arası bağışlanır.» (Buhârî)'},
+  {id:'kahf',  ic:'📖', nm:'Kehf sûresini oku', nur:12, ref:'«Kim Cuma günü Kehf sûresini okursa, iki Cuma arasında nûr ile aydınlanır.» (Hâkim · Beyhakî — sahîh/hasen)'},
+], en:[
+  {id:'ghusl', ic:'🚿', nm:'Perform ghusl (full bath)', nur:6, ref:'«Ghusl on Friday is (an emphasized sunnah/obligation) upon every adult.» (Bukhari · Muslim)'},
+  {id:'clean', ic:'👕', nm:'Wear clean, fine clothes', nur:3, ref:'«What harm is there if one of you gets two garments for Friday besides his work clothes!» (Ibn Majah · Abu Dawud)'},
+  {id:'nail',  ic:'✂️', nm:'Trim your nails', nur:3, ref:'Cleanliness and grooming on Friday is a sunnah; the pious would trim nails and cleanse before Friday.'},
+  {id:'comb',  ic:'💈', nm:'Comb hair and beard', nur:3, ref:'«Whoever has hair, let him honour it (care for it).» (Abu Dawud)'},
+  {id:'scent', ic:'🌹', nm:'Apply a nice fragrance', nur:4, ref:'«Whoever bathes on Friday, purifies as much as he can, applies oil/perfume… is forgiven between the two Fridays.» (Bukhari)'},
+  {id:'kahf',  ic:'📖', nm:'Read Surah al-Kahf', nur:12, ref:'«Whoever reads Surah al-Kahf on Friday, a light shines for him between the two Fridays.» (Hakim · Bayhaqi — sahih/hasan)'},
+], ar:[
+  {id:'ghusl', ic:'🚿', nm:'اغتسل (غُسل الجمعة)', nur:6, ref:'«غُسلُ يومِ الجمعة واجبٌ على كلِّ محتلم.» (البخاري · مسلم)'},
+  {id:'clean', ic:'👕', nm:'البس ثوبًا نظيفًا حسنًا', nur:3, ref:'«ما على أحدكم إن وجد أن يتّخذ ثوبين ليوم الجمعة سوى ثوبَي مهنته!» (ابن ماجه · أبو داود)'},
+  {id:'nail',  ic:'✂️', nm:'قلّم أظفارك', nur:3, ref:'النظافةُ والتزيُّن يوم الجمعة سنّة؛ كان السلفُ يقلّمون الأظفار ويتنظّفون قبل الجمعة.'},
+  {id:'comb',  ic:'💈', nm:'سرِّح شعرك ولحيتك', nur:3, ref:'«من كان له شعرٌ فليُكرمه.» (أبو داود)'},
+  {id:'scent', ic:'🌹', nm:'تطيّب بأطيب طيبك', nur:4, ref:'«من اغتسل يوم الجمعة وتطهّر ما استطاع ومسّ من طيب… غُفر له ما بين الجمعتين.» (البخاري)'},
+  {id:'kahf',  ic:'📖', nm:'اقرأ سورة الكهف', nur:12, ref:'«من قرأ سورة الكهف يوم الجمعة أضاء له من النور ما بين الجمعتين.» (الحاكم · البيهقي — صحيح/حسن)'},
+] };
+function cumaData(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return CUMA_ACTS[L]||CUMA_ACTS.tr; }
+function cumaReset(){ const d=S.dayNum||0; if(S.cumaDay!==d){ S.cumaDay=d; S.cumaActs={}; } }
+function renderCuma(){ cumaReset(); const acts=cumaData(); const w=document.getElementById('cumaList'); if(!w) return; w.innerHTML='';
+  let done=0; if(!S.cumaActs) S.cumaActs={};
+  for(const a of acts){ const on=!!S.cumaActs[a.id]; if(on) done++;
+    const card=document.createElement('div'); card.className='hcard';
+    card.innerHTML='<div class="hic">'+a.ic+'</div><div class="hbody"><div class="hnm">'+a.nm+' <span class="hcnt">'+(on?'✓':'✦'+a.nur)+'</span></div><div class="href">'+a.ref+'</div></div>'+
+      '<button class="hbuy'+(on?' off':'')+'">'+(on?(tU('q_done')||'Tamam ✓'):(tU('cuma_do')||'🌿 Yaptım'))+'</button>';
+    if(!on) card.querySelector('.hbuy').onclick=()=>doCumaAct(a.id);
+    w.appendChild(card); }
+  const pe=document.getElementById('cumaProg'); if(pe) pe.textContent=done+'/'+acts.length;
+}
+function doCumaAct(id){ cumaReset(); if(!isFriday()){ toast(tU('cuma_notfri')||'🌿 Bu sünnetler Cuma gününe mahsustur'); return; }
+  if(!S.cumaActs) S.cumaActs={}; if(S.cumaActs[id]) return;
+  const a=cumaData().find(x=>x.id===id); if(!a) return;
+  S.cumaActs[id]=true; addNur(a.nur); save(); refreshHUD(); sndChime(); banner('🌿 '+a.nm+' · +'+a.nur+(tU('nur_suffix')||' nûr')); renderCuma();
+  if(cumaData().every(x=>S.cumaActs[x.id]) && S.cumaFullDay!==(S.dayNum||0)){ S.cumaFullDay=(S.dayNum||0); addNur(10); save(); refreshHUD(); setTimeout(()=>{ banner('🌿 '+(tU('cuma_full')||'Cuma sünnetlerini tamamladın — bereket! (+10)')); sndFanfare(); },650); }
+}
+function openCuma(){ audio(); renderCuma(); document.getElementById('cuma').classList.add('show'); }
+function closeCuma(){ document.getElementById('cuma').classList.remove('show'); }
+function updateCumaBtn(){ const b=document.getElementById('cumaBtn'); if(b) b.style.display=isFriday()?'block':'none'; }
 // 📷 EKRAN GÖRÜNTÜSÜ — taze kareyi yakala + markalı alt şerit (nûr/rütbe + ihyagame.com) → paylaş/indir (reklam)
 function captureScreenshot(){
   try{
@@ -6348,6 +6417,9 @@ document.getElementById('muteBtn').onclick=()=>{ audio(); setMuted(!muted); };
 setMuted(muted);  // ilk ikon durumu (kayıtlı tercih)
 document.getElementById('hayirBtn').onclick=openHayir;
 document.getElementById('scenBtn').onclick=openScen;   // Senaryo Defteri artık AYRI (Hayır'dan bağımsız)
+document.getElementById('cumaBtn').onclick=openCuma;   // 🌿 Cuma Sünnetleri (sadece Cuma günü görünür)
+document.getElementById('cumaClose').onclick=closeCuma;
+document.getElementById('cuma').addEventListener('click',e=>{ if(e.target.id==='cuma') closeCuma(); });
 document.getElementById('shotBtn').onclick=captureScreenshot;   // 📷 ekran görüntüsü kaydet/paylaş
 document.getElementById('settingsBtn').onclick=openSettings;   // ⚙️ Ayarlar (kontroller + tercihler)
 document.getElementById('settingsClose').onclick=closeSettings;
@@ -6447,7 +6519,7 @@ actBtn.onclick=doAct;
 // Sayı tuşları → toolbar aksiyon/panel düğmeleri (sadece görünür/uygunsa); M harita, C modern şehir.
 // Space → dünyada etkileşim / diyalogda "devam". Esc → açık paneli kapat (geri dön). Mobilde dokunmatik düğmeler.
 const KEYMAP={ '1':'prayBtn','2':'drinkBtn','3':'eatBtn','4':'abdestBtn','5':'fastBtn','6':'ezberBtn','7':'invBtn','8':'hayirBtn','9':'scenBtn','0':'kibleBtn' };
-const OVERLAY_CLOSE={ dlg:closeDialog, veil:closeSheet, hayir:closeHayir, inv:closeInv, scen:closeScen, map:closeMap, market:closeMarket, ezber:closeEzber, settings:closeSettings, exam:closeExam, guide:closeGuide, profile:(typeof closeProfile==='function'?closeProfile:null), hacReg:closeHacReg };
+const OVERLAY_CLOSE={ dlg:closeDialog, veil:closeSheet, hayir:closeHayir, inv:closeInv, scen:closeScen, map:closeMap, market:closeMarket, ezber:closeEzber, settings:closeSettings, cuma:closeCuma, exam:closeExam, guide:closeGuide, profile:(typeof closeProfile==='function'?closeProfile:null), hacReg:closeHacReg };
 function tutOpen(){ const t=document.getElementById('tut'); return t && getComputedStyle(t).display!=='none'; }
 function anyOverlayOpen(){ return !!document.querySelector('.veil.show') || tutOpen(); }
 function closeTopOverlay(){
@@ -6554,6 +6626,7 @@ let _miniMapT=0;
 function refreshHUD(){
   document.getElementById('nur').textContent=S.nur;
   if(typeof updateModernBtn==='function') updateModernBtn();   // İhya BUGÜN butonu (Hac sonrası görünür)
+  if(typeof updateCumaBtn==='function') updateCumaBtn();       // 🌿 Cuma Sünnetleri butonu (sadece Cuma)
   const rk=document.getElementById('rank'); if(rk) rk.textContent=rankName(S.nur);
   const total=WORLD.islands.filter(i=>!i.side).length, done=WORLD.islands.filter(i=>!i.side&&S.conquered[i.id]).length;
   const pg=document.getElementById('prog'); if(pg) pg.style.width=(done/total*100)+'%';
