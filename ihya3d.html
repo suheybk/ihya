@@ -540,7 +540,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.61</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.62</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1361,6 +1361,8 @@ if(typeof S.jobCd!=='number') S.jobCd=0;         // modern iş (helâl kazanç/h
 if(typeof S.sabirCd!=='number') S.sabirCd=0;     // modern sabır olayı (otobüs/sıra/trafik) ödül cooldown (ms)
 if(!S.homeCd || typeof S.homeCd!=='object') S.homeCd={};   // modern EV rutini: aksiyon başına ödül cooldown (namaz/aile/ilim/şükür/dinlen)
 if(typeof S.hastaCd!=='number') S.hastaCd=0;     // modern KLİNİK hasta ziyareti ödül cooldown (ms)
+if(typeof S.fitness!=='number') S.fitness=0;     // KONDİSYON/disiplin 0..100 (spor salonu artırır, her gün azıcık düşer)
+if(typeof S.gymCd!=='number') S.gymCd=0;         // spor salonu antrenman cooldown (ms)
 const save=()=>{ try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){} };
 const today=()=>new Date().toISOString().slice(0,10);
 const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
@@ -1829,7 +1831,9 @@ function checkStreak(){
 // GÜN GEÇİŞİ: her gün/gece döngüsü tamamlanınca (gameTime 1→0 sarması) çağrılır.
 // Görevler tekrar açılır; fethedilen adalar (conquered) kalıcı, nûr birikir.
 function onNewDay(){
-  S.dayNum=(S.dayNum||0)+1; S.done={}; S.dg={prog:0,done:false}; _dgSig=''; save();
+  S.dayNum=(S.dayNum||0)+1; S.done={}; S.dg={prog:0,done:false}; _dgSig='';
+  S.fitness=Math.max(0,(S.fitness||0)-6);   // kondisyon her gün azıcık düşer → süreklilik/disiplin ister (spor salonu)
+  save();
   interactables.forEach(r=>{ if(!r.exam&&!r.gather&&!r.animal&&!r.npc&&!r.muahat&&!r.scenario&&!r.market&&!r.mosque&&!r.seccadePickup&&!r.station&&!r.modern&&!r.home) r.done=false; });
   applyIslandLock(); refreshHUD();
   weeklyJustice();   // haftalık: muhtaç ihmali → mutsuzluk → şehir olayları
@@ -2947,7 +2951,7 @@ function buildModern(){
   const defs=[ {kind:'cami',ic:'🕌',bx:ox,bz:oz},
     {kind:'market',ic:'🛒',bx:ox,bz:oz+34}, {kind:'durak',ic:'🚌',bx:ox,bz:oz+40},
     {kind:'ev',ic:'🏢',bx:ox-34,bz:oz}, {kind:'banka',ic:'🏦',bx:ox+34,bz:oz},
-    {kind:'klinik',ic:'🏥',bx:ox-24,bz:oz+24},
+    {kind:'klinik',ic:'🏥',bx:ox-24,bz:oz+24}, {kind:'gym',ic:'🏋️',bx:ox+24,bz:oz+24},
     {kind:bldKind,ic:(bldKind==='okul'?'🏫':'💼'),bx:ox,bz:oz-34} ];
   for(const d of defs){
     if(d.kind==='ev'){ g.add(mkBox(6,11,6,0xcdb892,d.bx,5.5,d.bz));
@@ -2976,6 +2980,10 @@ function buildModern(){
       for(let wx=-3;wx<=3;wx+=1.6) for(let fy=2;fy<5;fy+=2) g.add(mkBox(1.1,1.1,0.12,0x8fc7e0,d.bx+wx,fy,d.bz+3.56));   // camlar
       g.add(mkBox(2,2.6,0.16,0x5b3f27,d.bx,1.3,d.bz+3.56));                          // kapı
       const cres=new THREE.Mesh(new THREE.TorusGeometry(0.75,0.2,10,22,4.3), new THREE.MeshStandardMaterial({color:0xd9534f,emissive:0x7a2a27,emissiveIntensity:0.35})); cres.position.set(d.bx,5.05,d.bz+3.62); cres.rotation.z=-0.7; g.add(cres); }   // kırmızı hilâl (sağlık)
+    else if(d.kind==='gym'){ g.add(mkBox(9,5.5,7,0x565e6b,d.bx,2.75,d.bz));         // koyu-gri spor salonu gövdesi
+      for(let wx=-3;wx<=3;wx+=1.6) g.add(mkBox(1.1,1.7,0.12,0x9fb2c4,d.bx+wx,3.2,d.bz+3.56));   // uzun camlar
+      g.add(mkBox(2,2.6,0.16,0x2f2a24,d.bx,1.3,d.bz+3.56));                          // koyu kapı
+      g.add(mkBox(2.4,0.2,0.2,0xdadada,d.bx,4.8,d.bz+3.62)); for(const px of [-1.15,1.15]) g.add(mkBox(0.5,0.75,0.5,0xcc3a2f,d.bx+px,4.8,d.bz+3.62)); }   // halter tabelası (bar + kırmızı plakalar)
     else { const col=d.kind==='okul'?0xe6c25a:0x7f93b8; g.add(mkBox(9,5.5,7,col,d.bx,2.75,d.bz));
       for(let wx=-3;wx<=3;wx+=1.6) for(let fy=2;fy<5;fy+=2) g.add(mkBox(1.1,1.1,0.12,0x8fc7e0,d.bx+wx,fy,d.bz+3.56));
       g.add(mkBox(2,2.6,0.16,0x5b3f27,d.bx,1.3,d.bz+3.56)); }
@@ -2994,25 +3002,26 @@ const MODERN_BLD={ tr:{
   okul:{t:'Okul',x:'Sınıfa gir, dersini dinle, <b>dürüst ol</b> (kopya yok), öğretmenine ve arkadaşlarına hakkını ver. <i>«İlim öğrenmek her müslümana farzdır.»</i> (İbn Mâce)',a:'📚 Derse gir, öğren',d:'İlim ve dürüstlükle ihyâ; ilim, insanı yükselten nûrdur.'},
   is:{t:'İş Yeri',x:'İşine <b>helâlinden</b> bak; emaneti koru, hakkını al hakkını ver, dürüst çalış. <i>«Kişinin yediği en helâl şey, kendi elinin emeğidir.»</i> (Buhârî)',a:'💼 Helâlinden çalış',d:'Kesb-i helâl ve emanetle ihyâ; alın teri en temiz rızıktır.'},
   cami:{t:'Cami',x:'Modern şehirde de merkez, cami. Vaktinde namazını kıl, cemaate katıl, komşularınla selâmlaş.',a:'🕌 Namaz / cemaat',d:'Cemaat ve namazla şehri ihyâ ettin.'},
-  market:{t:'Market · Bakkal · Manav'}, banka:{t:'Banka'}, durak:{t:'Otobüs Durağı'}, klinik:{t:'Klinik · Hasta Ziyareti'},
+  market:{t:'Market · Bakkal · Manav'}, banka:{t:'Banka'}, durak:{t:'Otobüs Durağı'}, klinik:{t:'Klinik · Hasta Ziyareti'}, gym:{t:'Spor Salonu'},
 }, en:{
   ev:{t:'Apartment (Home)',x:'A modern apartment. Rest, care for your family, and pray at home. <i>«The best of you is the one who is best to his family.»</i> (Tirmidhi)',a:'🧎 Pray at home / rest',d:'You found peace at home; family rights and worship at home are the root of ihya.'},
   okul:{t:'School',x:'Go to class, listen, <b>be honest</b> (no cheating), give your teacher and friends their due. <i>«Seeking knowledge is an obligation upon every Muslim.»</i> (Ibn Majah)',a:'📚 Attend class, learn',d:'Ihya through knowledge and honesty; knowledge is a light that raises a person.'},
   is:{t:'Workplace',x:'Earn <b>lawfully</b>; guard trusts, give and take rights fairly, work honestly. <i>«The most lawful thing a person eats is from the work of his own hand.»</i> (Bukhari)',a:'💼 Earn lawfully',d:'Ihya through lawful earning and trust; the sweat of the brow is the purest sustenance.'},
   cami:{t:'Mosque',x:'The mosque is central in the modern city too. Pray on time, join the congregation, greet your neighbors.',a:'🕌 Prayer / congregation',d:'You revived the city through prayer and congregation.'},
-  market:{t:'Market · Grocer'}, banka:{t:'Bank'}, durak:{t:'Bus Stop'}, klinik:{t:'Clinic · Visiting the Sick'},
+  market:{t:'Market · Grocer'}, banka:{t:'Bank'}, durak:{t:'Bus Stop'}, klinik:{t:'Clinic · Visiting the Sick'}, gym:{t:'Gym'},
 }, ar:{
   ev:{t:'شقة (البيت)',x:'شقة عصرية. استرِح، وتعهَّد أهلك، وصلِّ في بيتك. <i>«خيرُكم خيرُكم لأهله.»</i> (الترمذي)',a:'🧎 صلِّ في البيت / استرِح',d:'وجدتَ السكينة في بيتك؛ حقُّ الأهل والعبادةُ في البيت أصلُ الإحياء.'},
   okul:{t:'المدرسة',x:'ادخل الصف، وأنصِت، و<b>كن صادقًا</b> (لا غش)، وأعطِ معلّمك وأصحابك حقّهم. <i>«طلبُ العلم فريضةٌ على كل مسلم.»</i> (ابن ماجه)',a:'📚 احضُر الدرس، تعلَّم',d:'إحياءٌ بالعلم والصدق؛ العلمُ نورٌ يرفع صاحبه.'},
   is:{t:'مكان العمل',x:'اكسِب من <b>الحلال</b>؛ احفظ الأمانة، وأعطِ الحقَّ وخُذ الحق، واعمل بصدق. <i>«ما أكل أحدٌ طعامًا أطيبَ من عمل يده.»</i> (البخاري)',a:'💼 اكسِب من الحلال',d:'إحياءٌ بالكسب الحلال والأمانة؛ عرقُ الجبين أطهرُ رزق.'},
   cami:{t:'المسجد',x:'المسجدُ مركزٌ في المدينة العصرية أيضًا. صلِّ في وقتك، وشارك الجماعة، وسلِّم على جيرانك.',a:'🕌 صلاة / جماعة',d:'أحييتَ المدينة بالصلاة والجماعة.'},
-  market:{t:'السوق · البقالة'}, banka:{t:'المصرف (البنك)'}, durak:{t:'موقف الحافلة'}, klinik:{t:'العيادة · عيادة المريض'},
+  market:{t:'السوق · البقالة'}, banka:{t:'المصرف (البنك)'}, durak:{t:'موقف الحافلة'}, klinik:{t:'العيادة · عيادة المريض'}, gym:{t:'النادي الرياضي'},
 } };
 function moBld(k){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return (MODERN_BLD[L]&&MODERN_BLD[L][k])||MODERN_BLD.tr[k]; }
 function modernBldNm(rec){ if(rec.modern==='wallet') return moWallet().t; if(rec.modern==='komsu') return tU('mo_greet_lbl')||'Selâm ver'; if(rec.modern==='dilenci') return tU('dl_title')||'Bir Muhtaç'; return moBld(rec.modern).t; }
 function openModernBuilding(rec){
   if(rec.modern==='ev'){ enterHome(); return; }                 // EV: girilebilir oda (içeride seccade·yatak·kanepe·rahle·mutfak + kapıda çıkış duası)
   if(rec.modern==='klinik'){ openHastaZiyareti(rec); return; }   // KLİNİK: hasta ziyareti → 70.000 melek (Tirmizî)
+  if(rec.modern==='gym'){ openGym(rec); return; }               // SPOR SALONU: kondisyon + disiplin (güçlü mümin)
   if(rec.modern==='dilenci'){ const t=S.gather['dilenci']; if(t&&Date.now()<t){ toast(tU('dl_justgave')||'🤲 Az önce verdin — biraz sonra tekrar.'); return; } openDialog(dlgDilenci()); return; }   // modern dilenci → gizli sadaka
   if(rec.modern==='market'){ openModernMarket(rec); return; }   // Faz B: market/manav/bakkal alışveriş paneli
   if(rec.modern==='wallet'){ openWalletEvent(rec); return; }    // modern olay: bulunan cüzdan (emanet)
@@ -3285,6 +3294,31 @@ function openHastaZiyareti(rec){ const H=moHosta(); audio(); const onCd=()=>S.ha
   openDialog({ ic:'🏥', title:H.t, start:'s0', steps:{ s0:{ who:H.who, txt:H.x, opts:[
     { l:H.visit, act:()=>{ if(onCd()){ toast(H.cd); return; } addNur(20); S.hastaCd=Date.now()+HASTA_CD; save(); refreshHUD(); sndFanfare(); spawnAngelHost(); banner(H.okb+' · '+hostUntilLabel()); setTimeout(()=>toast(H.okd),650); if(typeof closeDialog==='function') closeDialog(); } },
     { l:H.skip } ] } }});
+}
+// ---- SPOR SALONU: kondisyon + disiplin (güçlü mümin; dünyanın/nefsin oyalamasına dayanıklılık) ----
+const GYM_CD=45000;   // antrenman başına ~45sn (kaslar dinlensin)
+const MODERN_GYM={ tr:{
+  t:'Spor Salonu', who:'Antrenman', ex:'Bedenine hakkını ver; kuvvetlen, kondisyon ve disiplin kazan. Güçlü mümin; iş stresine ve dünyanın/nefsin oyalamasına karşı daha dirençlidir. <i>«Kuvvetli mü\'min, zayıf mü\'minden Allah\'a daha sevimli ve hayırlıdır.»</i> (Müslim)',
+  run:'🏃 Koşu (kondisyon)', lift:'🏋️ Ağırlık (kuvvet)', stretch:'🤸 Esneme (disiplin)', bye:'Çık',
+  ok:'💪 Antrenman yaptın — kondisyon', full:'💪 Formun zirvede — bugünlük yeter, dinlen.', cd:'⏳ Kasların dinlensin — biraz sonra tekrar gel.', fit:'Kondisyon' },
+en:{
+  t:'Gym', who:'Training', ex:'Give your body its due; get stronger, gain stamina and discipline. The strong believer is more resilient against work stress and the distractions of the world and the ego (nafs). <i>«The strong believer is more beloved to Allah and better than the weak believer.»</i> (Muslim)',
+  run:'🏃 Cardio (stamina)', lift:'🏋️ Weights (strength)', stretch:'🤸 Stretching (discipline)', bye:'Leave',
+  ok:'💪 You trained — fitness', full:'💪 You are in peak form — enough for today, rest.', cd:'⏳ Let your muscles rest — come back a little later.', fit:'Fitness' },
+ar:{
+  t:'النادي الرياضي', who:'تمرين', ex:'أعطِ بدنك حقّه؛ اقوَ واكتسب اللياقة والانضباط. المؤمنُ القويُّ أصلبُ أمام ضغط العمل وإلهاء الدنيا والنفس. <i>«المؤمنُ القويُّ خيرٌ وأحبُّ إلى الله من المؤمن الضعيف.»</i> (مسلم)',
+  run:'🏃 جري (لياقة)', lift:'🏋️ أثقال (قوّة)', stretch:'🤸 إطالة (انضباط)', bye:'خروج',
+  ok:'💪 تمرّنتَ — اللياقة', full:'💪 أنت في قمّة لياقتك — يكفي اليوم، استرِح.', cd:'⏳ دع عضلاتك ترتاح — عُد بعد قليل.', fit:'اللياقة' },
+};
+function moGym(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return MODERN_GYM[L]||MODERN_GYM.tr; }
+function openGym(rec){ const G=moGym(); audio();
+  const doEx=(gain,nur)=>{ if(S.gymCd&&Date.now()<S.gymCd){ toast(G.cd); return; }
+    if((S.fitness||0)>=100){ toast(G.full); return; }
+    S.fitness=Math.min(100,(S.fitness||0)+gain); addNur(nur); S.gymCd=Date.now()+GYM_CD; save(); refreshHUD(); sndChime();
+    banner('💪 '+G.ok+': '+Math.round(S.fitness)+'/100 · +'+nur+(tU('nur_suffix')||' nûr')); };
+  const txt=()=>G.ex+'<br><br><b>'+G.fit+': '+Math.round(S.fitness||0)+'/100</b>';
+  openDialog({ ic:'🏋️', title:G.t, start:'s0', steps:{ s0:{ who:G.who, txt:txt(), opts:[
+    { l:G.run, act:()=>doEx(14,2), go:'s0' }, { l:G.lift, act:()=>doEx(16,3), go:'s0' }, { l:G.stretch, act:()=>doEx(10,2), go:'s0' }, { l:G.bye } ] } }});
 }
 // ---- MELEK ORDUSU (70.000 temsili) — ziyaret sonrası oyuncunun etrafında ışıklı halka ----
 let angelHost=null, hostUntil=0, hostStart=0, hostAngels=[];
@@ -3730,9 +3764,10 @@ let needsAcc=0, thirstWarned=false, hungerWarned=false, toiletWarned=false;
 function fastingAbstain(){ return fastPhase()==='fasting'; }   // oruçluyken yeme/içme yok (iftara kadar) — tuvalet/abdest serbest
 function updateNeeds(dt){
   if(timeFrozen()) dt=0;                                    // zaman donduysa ihtiyaçlar da ilerlemez (panel/iç-mekân)
-  S.thirst=Math.min(100, S.thirst + THIRST_RATE*dt);
-  S.hunger=Math.min(100, S.hunger + HUNGER_RATE*dt);
-  S.toilet=Math.min(100, (S.toilet||0) + TOILET_RATE*dt);
+  const disc=1-(S.fitness||0)/250;                          // DİSİPLİN/kondisyon: güçlü beden ihtiyaçları daha yavaş biriktirir (fit 100 → %40 yavaş)
+  S.thirst=Math.min(100, S.thirst + THIRST_RATE*dt*disc);
+  S.hunger=Math.min(100, S.hunger + HUNGER_RATE*dt*disc);
+  S.toilet=Math.min(100, (S.toilet||0) + TOILET_RATE*dt*disc);
   if(S.thirst>70 && !thirstWarned && !fastingAbstain()){ thirstWarned=true; toast('💧 Susadın — kuyudan su çek, sonra 🥤 ile iç'); }
   if(S.thirst<50) thirstWarned=false;
   if(S.hunger>72 && !hungerWarned && !fastingAbstain()){ hungerWarned=true; toast('🍞 Karnın acıktı — hurma/ekmek topla, 🍽️ ile ye'); }
