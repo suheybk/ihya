@@ -531,7 +531,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.51</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.52</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1339,6 +1339,7 @@ if(typeof S.seccadeType!=='number') S.seccadeType=(S.hasSeccade?1:0);   // 0 yok
 if(typeof S.walletCd!=='number') S.walletCd=0;   // modern 'bulunan cüzdan' olayı cooldown (ms)
 if(typeof S.jobCd!=='number') S.jobCd=0;         // modern iş (helâl kazanç/haram reddi) ödül cooldown (ms)
 if(typeof S.sabirCd!=='number') S.sabirCd=0;     // modern sabır olayı (otobüs/sıra/trafik) ödül cooldown (ms)
+if(!S.homeCd || typeof S.homeCd!=='object') S.homeCd={};   // modern EV rutini: aksiyon başına ödül cooldown (namaz/aile/ilim/şükür/dinlen)
 const save=()=>{ try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){} };
 const today=()=>new Date().toISOString().slice(0,10);
 const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
@@ -2955,6 +2956,7 @@ const MODERN_BLD={ tr:{
 function moBld(k){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return (MODERN_BLD[L]&&MODERN_BLD[L][k])||MODERN_BLD.tr[k]; }
 function modernBldNm(rec){ if(rec.modern==='wallet') return moWallet().t; if(rec.modern==='komsu') return tU('mo_greet_lbl')||'Selâm ver'; return moBld(rec.modern).t; }
 function openModernBuilding(rec){
+  if(rec.modern==='ev'){ openModernHome(rec); return; }         // EV: günlük hayat rutini (namaz·aile·ilim·şükür·dinlenme)
   if(rec.modern==='market'){ openModernMarket(rec); return; }   // Faz B: market/manav/bakkal alışveriş paneli
   if(rec.modern==='wallet'){ openWalletEvent(rec); return; }    // modern olay: bulunan cüzdan (emanet)
   if(rec.modern==='banka'){ openBankaEvent(rec); return; }      // haramdan kaçınma: faizli banka (uzak dur)
@@ -3112,6 +3114,47 @@ function openJobBoard(rec){ const J=moJobs(); const onCd=()=>S.jobCd&&Date.now()
     halal:{ who:J.halal.who, txt:J.halal.x, ref:J.halal.ref, opts:[
       { l:J.halal.do, act:()=>{ if(onCd()){ toast(J.halal.cd); return; } S.dirhem=(S.dirhem||0)+8; addNur(6); dgBump('m_work'); S.jobCd=Date.now()+HALAL_JOB_CD; save(); refreshHUD(); sndChime(); banner('🔨 +8 💰 · +6'+(tU('nur_suffix')||' nûr')); setTimeout(()=>toast(J.halal.done),400); }, go:'s0' },
       { l:J.back, go:'s0' } ] }
+  }});
+}
+// ---- MODERN EV — GÜNLÜK HAYAT RUTİNİ (namaz·aile·ilim·şükür·dinlenme; değer+hadîs+cooldown) ----
+const HOME_CD=150000;   // ev aksiyonu başına ~2.5 dk ödül cooldown (nûr farm değil, rutin)
+const MODERN_HOME={ tr:{
+  t:'Ev — Günlük Hayat', intro:'Evinde huzuru bul: namaz kıl, aileni gözet, çocuğuna ilim ver, şükret ve ölçülü dinlen. Ev, ihyânın ilk mektebidir.',
+  back:'‹ Geri', bye:'Çık', ddo:'✓ Yap', cd:'⏳ Az önce yaptın — biraz ara ver, riyâ değil süreklilik esastır.',
+  pray:{ btn:'🧎 Evde namaz kıl', who:'Ev namazı', x:'Evinde huzurla (nafile) namazını kıl; evini ibadetle canlandır. <i>«Evlerinizde de namaz kılın; evlerinizi kabirlere çevirmeyin.»</i> (Buhârî-Müslim)', ok:'🧎 Evde namaz — ev nurlandı' },
+  family:{ btn:'👨‍👩‍👧 Aileye vakit ayır', who:'Aile hakkı', x:'Eşine, çocuklarına, ana-babana vakit ayır; gönüllerini hoş tut, hakkını gözet. <i>«Sizin en hayırlınız, ailesine en hayırlı olanınızdır.»</i> (Tirmizî)', ok:'👨‍👩‍👧 Aileye vakit — sıla-i rahim' },
+  teach:{ btn:'📖 Çocuğa Kur\'an öğret', who:'İlim · sadaka-i câriye', x:'Çocuğuna bir âyet, bir dua öğret; öğrettiğin ilim sen göçtükten sonra da amel defterine akar. <i>«Sizin en hayırlınız, Kur\'an\'ı öğrenen ve öğretendir.»</i> (Buhârî)', ok:'📖 Öğrettin — akan sadaka' },
+  eat:{ btn:'🍲 Evde yemek ye (şükür)', who:'Şükür · israf etme', x:'Ev sofrasını şükürle ye; nimeti hafife alma, israf etme, komşunu da an. <i>«Yiyin, için; fakat israf etmeyin.»</i> (A\'râf 7/31)', ok:'🍲 Şükrünü eda ettin', full:'🍽️ Şu an toksun — nimeti israf etme, sonra ye.' },
+  rest:{ btn:'😴 Dinlen (bedenin hakkı)', who:'Bedenin hakkı', x:'Ölçülü dinlen ki ibadete ve işine kuvvet bulasın; tembellik değil, dengeyi gözet. <i>«Bedeninin senin üzerinde hakkı vardır.»</i> (Buhârî)', ok:'😴 Dinlendin — kuvvet buldun' },
+}, en:{
+  t:'Home — Daily Life', intro:'Find peace at home: pray, tend to your family, teach your child knowledge, give thanks, and rest in moderation. The home is ihya\'s first school.',
+  back:'‹ Back', bye:'Leave', ddo:'✓ Do it', cd:'⏳ You just did this — take a break; consistency, not showing off, is the goal.',
+  pray:{ btn:'🧎 Pray at home', who:'Prayer at home', x:'Pray (voluntary prayers) at home with tranquility; enliven your home with worship. <i>«Pray in your homes; do not turn your homes into graves.»</i> (Bukhari-Muslim)', ok:'🧎 Prayer at home — light filled it' },
+  family:{ btn:'👨‍👩‍👧 Time with family', who:'Family\'s right', x:'Give time to your spouse, children and parents; gladden their hearts and honor their rights. <i>«The best of you is the one who is best to his family.»</i> (Tirmidhi)', ok:'👨‍👩‍👧 Time with family — kinship' },
+  teach:{ btn:'📖 Teach your child Qur\'an', who:'Knowledge · ongoing charity', x:'Teach your child a verse, a supplication; the knowledge you pass on flows into your record even after you pass. <i>«The best of you is he who learns the Qur\'an and teaches it.»</i> (Bukhari)', ok:'📖 You taught — flowing charity' },
+  eat:{ btn:'🍲 Eat at home (gratitude)', who:'Gratitude · no waste', x:'Eat your home meal with thanks; do not belittle the blessing, do not waste, remember your neighbor. <i>«Eat and drink, but do not be wasteful.»</i> (Al-A\'raf 7/31)', ok:'🍲 You gave thanks', full:'🍽️ You are full now — do not waste; eat later.' },
+  rest:{ btn:'😴 Rest (body\'s right)', who:'Body\'s right', x:'Rest in moderation so you have strength for worship and work; not laziness, but balance. <i>«Your body has a right over you.»</i> (Bukhari)', ok:'😴 You rested — regained strength' },
+}, ar:{
+  t:'البيت — الحياة اليومية', intro:'اجعل بيتك سكنًا: صلِّ، وتعهَّد أهلك، وعلِّم ولدك، واشكر، واسترِح باعتدال. البيتُ أولُ مدرسةٍ للإحياء.',
+  back:'‹ رجوع', bye:'خروج', ddo:'✓ افعل', cd:'⏳ فعلتَها للتو — خذ راحة؛ العبرة بالدوام لا بالرياء.',
+  pray:{ btn:'🧎 صلِّ في البيت', who:'صلاة البيت', x:'صلِّ النوافل في بيتك بسكينة، وأحيِ بيتك بالعبادة. <i>«صلّوا في بيوتكم ولا تتّخذوها قبورًا.»</i> (البخاري ومسلم)', ok:'🧎 صلاة في البيت — استنار البيت' },
+  family:{ btn:'👨‍👩‍👧 خصِّص وقتًا لأهلك', who:'حقُّ الأهل', x:'خصِّص وقتًا لزوجك وأولادك ووالديك، وأدخِل السرور عليهم واحفظ حقّهم. <i>«خيرُكم خيرُكم لأهله.»</i> (الترمذي)', ok:'👨‍👩‍👧 وقتٌ للأهل — صلةُ رحم' },
+  teach:{ btn:'📖 علِّم ولدك القرآن', who:'علم · صدقة جارية', x:'علِّم ولدك آيةً ودعاءً؛ فالعلم الذي تنشره يجري في صحيفتك بعد رحيلك. <i>«خيرُكم من تعلَّم القرآن وعلَّمه.»</i> (البخاري)', ok:'📖 علَّمتَ — صدقةٌ جارية' },
+  eat:{ btn:'🍲 كُل في البيت (شكرًا)', who:'شكر · لا إسراف', x:'كُل طعام بيتك شاكرًا؛ لا تستهِن بالنعمة ولا تُسرِف، واذكر جارك. <i>«كلوا واشربوا ولا تسرفوا.»</i> (الأعراف ٣١)', ok:'🍲 أدّيتَ الشكر', full:'🍽️ أنت شبعان الآن — لا تُسرِف، كُل لاحقًا.' },
+  rest:{ btn:'😴 استرِح (حقُّ البدن)', who:'حقُّ البدن', x:'استرِح باعتدال لتقوى على العبادة والعمل؛ ليس كسلًا بل توازنًا. <i>«إنّ لبدنك عليك حقًّا.»</i> (البخاري)', ok:'😴 استرحتَ — تجدّدت قوّتك' },
+} };
+function moHome(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return MODERN_HOME[L]||MODERN_HOME.tr; }
+function openModernHome(rec){ const H=moHome(); audio();
+  const on=(k)=>S.homeCd[k]&&Date.now()<S.homeCd[k];
+  const reward=(k,nur,extra)=>{ if(on(k)){ toast(H.cd); return; } addNur(nur); if(extra) extra(); S.homeCd[k]=Date.now()+HOME_CD; save(); refreshHUD(); sndChime(); banner(H[k].ok+' · +'+nur+(tU('nur_suffix')||' nûr')); };
+  const act=(k,fn)=>({ who:H[k].who, txt:H[k].x, opts:[ { l:H.ddo, act:fn, go:'s0' }, { l:H.back, go:'s0' } ] });
+  openDialog({ ic:'🏠', title:H.t, start:'s0', steps:{
+    s0:{ who:H.t, txt:H.intro, opts:[ {l:H.pray.btn,go:'pray'}, {l:H.family.btn,go:'family'}, {l:H.teach.btn,go:'teach'}, {l:H.eat.btn,go:'eat'}, {l:H.rest.btn,go:'rest'}, {l:H.bye} ] },
+    pray:act('pray',()=>{ reward('pray',6,()=>dgBump('pray')); }),
+    family:act('family',()=>{ reward('family',8); }),
+    teach:act('teach',()=>{ reward('teach',8); }),
+    eat:act('eat',()=>{ if((S.hunger||0)<15){ toast(H.eat.full); return; } S.hunger=Math.max(0,(S.hunger||0)-45); reward('eat',2); }),
+    rest:act('rest',()=>{ reward('rest',3); }),
   }});
 }
 // ---- MODERN KOMŞULAR: meydanda dolaşan kişiler; selâmlaşınca karşılıklı tek-el selâm ----
