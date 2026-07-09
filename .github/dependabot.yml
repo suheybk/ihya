@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # GitHub Actions'ların (checkout, setup-node vb.) güncel/güvenli kalması için
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+# NOT: Three.js importmap ile HTML içinde CDN'den (unpkg, three@0.160.0) sabitlenmiş;
+# Dependabot bunu izleyemez. Güncelleme için ihya3d.html importmap sürümü elle bump edilmeli
+# (öncelikle self-host'a geçmek daha güvenli — bkz. YAPILACAKLAR / kontrol listesi #5).
