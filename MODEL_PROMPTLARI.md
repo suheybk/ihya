@@ -228,3 +228,56 @@ Atölye adasının GB köşesinde (`pond_atolye` [13.4,-15.9]) **gölet** gather
 - **`rod.glb` — Olta** (opsiyonel): şu an oyuncu eline prosedürel çubuk yok; el hareketi olta jestini veriyor.
 
 **İleride (opsiyonel):** balık → tandırda "balık kızartma" (ayrı FOOD, daha değerli) — istersen eklenir.
+
+---
+
+## ⭐ FAZ 6.8x — YENİ ÖNCELİKLİ MODELLER (2026-07 · Suheyb üretecek)
+Son eklenen özellikler (namaz GLB·Arafat·gym ring·ipek böceği·modern binalar) şu an ya **ağır
+gerçekçi GLB** ya da **prosedürel kutu** ile çalışıyor. Aşağıdakiler oyunun claymorphism low-poly
+stiline uyan, hafif GLB'lerle onları değiştirir. **Öncelik sırasıyla** (üstte en kıymetli).
+Hepsi ORTAK STİL + teknik kurallara uymalı (base-center origin, Y-up, GLB, ~60–300 tris, dokusuz).
+
+### 1. ⭐⭐ `pray_lowpoly.glb` — Namaz kılan karakter (EN ÖNEMLİSİ)
+Oyunun kendi `boy_takke` karakteri stilinde (yeşil takke, ten yüz, açık cübbe) **namaz kılan** figür,
+**animasyonlu**: kıyâm (eller göğüste bağlı) → rükû (sırt yere paralel, eller dizde) → kavme (dik) →
+secde (yedi aza: alın+burun, iki el, iki diz, iki ayak parmağı; kollar yanlardan açık) → celse (otur) →
+teşehhüd (**sağ şehâdet parmağı kalkık**) → selâm (baş sağa-sola). **Tek animasyon klibi** (~25–35 sn,
+2 rekât), döngüsüz. Şu anki `prayer.glb` 9MB gerçekçi model — bu, ~200–400 tris low-poly + hafif olacak.
+Elbânî *Sıfatu Salâti'n-Nebî*'deki forma sadık. Origin taban-merkez, Y-up, ~1.8 m. **Bu gelince
+`models/prayer.glb` yerine kullanılır; kod evre-pencerelerine (t0/td) seek ediyor — klip süresini bana
+söyle, pencereleri güncellerim.**
+
+### 2. ⭐ `ihram.glb` — İhrâmlı hacı (Arafat kalabalığı + tavâf)
+İki parça beyaz **ihram** giymiş sade hacı (üst omuzda, alt bele sarılı), başı açık, A-pose. Çoğu beyaz;
+bir varyant koyu (kadın hacı çarşafı için `ihram_dark.glb`). Şu an Arafat'ta prosedürel beyaz konik
+figür var — bu onun yerini alır (kalabalık için düşük tris ~120 şart, 40+ kopya render edilecek).
+Origin taban-merkez, Y-up, ~1.8 m.
+
+### 3. ⭐ `jabal_rahmah.glb` — Cebel-i Rahme (Arafat tepesi + beyaz sütun)
+Low-poly kayalık **tepe/mound** (kum-terracotta) + zirvede **beyaz dikdörtgen sütun anıt** (basamaklı
+kaide + köşeli tepe). Referans: Arafat vakfe tepesi. Şu an prosedürel çiziliyor. Origin taban-merkez,
+Y-up, ~6–8 m geniş, sütun ~5 m. (İstersen ayrı `arafat_pillar.glb` sütun tek başına.)
+
+### 4. `silk_cocoon.glb` + `silk_moth.glb` — İpek böceği evreleri
+Dut yaprağı üstünde: (a) **koza** — oval ipeksi beyaz kozacık + ince dal; (b) **güve** — soluk bej ipek
+güvesi, açık kanatlı, idle. Şu an prosedürel. Küçük (~0.3 m). Origin taban-merkez, Y-up. (Larva/yumurta
+evreleri prosedürel kalabilir; koza+güve en görünür.)
+
+### 5. Modern bina cepheleri (claymorphism, iç mekân dollhouse ile uyumlu)
+Şu an modern binalar prosedürel kutu. Low-poly cepheler: `mbld_market.glb` (çizgili tente + vitrin),
+`mbld_bank.glb` (cam cephe + sütun), `mbld_clinic.glb` (beyaz + kırmızı hilâl), `mbld_gym.glb` (halter
+tabelası), `mbld_home.glb` (apartman), `mbld_mosque.glb` (kubbe + minare, modern-sade). Her biri ~1 katlı
+cephe, ~3–4 m, ön açık (kapı belli). Origin taban-merkez, Y-up.
+
+### 6. `boxing_ring.glb` — Gym boks ringi
+Kare **ring**: platform + 4 köşe direği + 3 sıra kırmızı ip. Şu an prosedürel. ~3.5 m kare. Origin
+taban-merkez, Y-up. (Sparring NPC'ler oyunda prosedürel; istersen `spar_npc.glb` boks eldivenli figür.)
+
+### 7. `city_bus.glb` — Şehir otobüsü (kırmızı + açık mavi)
+Sevimli low-poly **otobüs** — kırmızı gövde, açık mavi cam şeridi + tavan, ön far/arka stop, kapı. Şu an
+prosedürel kutu. ~4 m uzun. Origin taban-merkez, Y-up, ÖN=+Z.
+
+> **Not (kod tarafı hazır):** Tüm bunlar için oyunda **runtime bbox-ölçekleme** var (gym_equipment.glb
+> böyle yerleşti) — yani ölçek birebir olmak zorunda değil, kod odaya/sahneye sığdırır. Sadece **origin
+> taban-merkez + Y-up + tek obje** olsun yeterli. GLB'yi `models/` klasörüne aynı adla koyman kâfi;
+> koda ekleme promptunu ben veririm.

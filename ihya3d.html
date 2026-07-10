@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.80</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.81</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1840,14 +1840,20 @@ function renderDailyGoal(){
   const el=document.getElementById('dgoal'); if(!el) return;
   if(!S.dg) S.dg={prog:0,done:false};
   const g=dgToday(), prog=Math.min(S.dg.prog||0,g.n), done=S.dg.done;
-  const sig=(S.lang||'tr')+'|'+g.id+'|'+prog+'|'+(done?1:0);
+  const d=S.dayNum||0, dueRems=(Array.isArray(S.reminders)?S.reminders:[]).filter(r=>typeof reminderDueToday==='function'&&reminderDueToday(r));
+  const remSig=dueRems.map(r=>r.id+((S.remDone&&S.remDone[r.id]===d)?'✓':'')).join(',');
+  const sig=(S.lang||'tr')+'|'+g.id+'|'+prog+'|'+(done?1:0)+'|'+remSig;
   if(sig===_dgSig && el.style.display!=='none') return;
   _dgSig=sig; el.style.display='block';
   const pct=Math.round(prog/g.n*100);
   let h='<div class="vzhead">'+emo('🎯')+' <span>'+(tU('dg_head')||'Günün Hedefi')+'</span><span class="chev">'+(done?'✓':prog+'/'+g.n)+'</span></div>';
   h+='<div class="dgrow'+(done?' dgdone':'')+'"><span class="vzic">'+emo(g.ic)+'</span><span class="vznm">'+dgLabel(g)+'</span></div>';
   h+='<div class="dgbar"><i style="width:'+pct+'%"></i></div>';
+  if(dueRems.length){ h+='<div style="margin-top:6px;border-top:1px solid #0001;padding-top:5px">';   // KALICI hatırlatma checklist'i (bildirim gelip-gitmesin; oyuncu kendi yolunu çizer)
+    for(const r of dueRems){ const chk=(S.remDone&&S.remDone[r.id]===d); h+='<div class="dgrow dgrem'+(chk?' dgdone':'')+'" data-rid="'+r.id+'" style="cursor:pointer"><span class="vzic">'+(chk?'✅':'⬜')+'</span><span class="vznm">'+r.text+'</span></div>'; }
+    h+='</div>'; }
   el.innerHTML=h;
+  el.querySelectorAll('.dgrem').forEach(row=>{ row.onclick=(e)=>{ e.stopPropagation(); if(typeof toggleReminderDone==='function') toggleReminderDone(row.dataset.rid); }; });
 }
 /* ---- İSTİKAMET (streak): ardışık gün günlük ibadeti tamamlama ---- */
 function checkStreak(){
@@ -4128,10 +4134,13 @@ function doFast(){
 
 /* ============ SU/YEMEK İHTİYACI (Faz 9) — nazik, cezalandırmayan (şükür + empati) ============ */
 const THIRST_RATE=0.14, HUNGER_RATE=0.095, TOILET_RATE=0.07;   // /sn (susuzluk ~12dk, açlık ~18dk, tuvalet ~24dk dolar)
+const FITNESS_DECAY=0.07;   // /sn kondisyon azalır → spor SÜREKLİ gerekir (aksi halde maxta kalıp hiç antrenman yapılamıyordu); açlık/yorgunluk hızlandırır
 let needsAcc=0, thirstWarned=false, hungerWarned=false, toiletWarned=false;
 function fastingAbstain(){ return fastPhase()==='fasting'; }   // oruçluyken yeme/içme yok (iftara kadar) — tuvalet/abdest serbest
 function updateNeeds(dt){
   if(timeFrozen()) dt=0;                                    // zaman donduysa ihtiyaçlar da ilerlemez (panel/iç-mekân)
+  if((S.fitness||0)>0){ const strain=1+((S.thirst>60?1:0)+(S.hunger>60?1:0)+((S.toilet||0)>60?1:0))*0.7;   // KONDİSYON zamanla azalır (spor sürekli gerektirir); açlık/susuzluk/yorgunluk hızlandırır (max→antrenman yapılamama sorunu çözülür)
+    S.fitness=Math.max(0,(S.fitness||0)-FITNESS_DECAY*dt*strain); }
   const disc=1-(S.fitness||0)/250;                          // DİSİPLİN/kondisyon: güçlü beden ihtiyaçları daha yavaş biriktirir (fit 100 → %40 yavaş)
   S.thirst=Math.min(100, S.thirst + THIRST_RATE*dt*disc);
   S.hunger=Math.min(100, S.hunger + HUNGER_RATE*dt*disc);
@@ -4986,8 +4995,8 @@ function remL(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return REM_
 function openReminders(){ audio(); renderReminders(); document.getElementById('remind').classList.add('show'); }
 function closeReminders(){ document.getElementById('remind').classList.remove('show'); }
 function addReminder(text, recur){ text=(text||'').trim(); if(!text) return; if(S.reminders.length>=12){ toast('📅 En fazla 12 hatırlatma'); return; }
-  S.reminders.push({id:'r'+(S.remSeq=(S.remSeq||0)+1), text:text.slice(0,40), recur:recur||'daily', dow:(typeof dow==='function'?dow():0), last:-1}); save(); renderReminders(); }
-function removeReminder(id){ S.reminders=S.reminders.filter(r=>r.id!==id); save(); renderReminders(); }
+  S.reminders.push({id:'r'+(S.remSeq=(S.remSeq||0)+1), text:text.slice(0,40), recur:recur||'daily', dow:(typeof dow==='function'?dow():0), last:-1}); save(); renderReminders(); if(typeof renderDailyGoal==='function') renderDailyGoal(); }
+function removeReminder(id){ S.reminders=S.reminders.filter(r=>r.id!==id); if(S.remDone) delete S.remDone[id]; save(); renderReminders(); if(typeof renderDailyGoal==='function') renderDailyGoal(); }
 function renderReminders(){ const M=remL(), L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr';
   document.getElementById('remindHd').textContent=M.hd; document.getElementById('remindSub').textContent=M.sub;
   const lst=document.getElementById('remindList'); lst.innerHTML='';
@@ -5002,12 +5011,19 @@ function renderReminders(){ const M=remL(), L=(S.lang==='en'||S.lang==='ar')?S.l
   for(const rc of ['daily','weekly','once']){ const b=document.createElement('button'); b.className='hbuy'; b.style.cssText='flex:1;padding:7px;font-size:12px'+(_remRecur===rc?';background:#2f8f63;color:#fff':''); b.textContent=M[rc]; b.onclick=()=>{ _remRecur=rc; renderReminders(); }; rw.appendChild(b); }
   document.getElementById('remindInput').placeholder=M.custom;
 }
-function checkReminders(){ if(!Array.isArray(S.reminders)||!S.reminders.length) return; const d=S.dayNum||0, today=(typeof dow==='function'?dow():0), due=[];
-  for(const r of S.reminders){ let fire=false;
-    if(r.recur==='daily') fire=true; else if(r.recur==='weekly') fire=(r.dow===today); else if(r.recur==='once') fire=(r.last<0);
-    if(fire){ due.push(r.text); r.last=d; } }
-  S.reminders=S.reminders.filter(r=>!(r.recur==='once'&&r.last>=0));   // bir-kez'likler ateşlenince silinir
-  if(due.length){ save(); const M=remL(); setTimeout(()=>{ banner('📅 '+M.fire); },2100); setTimeout(()=>{ toast('📅 '+M.fire+': '+due.join(' · ')); },2650); }
+function reminderDueToday(r){ if(!r) return false; const today=(typeof dow==='function'?dow():0);
+  if(r.recur==='daily') return true; if(r.recur==='weekly') return r.dow===today; if(r.recur==='once') return true; return false; }
+function toggleReminderDone(id){ const d=S.dayNum||0; if(!S.remDone||typeof S.remDone!=='object') S.remDone={};
+  const r=(S.reminders||[]).find(x=>x.id===id); if(!r) return;
+  if(S.remDone[id]===d){ delete S.remDone[id]; }   // işareti kaldır
+  else { S.remDone[id]=d; addNur(1);   // yaptım → +1 nûr şükür
+    if(r.recur==='once'){ setTimeout(()=>removeReminder(id), 700); }   // bir-kez'lik → yapılınca listeden düşer
+  }
+  save(); if(typeof renderDailyGoal==='function') renderDailyGoal();
+}
+function checkReminders(){ if(!Array.isArray(S.reminders)||!S.reminders.length) return;
+  // BİLDİRİM GELİP-GİTMEZ: hatırlatmalar #dgoal HUD'ında KALICI checklist olarak durur (renderDailyGoal). Yeni günde sadece HUD tazelenir.
+  if(typeof renderDailyGoal==='function') renderDailyGoal();
 }
 // 🌿 CUMA SÜNNETLERİ — Cuma günü gusül·temizlik·koku·Kehf → bonus nûr (günde bir, iki Cuma arası bağışlanır)
 const CUMA_ACTS={ tr:[
@@ -7060,7 +7076,7 @@ actBtn.onclick=doAct;
 // Sayı tuşları → toolbar aksiyon/panel düğmeleri (sadece görünür/uygunsa); M harita, C modern şehir.
 // Space → dünyada etkileşim / diyalogda "devam". Esc → açık paneli kapat (geri dön). Mobilde dokunmatik düğmeler.
 const KEYMAP={ '1':'prayBtn','2':'drinkBtn','3':'eatBtn','4':'abdestBtn','5':'fastBtn','6':'ezberBtn','7':'invBtn','8':'hayirBtn','9':'scenBtn','0':'kibleBtn' };
-const OVERLAY_CLOSE={ dlg:closeDialog, veil:closeSheet, hayir:closeHayir, inv:closeInv, scen:closeScen, map:closeMap, market:closeMarket, ezber:closeEzber, settings:closeSettings, cuma:closeCuma, exam:closeExam, guide:closeGuide, profile:(typeof closeProfile==='function'?closeProfile:null), hacReg:closeHacReg };
+const OVERLAY_CLOSE={ dlg:closeDialog, veil:closeSheet, hayir:closeHayir, inv:closeInv, scen:closeScen, map:closeMap, market:closeMarket, ezber:closeEzber, settings:closeSettings, cuma:closeCuma, exam:closeExam, guide:closeGuide, profile:(typeof closeProfile==='function'?closeProfile:null), hacReg:closeHacReg, mosque:(typeof exitMosque==='function'?exitMosque:null), remind:(typeof closeReminders==='function'?closeReminders:null) };   // mosque→exitMosque: Esc'te mosqueMode kalıp kilitlenmesin
 function tutOpen(){ const t=document.getElementById('tut'); return t && getComputedStyle(t).display!=='none'; }
 function anyOverlayOpen(){ return !!document.querySelector('.veil.show') || tutOpen(); }
 function closeTopOverlay(){
@@ -7074,7 +7090,7 @@ addEventListener('keydown',e=>{
   const t=e.target; if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable)) return;   // form yazarken çalma
   if(introMode) return;   // dil-seçme/sinematikte kısayol yok
   // ESC — açık paneli/diyaloğu kapat (geri dön)
-  if(e.key==='Escape'){ if(anyOverlayOpen()){ e.preventDefault(); closeTopOverlay(); } return; }
+  if(e.key==='Escape'){ if(anyOverlayOpen()){ e.preventDefault(); closeTopOverlay(); } else if(mosqueMode){ e.preventDefault(); exitMosque(); } return; }   // panel yoksa ama mescitte takıldıysa → güvenli çıkış (kilit kurtarma)
   // SEÇMELİ UI (İmtihan / Diyalog) açıkken 1-9 → o seçeneği seç (mouse'a dokunmadan cevap)
   if(/^[1-9]$/.test(e.key)){
     const exam=document.getElementById('exam'), dlg=document.getElementById('dlg');
