@@ -541,7 +541,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.76</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.77</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -2248,7 +2248,7 @@ function applyIslandLock(){
 }
 
 /* ============ HASAT / TOPLAMA (Faz 1) — kesb-i helâl ============ */
-const GOODS={ hurma:{ic:'🌴',nm:'Hurma'}, dut:{ic:'🫐',nm:'Dut'}, sut:{ic:'🥛',nm:'Süt'}, yun:{ic:'🧶',nm:'Yün'}, ekmek:{ic:'🍞',nm:'Ekmek'}, su:{ic:'💧',nm:'Su'}, bal:{ic:'🍯',nm:'Bal'}, bugday:{ic:'🌾',nm:'Buğday'}, un:{ic:'🥣',nm:'Un'}, yumurta:{ic:'🥚',nm:'Yumurta'}, corek:{ic:'🥯',nm:'Çörek'}, pekmez:{ic:'🫙',nm:'Pekmez'}, balik:{ic:'🐟',nm:'Balık'}, izgara:{ic:'🍢',nm:'Kızarmış Balık'} };
+const GOODS={ hurma:{ic:'🌴',nm:'Hurma'}, dut:{ic:'🫐',nm:'Dut'}, sut:{ic:'🥛',nm:'Süt'}, yun:{ic:'🧶',nm:'Yün'}, ekmek:{ic:'🍞',nm:'Ekmek'}, su:{ic:'💧',nm:'Su'}, bal:{ic:'🍯',nm:'Bal'}, bugday:{ic:'🌾',nm:'Buğday'}, un:{ic:'🥣',nm:'Un'}, yumurta:{ic:'🥚',nm:'Yumurta'}, corek:{ic:'🥯',nm:'Çörek'}, pekmez:{ic:'🫙',nm:'Pekmez'}, balik:{ic:'🐟',nm:'Balık'}, izgara:{ic:'🍢',nm:'Kızarmış Balık'}, ipek:{ic:'🧵',nm:'İpek'} };
 // Hurma Bahçesi'nde toplanabilir ağaçlar (tekrarlanır: topla → hasat hali → cooldown → yeniden dolar)
 // Tüm adalara EŞİT dağıt: her adada 1 hurma + 1 dut ağacı (kenarlarda, görev hattından uzak)
 // Gather node'ları ada'nın 4 KÖŞESİNE dağıt (ada-yarıçapı-farkında): merkez görev hattından (z≈±2.6)
@@ -2315,6 +2315,57 @@ function makeGatherNode(def){
   return rec;
 }
 function buildGatherNodes(){ gatherNodes=[]; for(const d of GATHER_DEFS) makeGatherNode(d); }
+
+// ============ İPEK BÖCEĞİ DÖNGÜSÜ (dut ağaçlarında): yumurta→larva→koza→güve → koza'da İPEK hasat → döngü tekrar ============
+const SILK_STAGES=['yumurta','larva','koza','guve'], SILK_STAGE_MS=48000;   // her evre ~48sn
+let silkworms=[];
+function buildSilkStage(stage){ const g=new THREE.Group();
+  const leaf=new THREE.Mesh(new THREE.SphereGeometry(0.5,8,6), new THREE.MeshStandardMaterial({color:0x4a7c34,roughness:1})); leaf.scale.set(1.3,0.14,0.9); leaf.position.y=0.05; g.add(leaf);   // dut yaprağı
+  if(stage==='yumurta'){ const M=new THREE.MeshStandardMaterial({color:0xf3ead0}); for(let i=0;i<5;i++){ const e=new THREE.Mesh(new THREE.SphereGeometry(0.05,6,5),M); e.position.set(-0.18+i*0.09,0.13,(i%2)*0.06); g.add(e);} }
+  else if(stage==='larva'){ const M=new THREE.MeshStandardMaterial({color:0xe8e2d0}); for(let i=0;i<6;i++){ const s=new THREE.Mesh(new THREE.SphereGeometry(0.09,7,6),M); s.position.set(-0.32+i*0.12,0.14,0); s.scale.set(1,0.82,0.9); g.add(s);} const h=new THREE.Mesh(new THREE.SphereGeometry(0.06,6,5),new THREE.MeshStandardMaterial({color:0xcfc7ad})); h.position.set(0.4,0.14,0); g.add(h); }
+  else if(stage==='koza'){ const c=new THREE.Mesh(new THREE.SphereGeometry(0.16,10,8), new THREE.MeshStandardMaterial({color:0xf7f2e4,emissive:0x1c1c14,emissiveIntensity:0.04,roughness:0.55})); c.scale.set(0.78,1.45,0.78); c.position.y=0.3; g.add(c);   // ipek KOZASI (oval, ışıltılı)
+    const tw=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,0.55),new THREE.MeshStandardMaterial({color:0x6b4a2a})); tw.position.set(0.16,0.32,0); tw.rotation.z=0.6; g.add(tw); }
+  else { const body=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.26,7),new THREE.MeshStandardMaterial({color:0xcabfa0})); body.position.y=0.24; g.add(body);   // GÜVE (idle)
+    for(const s of [-1,1]){ const w=new THREE.Mesh(new THREE.PlaneGeometry(0.34,0.24), new THREE.MeshStandardMaterial({color:0xe6dcc4,side:THREE.DoubleSide,transparent:true,opacity:0.9})); w.position.set(s*0.17,0.27,0); w.rotation.y=s*0.5; g.add(w); g.userData['w'+(s<0?'L':'R')]=w; } }
+  return g;
+}
+function swapSilkStage(sw){ if(sw.g) scene.remove(sw.g); const g=buildSilkStage(SILK_STAGES[sw.stage]); g.position.set(sw.bx,0.5,sw.bz); scene.add(g); sw.g=g; }
+function spawnSilkworms(){ for(const sw of silkworms){ if(sw.g) scene.remove(sw.g); const i=interactables.indexOf(sw.irec); if(i>=0) interactables.splice(i,1); } silkworms=[];
+  for(const rec of gatherNodes){ if(rec.def.item!=='dut') continue;
+    const bx=rec.def.pos[0]+1.1, bz=rec.def.pos[2]+0.7;   // dut ağacının yanı (yaprak üstünde)
+    const sw={ stage:0, t:Date.now(), bx, bz, g:null }; swapSilkStage(sw);
+    const irec={ silk:true, sw, q:{id:'silk_'+rec.def.id, pos:[bx,0,bz], ic:'🐛', nm:'İpek böceği'}, g:new THREE.Object3D(), meshes:[], reach:2.4 };
+    irec.g.position.set(bx,0,bz); sw.irec=irec; interactables.push(irec); silkworms.push(sw);
+  }
+}
+function silkStageName(s){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr';
+  const M={tr:['🥚 Yumurta','🐛 Larva (tırtıl)','🧵 Koza — ipek hazır','🦋 Güve'],en:['🥚 Egg','🐛 Larva','🧵 Cocoon — silk ready','🦋 Moth'],ar:['🥚 بيضة','🐛 يرقة','🧵 شرنقة — الحرير جاهز','🦋 فراشة']}; return (M[L]||M.tr)[s]; }
+function updateSilkworms(dt){ if(!silkworms.length) return; const now=Date.now();
+  for(const sw of silkworms){
+    if(sw.stage===3 && sw.g){ const f=Math.sin(clock.elapsedTime*3+sw.bx)*0.15; if(sw.g.userData.wL)sw.g.userData.wL.rotation.y=-0.5-f; if(sw.g.userData.wR)sw.g.userData.wR.rotation.y=0.5+f; }   // güve idle kanat
+    if(now-sw.t>SILK_STAGE_MS){ sw.stage=(sw.stage<3)?sw.stage+1:0; sw.t=now; swapSilkStage(sw); }   // evre ilerle; güve→yumurta (döngü)
+  }
+}
+function harvestSilk(rec){ const sw=rec.sw;
+  if(sw.stage!==2){ toast(silkStageName(sw.stage)+' — '+(tU('silk_notyet')||'ipek için KOZA evresini bekle (🧵)')); return; }
+  if(invFull()){ toast(tU('t_bagfull')||'🎒 Dağarcık dolu'); return; }
+  const got=invAdd('ipek',2); facePlayer(sw.g.position); playAction(1.2,'pluck');
+  sw.stage=0; sw.t=Date.now(); swapSilkStage(sw);   // kozadan ipek çekildi → döngü baştan
+  save(); refreshHUD(); if(typeof renderInv==='function') renderInv(); sndChime();
+  toast('+'+got+' 🧵 '+(tU('silk_got')||'İpek aldın — kozadan çektin (tezgâhta işle)'));
+}
+// ============ KARINCA (models/ant.glb) — ağaç diplerinde kolonai, prosedürel dolaşma ============
+let antModel=null, ants=[], antsBuilt=false;
+function spawnAnts(){ if(antsBuilt) return; antsBuilt=true;
+  loader.load('models/ant.glb?v='+MODELV, gl=>{ antModel=gl.scene;
+    const box=new THREE.Box3().setFromObject(antModel); const sz=new THREE.Vector3(); box.getSize(sz); const sc=0.32/(Math.max(sz.x,sz.z)||1);
+    const spots=gatherNodes.filter(r=>r.def.item==='dut'||r.def.item==='hurma').slice(0,5);
+    for(const rec of spots){ const cx=rec.def.pos[0]+1.4, cz=rec.def.pos[2]+1.4;
+      for(let i=0;i<3;i++){ const a=antModel.clone(true); a.scale.setScalar(sc); scene.add(a);
+        ants.push({g:a, cx, cz, r:0.7+Math.random()*0.7, ph:Math.random()*6.28, spd:0.5+Math.random()*0.5}); } }
+  }, undefined, e=>{ antsBuilt=false; });
+}
+function updateAnts(dt){ for(const an of ants){ an.ph+=dt*an.spd; const x=an.cx+Math.cos(an.ph)*an.r, z=an.cz+Math.sin(an.ph)*an.r; an.g.position.set(x,0.02,z); an.g.rotation.y=-an.ph; } }
 function swapGatherModel(rec, toFull){
   const it=instance(toFull?rec.def.full:rec.def.bare);
   it.g.position.copy(rec.g.position); it.g.rotation.copy(rec.g.rotation); it.g.scale.copy(rec.g.scale); it.g.visible=rec.g.visible;
@@ -2596,6 +2647,15 @@ function isFriday(){ return dow()===5; }
 const SECCADE_YUN=5;   // seccade örmek için gereken yün
 const SECCADE_FIYAT=8; // seccade satış (dirhem)
 let laidSeccadeRec=null, seccadeAnim=0;
+const SILK_SECCADE=4;   // dut kozalarından toplanan ipek → premium ipek seccade (tip 3, en yüksek huşû bonusu)
+function craftSilkSeccade(){
+  if((S.inv.ipek||0)<SILK_SECCADE){ toast('🧵 '+SILK_SECCADE+' ipek gerek ('+(S.inv.ipek||0)+' var) — dut ağaçlarındaki 🧵 kozalardan topla'); return; }
+  S.inv.ipek-=SILK_SECCADE; if(S.inv.ipek<=0) delete S.inv.ipek;
+  const abandoned=!!S.laidSeccade; if(abandoned){ S.laidSeccade=null; removeLaidSeccade(); }
+  S.hasSeccade=true; S.seccadeType=3;   // ipek seccade = en konforlu (huşûlu, uzun namaz)
+  playAction(2.0,'weave'); save(); refreshHUD(); if(typeof renderInv==='function') renderInv(); updateSeccadeBtn(); if(typeof updateWoolHint==='function') updateWoolHint(); sndFanfare();
+  banner('🧵 İpek seccade örüldü'); toast('Dut kozalarından çektiğin ipeği tezgâhta işledin — yumuşacık, huşûlu ipek seccade (🧵)');
+}
 function craftSeccade(){
   if(S.hasSeccade){ toast('✓ Zaten bir seccaden var'); return; }
   if((S.inv.yun||0)<SECCADE_YUN){ toast('🧵 '+SECCADE_YUN+' yün gerek ('+(S.inv.yun||0)+' var)'); return; }
@@ -5298,6 +5358,7 @@ function doStation(rec){
   } else if(rec.craft==='seccade'){
     const opts=[];
     opts.push({l:(S.hasSeccade?'🧵 Yeni seccade ör':'🧵 Seccade ör')+' ('+yun+'/'+SECCADE_YUN+' yün)', act:()=>craftSeccade()});
+    opts.push({l:'🧵 İpekten seccade ör ('+(S.inv.ipek||0)+'/'+SILK_SECCADE+' ipek)', act:()=>craftSilkSeccade()});   // dut kozalarından ipek → premium ipek seccade
     if((S.bag||0)<1) opts.push({l:'🎒 Çanta ör ('+yun+'/'+BAG_YUN[1]+' yün → 150 kapasite)', act:()=>craftBag(1)});
     if((S.bag||0)<2) opts.push({l:'🎒 Büyük çanta ör ('+yun+'/'+BAG_YUN[2]+' yün → 200 kapasite)', act:()=>craftBag(2)});
     opts.push({l:'Kapat'});
@@ -6214,6 +6275,8 @@ function buildWorld(){
   if(!tpl.hive) tpl.hive=buildHiveTemplate();   // arı kovanı prosedürel modelini tpl'e ekle (gather 'hive' bunu kullanır)
   if(!tpl.pond) tpl.pond=buildPondTemplate();   // gölet prosedürel modeli (gather 'pond' → balık tut); pond.glb gelince otomatik değişir
   buildGatherNodes();   // Medine: Hurma Bahçesi'nde toplanabilir ağaçlar + arı kovanı
+  spawnSilkworms();     // dut ağaçlarında ipek böceği döngüsü (yumurta→larva→koza→güve → ipek)
+  spawnAnts();          // ağaç diplerinde karınca kolonisi (models/ant.glb)
   buildAnimals();       // Medine: dolaşan hayvanlar (çobanlık)
   buildMarket();        // Medine: Şehir'de Sûk (pazar)
   buildNpcs();          // Medine: tekrarlanan hayır NPC'leri (yetim/komşu/misafir)
@@ -6872,6 +6935,7 @@ function doAct(){ if(!near) return;
   if(near.market){ openMarket(); return; }
   if(near.animal){ doTend(near); return; }
   if(near.gather){ doGather(near); return; }
+  if(near.silk){ harvestSilk(near); return; }               // ipek böceği → koza'da ipek hasat
   if(near.exam){ openExam(near.islId); return; }
   if(near.modern){ openModernBuilding(near); return; }
   if(near.home){ activateHomeObj(near); return; }               // evin içi: mobilya aksiyonu / kapıda çıkış duası
@@ -7292,6 +7356,7 @@ function tick(){
         else if(near.market){ actBtn.textContent=tU('ab_market')||'🛒 Pazar'; }
         else if(near.animal){ actBtn.textContent = animalReady(near.def) ? (near.q.ic+' '+animalLabel(near.def)) : (tU('ab_rest')||'🐑 Dinleniyor'); }
         else if(near.gather){ actBtn.textContent = nodeReady(near.def) ? (gverb(near.def.item)||(near.q.ic+' '+(tU('ab_gather')||'Topla'))) : (tU('ab_ripening')||'🌱 Olgunlaşıyor'); }
+        else if(near.silk){ actBtn.textContent = near.sw.stage===2 ? '🧵 '+(tU('ab_silk')||'İpek al') : silkStageName(near.sw.stage); }
         else if(near.exam){ actBtn.textContent = S.conquered[near.islId] ? (tU('ab_exam_done')||'Meydan ✓') : (examReady(near.islId) ? (tU('ab_exam_enter')||'📝 İmtihana Gir') : (tU('ab_exam_lock')||'🔒 Önce dersler')); }
         else if(near.modern){ actBtn.textContent = near.q.ic+' '+modernBldNm(near); }
         else if(near.home){ actBtn.textContent = homeObjName(near.homeObj); }
@@ -7324,6 +7389,8 @@ function tick(){
         ? ((S.lang==='en'||S.lang==='ar')
             ? (nodeReady(near.def) ? (near.q.ic+' '+(tU('pr_gatherv')||'Gather')+' '+goodName(near.def.item)) : ('🌱 '+goodName(near.def.item)+(tU('pr_ripen')||' — ripening')))
             : ((nodeReady(near.def)?near.q.ic+' ':'🌱 ')+near.q.nm+(nodeReady(near.def)?' topla':' — olgunlaşıyor')))
+        : near.silk
+        ? (near.sw.stage===2?'🧵 ':'🐛 ')+silkStageName(near.sw.stage)
         : near.exam
         ? ((S.conquered[near.islId]?'✓ ':examReady(near.islId)?'📝 ':'🔒 ')+(tU('pr_exam')||'İmtihan Meydanı'))
         : near.modern
@@ -7385,6 +7452,8 @@ function tick(){
     const m=meclisRoof.material, tgt=under?0.10:1; m.transparent=under||m.opacity<0.99;   // daha net saydam
     m.opacity += (tgt-m.opacity)*0.18; m.depthWrite=m.opacity>0.9; if(m.opacity>0.995){m.opacity=1;m.transparent=false;} }
   updateGuideBeacon();
+  if(typeof updateSilkworms==='function') updateSilkworms(dt);   // ipek böceği döngüsü (evre ilerleme + güve kanat)
+  if(typeof updateAnts==='function') updateAnts(dt);             // karınca dolaşma
   if(typeof updateGlbPrayer==='function') updateGlbPrayer(dt);   // NAMAZ GLB modeli oynatma (evre penceresi) — aktifse
   if(typeof updateGuardian==='function') updateGuardian(dt);   // evden çıkış duası → koruyucu melek eşliği
   if(typeof updateAngelHost==='function') updateAngelHost(dt);   // hasta ziyareti → 70.000 melek ışık halkası
