@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.94</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.95</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -4328,6 +4328,85 @@ const IMAM_SOZ_AR=[
   '«المسلمُ من سلِم المسلمون من لسانه ويده». (البخاري)',
 ];
 function imamSoz(i){ return (S.lang==='ar' && IMAM_SOZ_AR[i]) || (S.lang==='en' && IMAM_SOZ_EN[i]) || IMAM_SOZ[i]; }
+// 💬 İMAM SOHBETİ — GERÇEK DİYALOG (Faz 6.95): tek toast yerine karşılıklı konuşma (#dlg motoru).
+// Dallar: nasihat (dönen sahih söz + uygulama) · soru sor (namaz kazası/gizli sadaka/ilim) · kalp daralması (zikir) · selâm.
+// Nûr: vakit başına BİR kez +5 (S.sohbetNur=dayNum_vakit) — sohbet hep açık, ödül farm edilemez.
+function sohbetReward(){ const key=S.dayNum+'_'+vakitOf(gameTime)[1];
+  if(S.sohbetNur!==key){ S.sohbetNur=key; addNur(5); sndChime(); setTimeout(()=>toast('💬 '+(tU('so_nur')||'Sohbetin bereketi: +5 nûr')),200); }
+  save(); refreshHUD(); if(mosqueMode && typeof renderMosque==='function') renderMosque();
+}
+function imamSohbetDlg(){
+  const L=(S.lang==='en')?'en':(S.lang==='ar')?'ar':'tr';
+  const soz=imamSoz((S.dayNum*3+(vakitOf(gameTime)[0]*7|0))%IMAM_SOZ.length);   // vakte göre dönen sahih nasihat
+  const ALL={
+   tr:{ title:'İmam ile Sohbet', imam:'İmam',
+    s0:'Es-selâmü aleyküm evlâdım, hoş geldin! Şöyle yanıma otur. Gönlünde ne var, ne konuşalım?',
+    o_nasihat:'🌿 Bana bir nasihat ver', o_soru:'❓ Bir sorum var', o_kalp:'💭 Kalbim daralıyor', o_selam:'🤝 Sadece selâm vermeye geldim',
+    nas1:'Dinle öyleyse:<br><br><i>'+soz+'</i><br><br>Peki bunu hayatına nasıl taşıyacaksın evlâdım?',
+    o_adim:'Bugün küçük bir adımla başlayacağım', o_acikla:'Biraz açar mısınız?',
+    nasA:'Mâşâallah! Rasûlullah ﷺ: «Allah\'a en sevimli amel, az da olsa devamlı olandır.» (Buhârî, Müslim) Küçük ama devamlı bir adım, büyük ama yarım kalandan hayırlıdır. Haydi, bugünkü adımın bereketli olsun.',
+    nasB:'Elbette. Bu söz günlük hayata şöyle iner: evde, çarşıda, işte karşındakine kolaylaştır, müjdele, sevindir. Din nasihattır; nasihat da sıcak bir gönülle olur. Yarın gel, birlikte üzerinden geçelim.',
+    soru0:'Sor bakalım evlâdım, çekinme. İlmin kapısı sorudur.',
+    o_s1:'Namazı kaçırırsam ne yapayım?', o_s2:'Sadakanın en faziletlisi hangisi?', o_s3:'İlim öğrenmek için ne yapmalıyım?',
+    s1a:'Rasûlullah ﷺ: «Kim bir namazı unutur ya da uyuyakalırsa, hatırladığında onu kılsın.» (Müslim) Üzül ama ümitsizliğe düşme: hatırlayınca hemen kılarsın, tövbe edersin. Allah tövbe edeni sever.',
+    s2a:'Gizli verilendir. Arş\'ın gölgesinde anılan yedi sınıftan biri: «Sağ elinin verdiğini sol eli bilmeyecek kadar gizli sadaka veren.» (Buhârî, Müslim) Verirken kimsenin görmesini bekleme; Görenin Allah olması yeter.',
+    s3a:'«Kim ilim için bir yola girerse, Allah ona cennete giden yolu kolaylaştırır.» (Müslim) Her gün az da olsa oku, soran ol, âlim meclislerinde otur — tıpkı şimdi yaptığın gibi.',
+    kalp1:'Evlâdım, «Bilesiniz ki kalpler ancak Allah\'ı anmakla huzur bulur.» (Ra\'d 28) Gel, birlikte diyelim...',
+    o_zikir:'🤲 Birlikte zikredelim',
+    kalp2:'Sübhânallâhi ve bihamdihî, sübhânallâhi\'l-azîm... Nasıl, gönlün ferahladı mı? Bu iki kelime dile hafif, mîzanda ağır, Rahmân\'a sevimlidir. (Buhârî, Müslim) Daraldıkça buraya gel; kapımız da gönlümüz de açık.',
+    selam1:'Ve aleyküm selâm ve rahmetullâh! Mescide uğrayan gönül boş dönmez. Yüzünü gördük, gönlümüz ferahladı; cemaat de sana duacı. Selâmı yaymaya devam et — «Îmân etmedikçe cennete giremezsiniz; birbirinizi sevmedikçe îmân etmiş olmazsınız. Selâmı aranızda yayın.» (Müslim)',
+    o_eyv:'🤲 Allah razı olsun', o_baska:'↩ Başka bir şey soracağım', o_git:'🚪 Müsaadenizle' },
+   en:{ title:'Talk with the Imam', imam:'Imam',
+    s0:'As-salamu alaykum, my child — welcome! Come, sit beside me. What is on your heart; what shall we talk about?',
+    o_nasihat:'🌿 Give me counsel', o_soru:'❓ I have a question', o_kalp:'💭 My heart feels tight', o_selam:'🤝 I only came to greet you',
+    nas1:'Then listen:<br><br><i>'+soz+'</i><br><br>And how will you carry this into your life, my child?',
+    o_adim:'I will start with a small step today', o_acikla:'Could you explain a little?',
+    nasA:'Masha\'Allah! The Messenger ﷺ said: «The most beloved deeds to Allah are the most constant, even if small.» (Bukhari, Muslim) A small but steady step is better than a great one left half-done. May today\'s step be blessed.',
+    nasB:'Of course. It comes down to daily life: at home, in the market, at work — make things easy for people, give glad tidings, bring joy. Religion is sincere counsel, and counsel flows from a warm heart. Come tomorrow; we will go over it together.',
+    soru0:'Ask, my child, do not be shy. Questions are the door of knowledge.',
+    o_s1:'What if I miss a prayer?', o_s2:'Which charity is most virtuous?', o_s3:'How should I seek knowledge?',
+    s1a:'The Messenger ﷺ said: «Whoever forgets a prayer or sleeps through it, let him pray it when he remembers.» (Muslim) Regret it, but do not despair: pray it at once and repent — Allah loves those who repent.',
+    s2a:'The one given in secret. Among the seven shaded by the Throne: «one who gives charity so secretly that his left hand does not know what his right hand gave.» (Bukhari, Muslim) Seek no eyes upon you; it is enough that Allah sees.',
+    s3a:'«Whoever travels a path seeking knowledge, Allah eases for him a path to Paradise.» (Muslim) Read a little every day, keep asking, and sit in gatherings of knowledge — just as you are doing now.',
+    kalp1:'My child, «Verily, in the remembrance of Allah do hearts find rest.» (ar-Ra\'d 28) Come, let us say together...',
+    o_zikir:'🤲 Let us make dhikr together',
+    kalp2:'Subhanallahi wa bihamdihi, subhanallahil-azim... Well — has your heart eased? These two phrases are light on the tongue, heavy on the Scale, beloved to the Most Merciful. (Bukhari, Muslim) Whenever it tightens again, come here; our door and our hearts are open.',
+    selam1:'Wa alaykum as-salam wa rahmatullah! No heart that visits the mosque returns empty. Seeing your face gladdened us, and the congregation prays for you. Keep spreading salam — «You will not enter Paradise until you believe, and you will not believe until you love one another. Spread salam among yourselves.» (Muslim)',
+    o_eyv:'🤲 May Allah reward you', o_baska:'↩ I would ask something else', o_git:'🚪 With your leave' },
+   ar:{ title:'مجلسٌ مع الإمام', imam:'الإمام',
+    s0:'السلام عليكم يا بُنيّ، أهلًا بك! اجلس بجانبي. ما في قلبك؟ فيمَ نتحدّث؟',
+    o_nasihat:'🌿 انصحني', o_soru:'❓ عندي سؤال', o_kalp:'💭 قلبي ضائق', o_selam:'🤝 جئتُ للسلام فقط',
+    nas1:'فاستمع إذًا:<br><br><i>'+soz+'</i><br><br>فكيف تحمل هذا في حياتك يا بُنيّ؟',
+    o_adim:'سأبدأ اليوم بخطوةٍ صغيرة', o_acikla:'هلّا وضّحتَ قليلًا؟',
+    nasA:'ما شاء الله! قال رسول الله ﷺ: «أحبُّ الأعمال إلى الله أدومُها وإن قلّ». (البخاري ومسلم) خطوةٌ صغيرةٌ دائمةٌ خيرٌ من كبيرةٍ منقطعة. باركَ اللهُ في خطوتك اليوم.',
+    nasB:'بالطبع. معناه في الحياة اليومية: في البيت والسوق والعمل — يسِّر على الناس وبشِّر وأدخِلِ السرور. الدينُ النصيحة، والنصيحةُ تكون بقلبٍ دافئ. تعالَ غدًا نراجعه معًا.',
+    soru0:'سَل يا بُنيّ ولا تستحِ. السؤالُ بابُ العلم.',
+    o_s1:'ماذا أفعل إن فاتتني صلاة؟', o_s2:'أيُّ الصدقة أفضل؟', o_s3:'كيف أطلب العلم؟',
+    s1a:'قال رسول الله ﷺ: «من نسي صلاةً أو نام عنها فليصلِّها إذا ذكرها». (مسلم) احزن ولا تيأس: صلِّها فورَ التذكّر وتُب — واللهُ يحبّ التوّابين.',
+    s2a:'صدقةُ السرّ. من السبعة الذين يظلّهم الله: «رجلٌ تصدّق بصدقةٍ فأخفاها حتى لا تعلم شمالُه ما تنفق يمينُه». (البخاري ومسلم) لا تنتظر عينَ أحد؛ يكفيك أنّ اللهَ يرى.',
+    s3a:'«من سلك طريقًا يلتمس فيه علمًا سهّل اللهُ له به طريقًا إلى الجنة». (مسلم) اقرأ كلَّ يومٍ ولو قليلًا، واسأل، واجلس في مجالس العلم — كما تفعل الآن.',
+    kalp1:'يا بُنيّ، ﴿أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ﴾ (الرعد ٢٨). تعالَ نقُل معًا...',
+    o_zikir:'🤲 لنذكرِ اللهَ معًا',
+    kalp2:'سبحان الله وبحمده، سبحان الله العظيم... أرأيت؟ هل انشرح صدرُك؟ كلمتان خفيفتان على اللسان، ثقيلتان في الميزان، حبيبتان إلى الرحمن. (البخاري ومسلم) كلّما ضاق صدرُك فتعالَ؛ بابُنا وقلبُنا مفتوحان.',
+    selam1:'وعليكم السلام ورحمة الله! ما زار قلبٌ المسجدَ ورجع فارغًا. أسعدَنا وجهُك والجماعةُ تدعو لك. وانشرِ السلام — «لا تدخلون الجنةَ حتى تؤمنوا، ولا تؤمنوا حتى تحابّوا... أفشوا السلامَ بينكم». (مسلم)',
+    o_eyv:'🤲 جزاك الله خيرًا', o_baska:'↩ أسأل شيئًا آخر', o_git:'🚪 عن إذنك' }
+  };
+  const C=ALL[L];
+  const T=(txt,opts)=>({who:C.imam, txt, opts});
+  return { ic:'💬', title:C.title, start:'s0', steps:{
+    s0:T(C.s0,[ {l:C.o_nasihat,go:'nas1'}, {l:C.o_soru,go:'soru0'}, {l:C.o_kalp,go:'kalp1'}, {l:C.o_selam,go:'selam1'} ]),
+    nas1:T(C.nas1,[ {l:C.o_adim,go:'nasA'}, {l:C.o_acikla,go:'nasB'} ]),
+    nasA:T(C.nasA,[ {l:C.o_eyv,act:sohbetReward}, {l:C.o_baska,go:'s0'} ]),
+    nasB:T(C.nasB,[ {l:C.o_eyv,act:sohbetReward}, {l:C.o_baska,go:'s0'} ]),
+    soru0:T(C.soru0,[ {l:C.o_s1,go:'s1a'}, {l:C.o_s2,go:'s2a'}, {l:C.o_s3,go:'s3a'} ]),
+    s1a:T(C.s1a,[ {l:C.o_eyv,act:sohbetReward}, {l:C.o_baska,go:'s0'} ]),
+    s2a:T(C.s2a,[ {l:C.o_eyv,act:sohbetReward}, {l:C.o_baska,go:'s0'} ]),
+    s3a:T(C.s3a,[ {l:C.o_eyv,act:sohbetReward}, {l:C.o_baska,go:'s0'} ]),
+    kalp1:T(C.kalp1,[ {l:C.o_zikir,go:'kalp2'} ]),
+    kalp2:T(C.kalp2,[ {l:C.o_eyv,act:sohbetReward}, {l:C.o_baska,go:'s0'} ]),
+    selam1:T(C.selam1,[ {l:C.o_eyv,act:sohbetReward}, {l:C.o_git} ])
+  }};
+}
 // ZİKİR: mescitte (özellikle kerahat / namaz kılınmayan vakitlerde) — vakit başına bir kez her biri
 const ZIKIR=[
   {id:'hamdele', ad:'Hamdele', ic:'🌿', nur:3, txt:'Elhamdü lillâhi Rabbil âlemîn — Hamd, âlemlerin Rabbi Allah\'a mahsustur. Şükrün başıdır.'},
@@ -4440,8 +4519,7 @@ window.__mosqueAct=function(kind){
     S.imamMet=true; addNur(15); sndFanfare(); banner(tU('ma_vazife_banner')||'📜 İmam sana vazife verdi');
     setTimeout(()=>toast(tU('ma_vazife_toast')||'İmam: «Sende adalet ve merhamet gördüm. Bundan sonra insanların arasını bul (🕊️ barıştır), haksızlığa âdil hükmet (⚖️), emaneti ehline ulaştır (📿). Senaryo Defterin açıldı.» (+15 nûr)'),250); }
   else if(kind==='sohbet'){ if(!S.mosqueUnlocked){ renderMosque(); return; }
-    addNur(5); sndChime(); const soz=imamSoz((S.dayNum*3+ (vakitOf(gameTime)[0]*7|0))%IMAM_SOZ.length);
-    banner(tU('ma_sohbet_banner')||'💬 İmam sohbeti'); setTimeout(()=>toast(soz+' (+5 '+(tU('nur_suffix')||'nûr')+')'),200); }
+    openDialog(imamSohbetDlg()); }   // 💬 GERÇEK SOHBET: karşılıklı diyalog (#dlg mescit panelinin üstünde açılır); nûr vakit başına 1 kez (sohbetReward)
   else if(kind==='sit'){ const key=S.dayNum+'_'+vn; if(S.mosqueSat===key){ renderMosque(); return; }
     S.mosqueSat=key; addNur(3); sndChime(); setTimeout(()=>toast(tU('ma_sit_toast')||'🤲 Sessizce oturup dinledin — huzur ve nûr (+3)'),150); }
   save(); refreshHUD(); applyIslandLock(); renderMosque();
