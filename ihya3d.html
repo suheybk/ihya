@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.95</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.96</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1396,7 +1396,7 @@ if(!S.homeCd || typeof S.homeCd!=='object') S.homeCd={};   // modern EV rutini: 
 if(typeof S.hastaCd!=='number') S.hastaCd=0;     // modern KLİNİK hasta ziyareti ödül cooldown (ms)
 if(typeof S.fitness!=='number') S.fitness=0;     // KONDİSYON/disiplin 0..100 (spor salonu artırır, her gün azıcık düşer)
 if(typeof S.gymCd!=='number') S.gymCd=0;         // spor salonu antrenman cooldown (ms)
-const save=()=>{ try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){} };
+const save=()=>{ try{ S.savedAt=Date.now(); localStorage.setItem('ihya3d_v1',JSON.stringify(S)); if(typeof window!=='undefined') window.__fbDirty=true; }catch(e){} };   // savedAt+dirty → ☁️ bulut senkronu (M0) karşılaştırma/throttle için
 const today=()=>new Date().toISOString().slice(0,10);
 const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
 
@@ -1556,6 +1556,7 @@ const UI_STR={ en:{
   thief_counter:'The thief struck back — close in and strike again!',
   ab_exam_again:'📝 Retake the exam', ex_again_s:' — knowledge refreshed (+5 nur)', ex_again_done:'✓ Done (+5 nur)', ex_again_b:'Knowledge refreshed — +5 nur',
   fb_mail_sent:'A sign-in link was sent to your email', fb_email_confirm:'Enter your email to verify the sign-in link:', fb_signed_in:'Signed in: ',
+  fb_cloud_first:'Your save is now backed up to the cloud — safe even if you change devices', fb_cloud_title:'Cloud Save Found', fb_cloud_txt:'This account has a more advanced save:', fb_cloud_day:'Day', fb_cloud_q:'Load the CLOUD save instead of the one on this device?', fb_cloud_yes:'☁️ Load cloud save', fb_cloud_no:'📱 Continue with this device\'s save',
   hj_tiras_sub:'Shave or trim your hair; thus you exit ihram and your Hajj is complete. May Allah accept it.', hj_tiras_btn:'✂️ Shave — complete the Hajj (+60 nur)',
   hj_done_banner:'🕋 A blessed Hajj — Hajj accepted', hj_done_toast:'«Whoever performs Hajj for Allah and commits no obscenity or sin returns as the day his mother bore him (free of sin).» (Bukhari)',
   hj_fee_need:'Not enough dirhams for Hajj — needed: ',
@@ -1691,6 +1692,7 @@ ar:{
   thief_counter:'ردَّ اللصُّ الضربة — اقترِب واضرِب من جديد!',
   ab_exam_again:'📝 أعِدِ الامتحان', ex_again_s:' — تجدَّدت معرفتُك (+٥ نور)', ex_again_done:'✓ تمّ (+٥ نور)', ex_again_b:'تجدَّدت معرفتُك — +٥ نور',
   fb_mail_sent:'أُرسل رابطُ الدخول إلى بريدك', fb_email_confirm:'اكتب بريدك للتحقق من رابط الدخول:', fb_signed_in:'تمّ الدخول: ',
+  fb_cloud_first:'حُفظ تقدُّمك في السحابة — آمنٌ حتى لو غيّرتَ جهازك', fb_cloud_title:'وُجد حفظٌ سحابيّ', fb_cloud_txt:'لهذا الحساب حفظٌ أكثرُ تقدّمًا:', fb_cloud_day:'اليوم', fb_cloud_q:'أيُحمَّل الحفظُ السحابيُّ بدلَ حفظِ هذا الجهاز؟', fb_cloud_yes:'☁️ حمِّلِ الحفظَ السحابيّ', fb_cloud_no:'📱 تابِع بحفظِ هذا الجهاز',
   hj_tiras_sub:'احلِق شعرك أو قصِّره؛ بذلك تتحلّل من الإحرام ويتمُّ حجُّك. تقبّل الله.', hj_tiras_btn:'✂️ احلِق — أتمِمِ الحجّ (+٦٠ نور)',
   hj_done_banner:'🕋 حجٌّ مبرور — تقبّل الله', hj_done_toast:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع كيومَ ولدته أمُّه.» (البخاري)',
   hj_fee_need:'لا دراهم كافية للحجّ — يلزم: ',
@@ -6999,6 +7001,7 @@ async function fbFinishEmailLink(){   // e-postadaki bağlantıyla dönüş: ?mo
     if(j && j.idToken){ S.fbUser={email:j.email, localId:j.localId, refreshToken:j.refreshToken, at:Date.now()}; save();
       banner('🔥 '+(tU('fb_signed_in')||'Giriş yapıldı: ')+j.email);
       try{ history.replaceState(null,'',location.pathname); }catch(e){}   // oobCode URL'den temizlensin
+      setTimeout(()=>fbCloudCheck(), 1200);   // ☁️ girişten hemen sonra: bulutta ileri kayıt varsa geri yükleme teklif et
     } else if(j && j.error) console.warn('firebase link', j.error.message);
   }catch(e){ console.warn('firebase link', e); }
 }
@@ -7006,6 +7009,68 @@ function fbBootSync(){   // "kayıt olmuş herkese mail": eski (yalnız local) k
   if(!fbReady()) return;
   fbFinishEmailLink();
   if(S.hajjReg && S.hajjReg.email && !S.fbMailSent) fbHajjRegister(S.hajjReg);
+  if(S.fbUser) fbCloudCheck();                                   // ☁️ girişliyse: bulut kaydını karşılaştır (geride→yedekle, ileride→geri yükleme TEKLİF et)
+  setInterval(()=>{ fbCloudPush(); }, 30000);                    // periyodik yedek (içeride 90sn+dirty throttle var)
+}
+/* ── ☁️ BULUT KAYIT SENKRONU (M0, Faz 6.96) — girişin GERÇEK faydası: kayıt Firestore'da yedeklenir,
+   cihaz değişse de korunur. Saf REST (SDK yok). Kurallara EK gerekir (kullanıcı):
+     match /users/{uid} { allow read, write: if request.auth != null && request.auth.uid == uid; }
+   Akış: giriş (e-posta bağlantısı) → boot'ta karşılaştır → bulut İLERİDEYSE geri-yükleme diyaloğu (ASLA otomatik ezme);
+   yerel ilerideyse/eşitse buluta yaz. Sonra her ~90sn'de değişiklik varsa sessiz yedek. */
+let _fbTok=null, _fbTokExp=0, _fbLastPush=0;
+async function fbToken(){   // idToken (1 saat) — refreshToken ile yenile, önbellekle
+  if(!fbReady() || !S.fbUser || !S.fbUser.refreshToken) return null;
+  if(_fbTok && Date.now() < _fbTokExp-60000) return _fbTok;
+  try{
+    const r=await fetch('https://securetoken.googleapis.com/v1/token?key='+FIREBASE.apiKey,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'grant_type=refresh_token&refresh_token='+encodeURIComponent(S.fbUser.refreshToken)});
+    const j=await r.json();
+    if(j && j.id_token){ _fbTok=j.id_token; _fbTokExp=Date.now()+((+j.expires_in||3600)*1000);
+      if(j.refresh_token && j.refresh_token!==S.fbUser.refreshToken){ S.fbUser.refreshToken=j.refresh_token; save(); }
+      return _fbTok; }
+  }catch(e){}
+  return null;
+}
+async function fbCloudPush(force){   // kaydı buluta yaz (throttle: 90sn + değişiklik şartı; force=hemen)
+  if(!S.fbUser) return false;
+  const now=Date.now();
+  if(!force && (now-_fbLastPush<90000 || !window.__fbDirty)) return false;
+  const tok=await fbToken(); if(!tok) return false;
+  try{
+    const first=!S.fbSyncAt;
+    const body={fields:{ save:{stringValue:JSON.stringify(S)}, updatedAt:{integerValue:String(now)},
+      nur:{integerValue:String(Math.round(S.nur||0))}, dayNum:{integerValue:String(S.dayNum||0)}, email:{stringValue:S.fbUser.email||''} }};
+    const r=await fetch('https://firestore.googleapis.com/v1/projects/'+FIREBASE.projectId+'/databases/(default)/documents/users/'+S.fbUser.localId
+      +'?updateMask.fieldPaths=save&updateMask.fieldPaths=updatedAt&updateMask.fieldPaths=nur&updateMask.fieldPaths=dayNum&updateMask.fieldPaths=email',
+      {method:'PATCH',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify(body)});
+    if(r.ok){ window.__fbDirty=false; _fbLastPush=now; S.fbSyncAt=now; try{ localStorage.setItem('ihya3d_v1',JSON.stringify(S)); }catch(e){}
+      if(first) toast('☁️ '+(tU('fb_cloud_first')||'Kaydın buluta yedeklendi — artık cihaz değişse de korunur'));
+      return true; }
+  }catch(e){}
+  return false;
+}
+async function fbCloudPull(){   // buluttaki kaydın özetini getir
+  if(!S.fbUser) return null;
+  const tok=await fbToken(); if(!tok) return null;
+  try{
+    const r=await fetch('https://firestore.googleapis.com/v1/projects/'+FIREBASE.projectId+'/databases/(default)/documents/users/'+S.fbUser.localId,
+      {headers:{'Authorization':'Bearer '+tok}});
+    if(!r.ok) return null;
+    const f=(await r.json()).fields||{};
+    return { save:f.save&&f.save.stringValue, updatedAt:+((f.updatedAt&&f.updatedAt.integerValue)||0),
+      nur:+((f.nur&&f.nur.integerValue)||0), dayNum:+((f.dayNum&&f.dayNum.integerValue)||0) };
+  }catch(e){ return null; }
+}
+async function fbCloudCheck(){   // boot/giriş sonrası: bulut İLERİDEYSE geri yükleme TEKLİFİ (asla otomatik ezme)
+  const c=await fbCloudPull();
+  if(!c || !c.save){ window.__fbDirty=true; fbCloudPush(true); return; }   // bulut boş → ilk yedeği yaz
+  const localAt=S.savedAt||0;
+  if(c.updatedAt>localAt+5000 && (c.nur>(S.nur||0) || c.dayNum>(S.dayNum||0))){
+    openDialog({ic:'☁️', title:tU('fb_cloud_title')||'Bulut Kaydı Bulundu', start:'s0', steps:{
+      s0:{who:'', txt:(tU('fb_cloud_txt')||'Bu hesapta daha ileride bir kayıt var:')+' ☀️ '+(tU('fb_cloud_day')||'Gün')+' '+c.dayNum+' · ✨ '+c.nur+(tU('nur_suffix')||' nûr')+'<br><br>'+(tU('fb_cloud_q')||'Bu cihazdaki kayıt yerine BULUTTAKİ yüklensin mi?'), opts:[
+        {l:(tU('fb_cloud_yes')||'☁️ Bulut kaydını yükle'), act:()=>{ try{ localStorage.setItem('ihya3d_v1', c.save); location.reload(); }catch(e){} }},
+        {l:(tU('fb_cloud_no')||'📱 Bu cihazdaki kayıtla devam et'), act:()=>{ window.__fbDirty=true; fbCloudPush(true); }} ]}}});
+  } else { window.__fbDirty=true; fbCloudPush(true); }   // yerel güncel/eşit → buluta yaz
 }
 function beginHajjPayment(){
   // ⚠️ ÖDEME SEAM — gerçek iyzico ödemesi BURADA backend ile başlatılır:
@@ -8280,6 +8345,8 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     hitThief:()=>{ if(!thief) return 'hırsız yok'; strikeThief(); return thief?{hp:thief.hp,dying:thief.dying>0}:'kaçtı'; },
     clearThief:()=>{ removeThief(); return 'temizlendi'; },
     fbState:()=>({ready:fbReady(), user:S.fbUser||null, mailSentAt:S.fbMailSent||0, reg:S.hajjReg?{email:S.hajjReg.email}:null}),
+    fbCloud:()=>({signedIn:!!S.fbUser, dirty:!!window.__fbDirty, lastPushAt:_fbLastPush, syncAt:S.fbSyncAt||0, savedAt:S.savedAt||0}),
+    fbPush:()=>fbCloudPush(true), fbPull:()=>fbCloudPull(), fbCheck:()=>fbCloudCheck(),
     setHacNamazCam:(px,py,pz,lx,ly,lz)=>{ if(px!=null)hacNamazCamPos.set(px,py,pz); if(lx!=null)hacNamazCamLook.set(lx,ly,lz); return {pos:hacNamazCamPos.toArray().map(v=>+v.toFixed(2)), look:hacNamazCamLook.toArray().map(v=>+v.toFixed(2))}; },
     nudgeYaw:(d)=>{ PRAYER_YAW+=(d||0.1); return +PRAYER_YAW.toFixed(3); },   // kıbleyi adım adım çevir (küçük dokunuşlarla hizala)
     hacPrayerInfo:()=>({praying:hacPraying, PRAYER_YAW:+PRAYER_YAW.toFixed(3), baseYaw:+hacPrayerBaseYaw.toFixed(3), pilgrimYaw:hacPilgrim?+hacPilgrim.g.rotation.y.toFixed(3):null, rigOK:!!(hacPilgrimRig&&hacPilgrimRig.armL), camPos:hacNamazCamPos.toArray().map(v=>+v.toFixed(2)), camLook:hacNamazCamLook.toArray().map(v=>+v.toFixed(2)), makam:MAKAM.toArray(), kabe:KABE_IC.toArray()}),
