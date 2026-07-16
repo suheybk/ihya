@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.93</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.94</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -6890,7 +6890,7 @@ window.openHacReg=openHacReg; window.closeHacReg=closeHacReg; window.hacGender=h
      2) Authentication > Settings > Authorized domains → ihyagame.com (+ test için raw.githack.com) ekle
      3) Firestore Database oluştur → Rules: match /hajjApplications/{d} { allow create: if true; allow read,update,delete: if false; }
      4) Project settings > genel → apiKey + projectId'yi aşağıya yapıştır → deploy. BOŞKEN her şey sessizce atlanır. */
-const FIREBASE={ apiKey:'', projectId:'' };   // ← BURAYI DOLDURUNCA AKTİF
+const FIREBASE={ apiKey:'AIzaSyBTpC8nyMRBsT-Agi7J7RVyNKYt8w6j95k', projectId:'ihyagame' };   // ✅ AKTİF (proje: ihyagame — kullanıcı 2026-07-12)
 function fbReady(){ return /^AIza/.test(FIREBASE.apiKey||'') && !!FIREBASE.projectId; }
 async function fbHajjRegister(reg){
   if(!fbReady() || !reg || !reg.email) return false;
