@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.92</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.93</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -8212,6 +8212,12 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     imamState:()=>({consec:S.mosqueConsec, mark:S.mosqueConsecMark, met:S.imamMet, ready:(!S.imamMet&&S.mosqueConsec>=5)}),
     setImam:(v)=>{ S.imamMet=!!v; S.mosqueConsec=v?0:S.mosqueConsec; save(); return {met:S.imamMet}; },
     recordMosque:(vn)=>{ recordMosquePrayer(vn); save(); return {streak:S.mosqueStreak, unlocked:S.mosqueUnlocked, todaySet:S.mosqueVSet.length, consec:S.mosqueConsec, imamMet:S.imamMet}; },
+    // KISAYOL: 7 gün × 5 vakit camide serisini TAMAMLANMIŞ say → İmam sohbetini aç (gerçek kutlamayla)
+    unlockSohbet:()=>{ S.mosqueStreak=7; S.mosqueStreakDay=S.dayNum; S.mosqueVDay=S.dayNum; S.mosqueVSet=FARZ_VAKIT.slice(); S.mosqueFullDay=S.dayNum;
+      const first=!S.mosqueUnlocked; S.mosqueUnlocked=true; save();
+      if(first){ banner('🕌 İmam ve cemaatle tanıştın'); setTimeout(()=>toast('7 gün her vakti camide kıldın — artık imam ve cemaatle sohbet edip ilim alabilirsin.'),300); sndFanfare(); }
+      if(mosqueMode && typeof renderMosque==='function') renderMosque();
+      return {unlocked:true, hint:'Mescide gir → «💬 İmam ve cemaatle sohbet et (ilim +5)» butonu açık. Her sohbet: sahih bir imam sözü + 5 nûr (vakte göre döner).'}; },
     obstacles:()=>OBSTACLES.length, blocked:(x,z)=>blocked(x,z),
     dayNum:()=>S.dayNum, setDayNum:(n)=>{ S.dayNum=n; save(); },
     fastPhase:()=>fastPhase(), doFast:()=>doFast(),
