@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.97</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.98</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1557,6 +1557,7 @@ const UI_STR={ en:{
   ab_exam_again:'📝 Retake the exam', ex_again_s:' — knowledge refreshed (+5 nur)', ex_again_done:'✓ Done (+5 nur)', ex_again_b:'Knowledge refreshed — +5 nur',
   fb_mail_sent:'A sign-in link was sent to your email', fb_email_confirm:'Enter your email to verify the sign-in link:', fb_signed_in:'Signed in: ',
   fb_cloud_first:'Your save is now backed up to the cloud — safe even if you change devices', fb_cloud_title:'Cloud Save Found', fb_cloud_txt:'This account has a more advanced save:', fb_cloud_day:'Day', fb_cloud_q:'Load the CLOUD save instead of the one on this device?', fb_cloud_yes:'☁️ Load cloud save', fb_cloud_no:'📱 Continue with this device\'s save',
+  hd_hac_full:'Hajj', hd_hac_u:'Umrah',
   ab_hacgate:'🕋 Umrah / Hajj', hg_title:'Journey to Mecca', hg_txt:'You have revived the world — the gate of Mecca is open to you. What would you like to do?', hg_umre:'🕋 Intend Umrah', hg_hac:'🧳 Go to Hajj (application)', hg_end:'🏁 View the revival keepsake (end screen)', hg_back:'🚪 Not now',
   hj_tiras_sub:'Shave or trim your hair; thus you exit ihram and your Hajj is complete. May Allah accept it.', hj_tiras_btn:'✂️ Shave — complete the Hajj (+60 nur)',
   hj_done_banner:'🕋 A blessed Hajj — Hajj accepted', hj_done_toast:'«Whoever performs Hajj for Allah and commits no obscenity or sin returns as the day his mother bore him (free of sin).» (Bukhari)',
@@ -1694,6 +1695,7 @@ ar:{
   ab_exam_again:'📝 أعِدِ الامتحان', ex_again_s:' — تجدَّدت معرفتُك (+٥ نور)', ex_again_done:'✓ تمّ (+٥ نور)', ex_again_b:'تجدَّدت معرفتُك — +٥ نور',
   fb_mail_sent:'أُرسل رابطُ الدخول إلى بريدك', fb_email_confirm:'اكتب بريدك للتحقق من رابط الدخول:', fb_signed_in:'تمّ الدخول: ',
   fb_cloud_first:'حُفظ تقدُّمك في السحابة — آمنٌ حتى لو غيّرتَ جهازك', fb_cloud_title:'وُجد حفظٌ سحابيّ', fb_cloud_txt:'لهذا الحساب حفظٌ أكثرُ تقدّمًا:', fb_cloud_day:'اليوم', fb_cloud_q:'أيُحمَّل الحفظُ السحابيُّ بدلَ حفظِ هذا الجهاز؟', fb_cloud_yes:'☁️ حمِّلِ الحفظَ السحابيّ', fb_cloud_no:'📱 تابِع بحفظِ هذا الجهاز',
+  hd_hac_full:'الحجّ', hd_hac_u:'العمرة',
   ab_hacgate:'🕋 عمرة / حجّ', hg_title:'رحلةُ مكة', hg_txt:'لقد أحييتَ الدنيا — بابُ مكة مفتوحٌ لك. ماذا تريد؟', hg_umre:'🕋 انوِ العمرة', hg_hac:'🧳 اذهب إلى الحجّ (التسجيل)', hg_end:'🏁 شاهِد ذكرى الإحياء (شاشة النهاية)', hg_back:'🚪 ليس الآن',
   hj_tiras_sub:'احلِق شعرك أو قصِّره؛ بذلك تتحلّل من الإحرام ويتمُّ حجُّك. تقبّل الله.', hj_tiras_btn:'✂️ احلِق — أتمِمِ الحجّ (+٦٠ نور)',
   hj_done_banner:'🕋 حجٌّ مبرور — تقبّل الله', hj_done_toast:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع كيومَ ولدته أمُّه.» (البخاري)',
@@ -3156,6 +3158,7 @@ const JAM=new THREE.Vector3(KABE_IC.x-30, 0, KABE_IC.z-14);
 const JAM_DX=5.0;   // sütunlar arası mesafe
 const hacJamCamPos=new THREE.Vector3(JAM.x, 6.2, JAM.z+12);
 const hacJamCamLook=new THREE.Vector3(JAM.x, 2.2, JAM.z);
+const _hacCamP=new THREE.Vector3(), _hacCamL=new THREE.Vector3();   // dinamik kamera (cemre: aktif sütunu izle — karakter panel arkasında kalmasın)
 // ── KURBAN alanı: koyun + kesim/dağıtım (Mina'nın Kâbe tarafında) ──
 const KURBAN=new THREE.Vector3(KABE_IC.x-30, 0, KABE_IC.z+8);
 const hacKurCamPos=new THREE.Vector3(KURBAN.x+2, 4.6, KURBAN.z+9);
@@ -3258,6 +3261,8 @@ function hacBadge(P){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr';
 function renderHac(){
   const st=document.getElementById('hacStep'), body=document.getElementById('hacBody'); if(!body)return;
   const P=hacState; let title='', h='';
+  const hd=document.querySelector('#hac h3'); if(hd) hd.textContent = P.full ? ('🕋 '+(tU('hd_hac_full')||'Hac')) : ('🕋 '+(tU('hd_hac_u')||'Umre'));   // tam Hac'da başlık "Hac" (Umre değil)
+  const hi=document.getElementById('hacIntro'); if(hi) hi.style.display = (P.phase==='ihram') ? '' : 'none';   // genel tanıtım satırı sadece İLK evrede → panel kompakt
   if(P.phase==='ihram'){ title=tU('hac_ihram_title')||'İhrâm & Niyet';
     h+='<div class="sub" style="margin-bottom:8px">'+(tU('hac_ihram_sub')||'İki dikişsiz beyaz örtüye bürün, niyet et ve telbiye getir: <i>"Lebbeyk Allâhümme lebbeyk…"</i> — "Buyur Allah\'ım buyur." İhrâmlıyken saç/tırnak kesmek, koku sürünmek, avlanmak yasaktır.')+'</div>';
     h+='<button class="do" onclick="__hacAct(\'ihram\')">'+(tU('hac_ihram_btn')||'🤍 İhrâma gir ve telbiye getir')+'</button>'; }
@@ -7982,7 +7987,8 @@ function tick(){
       if(ph==='say'){ cp=hacSayCamPos; cl=hacSayCamLook; }                 // sa'y AYRI Mes'â'da
       else if(ph==='arafat'){ cp=hacArafatCamPos; cl=hacArafatCamLook; }   // Cebel-i Rahme
       else if(ph==='muzdelife'){ cp=hacMuzCamPos; cl=hacMuzCamLook; }      // gece taş toplama
-      else if(ph==='cemre'){ cp=hacJamCamPos; cl=hacJamCamLook; }          // Mina 3 cemre
+      else if(ph==='cemre'){ const _jx=JAM.x+((hacState.jamStage||0)-1)*JAM_DX;   // Mina: AKTİF sütunu + hacıyı çerçevele (yandan, yüksekçe — panel altta kalır)
+        _hacCamP.set(_jx+3.8, 4.4, JAM.z+9.0); _hacCamL.set(_jx-0.4, 1.5, JAM.z+1.0); cp=_hacCamP; cl=_hacCamL; }
       else if(ph==='kurban'){ cp=hacKurCamPos; cl=hacKurCamLook; }         // kurban alanı
       else if(ph==='namaz' && hacPraying){ cp=hacNamazCamPos; cl=hacNamazCamLook; }   // Makām-ı İbrâhîm namaz
       camera.position.lerp(cp, 0.1); camera.lookAt(cl);
