@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.98</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.99</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -714,6 +714,15 @@
     <div class="exhead"><h3 data-i18n="hd_hac">🕋 Umre</h3><span class="exprog" id="hacStep"></span></div>
     <div class="sub" data-i18n="hac_intro" id="hacIntro">Mîkāttan ihrâma niyet et; Kâbe'yi tavâf et, Safâ ile Merve arasında sa'y yap, sonra tıraş ol.</div>
     <div id="hacBody"></div>
+  </div>
+</div>
+
+<!-- 🌅 YENİ DOĞUŞ (İ1): Hac sonrası sinematik + karakter özelleştirme (saç/sakal/boy/kilo) -->
+<div class="veil" id="newbirth">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="exhead"><h3 id="nbTitle">🌅 Yeni Doğuş</h3></div>
+    <div id="nbBody"></div>
   </div>
 </div>
 <div id="hacFade" style="position:fixed;inset:0;background:#0a0e1a;opacity:0;pointer-events:none;z-index:15"></div>
@@ -1396,6 +1405,7 @@ if(!S.homeCd || typeof S.homeCd!=='object') S.homeCd={};   // modern EV rutini: 
 if(typeof S.hastaCd!=='number') S.hastaCd=0;     // modern KLİNİK hasta ziyareti ödül cooldown (ms)
 if(typeof S.fitness!=='number') S.fitness=0;     // KONDİSYON/disiplin 0..100 (spor salonu artırır, her gün azıcık düşer)
 if(typeof S.gymCd!=='number') S.gymCd=0;         // spor salonu antrenman cooldown (ms)
+if(!S.charCustom || typeof S.charCustom!=='object') S.charCustom={hair:'normal',beard:0,boyK:1,kiloK:1};   // 🌅 Yeni Doğuş görünümü (saç/sakal/boy/kilo — Hac sonrası seçilir)
 const save=()=>{ try{ S.savedAt=Date.now(); localStorage.setItem('ihya3d_v1',JSON.stringify(S)); if(typeof window!=='undefined') window.__fbDirty=true; }catch(e){} };   // savedAt+dirty → ☁️ bulut senkronu (M0) karşılaştırma/throttle için
 const today=()=>new Date().toISOString().slice(0,10);
 const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
@@ -1558,6 +1568,7 @@ const UI_STR={ en:{
   fb_mail_sent:'A sign-in link was sent to your email', fb_email_confirm:'Enter your email to verify the sign-in link:', fb_signed_in:'Signed in: ',
   fb_cloud_first:'Your save is now backed up to the cloud — safe even if you change devices', fb_cloud_title:'Cloud Save Found', fb_cloud_txt:'This account has a more advanced save:', fb_cloud_day:'Day', fb_cloud_q:'Load the CLOUD save instead of the one on this device?', fb_cloud_yes:'☁️ Load cloud save', fb_cloud_no:'📱 Continue with this device\'s save',
   hd_hac_full:'Hajj', hd_hac_u:'Umrah',
+  nb_title:'A New Birth', nb_cine1:'«Whoever performs Hajj for Allah and does not utter obscenity or commit sin returns <b>as on the day his mother bore him</b>.» (Bukhari)', nb_cine2:'Hajj has renewed you. Things have changed: ahead lies a <b>new life</b> and a <b>path of learning</b> that will raise you step by step. First, look in the mirror — choose yourself.', nb_cont:'Look in the mirror', nb_note:'Age-appropriate, modest options — changes appear on your character instantly.', nb_hair:'Hair', nb_h_n:'Normal', nb_h_k:'Short', nb_h_t:'Shaved', nb_beard:'Beard', nb_b_0:'None', nb_b_1:'Short', nb_b_2:'Full', nb_boy:'Height', nb_boy_k:'Short', nb_boy_o:'Medium', nb_boy_u:'Tall', nb_kilo:'Build', nb_k_i:'Slim', nb_k_o:'Medium', nb_k_g:'Broad', nb_start:'I\'m ready — begin the new life', nb_welcome:'May your new life be blessed', nb_welcome2:'🏙️ Ihya — Today: time to carry what you learned into life. Your path of learning will open step by step, insha\'Allah.',
   ab_hacgate:'🕋 Umrah / Hajj', hg_title:'Journey to Mecca', hg_txt:'You have revived the world — the gate of Mecca is open to you. What would you like to do?', hg_umre:'🕋 Intend Umrah', hg_hac:'🧳 Go to Hajj (application)', hg_end:'🏁 View the revival keepsake (end screen)', hg_back:'🚪 Not now',
   hj_tiras_sub:'Shave or trim your hair; thus you exit ihram and your Hajj is complete. May Allah accept it.', hj_tiras_btn:'✂️ Shave — complete the Hajj (+60 nur)',
   hj_done_banner:'🕋 A blessed Hajj — Hajj accepted', hj_done_toast:'«Whoever performs Hajj for Allah and commits no obscenity or sin returns as the day his mother bore him (free of sin).» (Bukhari)',
@@ -1696,6 +1707,7 @@ ar:{
   fb_mail_sent:'أُرسل رابطُ الدخول إلى بريدك', fb_email_confirm:'اكتب بريدك للتحقق من رابط الدخول:', fb_signed_in:'تمّ الدخول: ',
   fb_cloud_first:'حُفظ تقدُّمك في السحابة — آمنٌ حتى لو غيّرتَ جهازك', fb_cloud_title:'وُجد حفظٌ سحابيّ', fb_cloud_txt:'لهذا الحساب حفظٌ أكثرُ تقدّمًا:', fb_cloud_day:'اليوم', fb_cloud_q:'أيُحمَّل الحفظُ السحابيُّ بدلَ حفظِ هذا الجهاز؟', fb_cloud_yes:'☁️ حمِّلِ الحفظَ السحابيّ', fb_cloud_no:'📱 تابِع بحفظِ هذا الجهاز',
   hd_hac_full:'الحجّ', hd_hac_u:'العمرة',
+  nb_title:'ولادةٌ جديدة', nb_cine1:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع <b>كيومَ ولدته أمُّه</b>.» (البخاري)', nb_cine2:'جدَّدك الحجُّ. تغيّر الأمر: أمامك <b>حياةٌ جديدة</b> و<b>طريقُ تعلُّمٍ</b> يربّيك خطوةً خطوة. انظر أولًا في المرآة — اختر نفسك.', nb_cont:'انظر في المرآة', nb_note:'خياراتٌ محتشمةٌ مناسبةٌ للعمر — تظهر التغييرات على شخصيّتك فورًا.', nb_hair:'الشعر', nb_h_n:'عاديّ', nb_h_k:'قصير', nb_h_t:'محلوق', nb_beard:'اللحية', nb_b_0:'بلا', nb_b_1:'قصيرة', nb_b_2:'كاملة', nb_boy:'الطول', nb_boy_k:'قصير', nb_boy_o:'متوسّط', nb_boy_u:'طويل', nb_kilo:'البِنية', nb_k_i:'نحيف', nb_k_o:'متوسّط', nb_k_g:'عريض', nb_start:'أنا جاهز — ابدأ الحياةَ الجديدة', nb_welcome:'باركَ اللهُ حياتَك الجديدة', nb_welcome2:'🏙️ إحياء — اليوم: وقتُ حملِ ما تعلّمتَه إلى الحياة. سينفتح طريقُ تعلُّمك خطوةً خطوة إن شاء الله.',
   ab_hacgate:'🕋 عمرة / حجّ', hg_title:'رحلةُ مكة', hg_txt:'لقد أحييتَ الدنيا — بابُ مكة مفتوحٌ لك. ماذا تريد؟', hg_umre:'🕋 انوِ العمرة', hg_hac:'🧳 اذهب إلى الحجّ (التسجيل)', hg_end:'🏁 شاهِد ذكرى الإحياء (شاشة النهاية)', hg_back:'🚪 ليس الآن',
   hj_tiras_sub:'احلِق شعرك أو قصِّره؛ بذلك تتحلّل من الإحرام ويتمُّ حجُّك. تقبّل الله.', hj_tiras_btn:'✂️ احلِق — أتمِمِ الحجّ (+٦٠ نور)',
   hj_done_banner:'🕋 حجٌّ مبرور — تقبّل الله', hj_done_toast:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع كيومَ ولدته أمُّه.» (البخاري)',
@@ -3204,7 +3216,7 @@ function hacFade(){ const f=document.getElementById('hacFade'); if(!f)return; f.
 function telbiye(){ if(muted) return; try{ const u=new SpeechSynthesisUtterance('لَبَّيْكَ اللَّهُمَّ لَبَّيْك'); u.lang='ar-SA'; u.rate=0.7; u.pitch=0.6; speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(e){} }
 function startHacScene(){   // sahneyi Kâbe'ye çevir + 360° orbit sinematiğini başlat (girdap sonunda çağrılır)
   hacVortexT=0; document.body.classList.remove('warping'); warpBlock=false;
-  if(player){ camera.up.set(0,1,0); player.rotation.x=0; player.rotation.z=0; player.position.y=0; player.scale.setScalar(1.95); }
+  if(player){ camera.up.set(0,1,0); player.rotation.x=0; player.rotation.z=0; player.position.y=0; applyPlayerScale(); }
   hacMode=true; if(hacGroup) hacGroup.visible=true; near=null;
   hacState={phase:'ihram', full:_hajjFull, tavaf:0, say:0, cemre:0, stones:0, jamStage:0, kurbanStep:0, ang:Math.PI/4, angT:Math.PI/4, sayPos:-1, sayT:-1};
   hacPraying=false; hacThrowT=0; if(kurbanMeatMesh) kurbanMeatMesh.visible=false; if(kurbanSheep) kurbanSheep.visible=true;
@@ -3241,7 +3253,7 @@ function enterHac(full){
 function exitHac(){ hacMode=false; hacVortexT=0; warpBlock=false; document.body.classList.remove('warping'); wake();
   hacPraying=false; hacPrayHold=false; if(hacPilgrim){ hacPilgrim.g.rotation.x=0; hacPilgrim.g.position.y=0; }   // tavâf-namazı yarıda kaldıysa rig'i sıfırla
   if(hacGroup) hacGroup.visible=false; document.getElementById('hac').classList.remove('show');
-  if(player){ camera.up.set(0,1,0); player.rotation.x=0; player.rotation.z=0; player.position.y=0; player.scale.setScalar(1.95); camera.position.copy(player.position).add(CAM_OFF); } hacFade(); }
+  if(player){ camera.up.set(0,1,0); player.rotation.x=0; player.rotation.z=0; player.position.y=0; applyPlayerScale(); camera.position.copy(player.position).add(CAM_OFF); } hacFade(); }
 function setHacDayNight(frac){ try{ gameTime=frac; if(typeof updateDayNight==='function') updateDayNight(0); }catch(e){} }   // Arafat=gündüz, Müzdelife=gece atmosferi
 const STONES_NEED=21;   // 3 cemre × 7 taş
 function jamName(i){ return [ {ic:'🔸',nm:(tU('hj_jam_small')||'Küçük Cemre (Suğrâ)')}, {ic:'🔹',nm:(tU('hj_jam_mid')||'Orta Cemre (Vustâ)')}, {ic:'🔺',nm:(tU('hj_jam_big')||'Akabe Cemresi (Büyük)')} ][Math.max(0,Math.min(2,i|0))]; }
@@ -3347,7 +3359,9 @@ window.__hacAct=function(kind){
       if(firstHajj) setTimeout(()=>banner('🏙️ '+(tU('mo_unlock')||'İhya — Bugün açıldı: öğrendiklerini bugünün hayatına taşı (şehir butonu 🏙️)')),2600);
     } else { S.umreCount=(S.umreCount||0)+1; addNur(40); save(); refreshHUD(); sndFanfare(); banner(tU('hac_done_banner')||'🕋 Umre kabul olsun');
       setTimeout(()=>toast(tU('hac_done_toast')||'"Bir umre, diğer umreye kadar aralarındaki (küçük) günahlara keffârettir." (Buhârî, Umre 1)'),1200); }
-    setTimeout(()=>exitHac(),700); return; }
+    setTimeout(()=>exitHac(),700);
+    if(P.full) setTimeout(()=>openNewBirth(true), 1900);   // 🌅 YENİ DOĞUŞ: tam Hac sonrası sinematik + karakter özelleştirme (İ1)
+    return; }
 };
 // TAVÂF NAMAZI (Hac/Umre) — KENDİ karakterimiz (hacPilgrim) Makām-ı İbrâhîm'de prosedürel 2 rekât kılar (GLB adam YOK)
 function startHacPrayer(hold){   // hold=true → tuning modu: kıyamda SABİT durur (otomatik bitmez), cihazda kıble/kamera ayarı için
@@ -3365,10 +3379,71 @@ function finishHacNamaz(){ const P=hacState; hacPraying=false; hacPrayHold=false
   setTimeout(()=>banner('﴿إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ﴾'),400);
   setTimeout(()=>toast(tU('hac_say_verse')||'"Şüphesiz Safâ ile Merve, Allah\'ın nişânelerindendir." (Bakara 158)'),1700);
 }
+// ── 🌅 YENİ DOĞUŞ GÖRÜNÜMÜ (İ1, Faz 6.99): saç/sakal (yaşa göre, ÖLÇÜLÜ) + boy/kilo — tek merkez ──
+let beardMesh=null, BEARD_POS=[0.795,0.36];   // sakal konumu (localH oranı, localD oranı) — cihazda setBeardPos ile ayarlanabilir
+function applyPlayerScale(){ if(!player) return; const c=S.charCustom||{};
+  player.scale.set(1.95*(c.kiloK||1), 1.95*(c.boyK||1), 1.95*(c.kiloK||1)); }   // boy=Y, kilo=X/Z (ölçülü aralıklar)
+function applyCharCustom(){ if(!player) return; const c=S.charCustom||{};
+  const shaved=!!S.hairShaved, h=c.hair||'normal';   // Hac tıraşı HER ZAMAN öncelikli (3 Cuma uzar)
+  player.traverse(o=>{ if(!o.isMesh||!o.name) return;
+    if(/^Hair_/.test(o.name)) o.visible = !shaved && h!=='tiras';
+    if(/^Bang_/.test(o.name)) o.visible = !shaved && h==='normal'; });   // kısa: perçemsiz · tıraşlı: saçsız
+  // SAKAL — yalnız YETİŞKİN ERKEK profili (çocukta/kadında yok; "yaşına göre, abartmadan")
+  if(beardMesh){ player.remove(beardMesh); beardMesh=null; }
+  const want=(isAdult()&&isMale())?(+c.beard||0):0;
+  if(want>0){
+    const bb=new THREE.Box3().setFromObject(player); const sz=new THREE.Vector3(); bb.getSize(sz);
+    const localH=sz.y/(player.scale.y||1), localD=Math.max(0.2, sz.z/(player.scale.z||1));
+    const m=new THREE.MeshStandardMaterial({color:0x35261a,roughness:0.95});
+    const w=want===2?0.20:0.165, hh=want===2?0.085:0.05;
+    const g=new THREE.Group();
+    const b=new THREE.Mesh(new THREE.BoxGeometry(w,hh,0.055), m); b.frustumCulled=false; g.add(b);
+    g.position.set(0, localH*BEARD_POS[0], localD*BEARD_POS[1]);
+    beardMesh=g; player.add(g);
+  }
+  applyPlayerScale();
+}
 // SAÇ TIRAŞI (Hac/Umre tıraş) — saç mesh'leri gizlenir; 3 Cuma geçince yeniden uzar
-function updatePlayerHair(){ if(!player) return; const hide=!!S.hairShaved;
-  player.traverse(o=>{ if(o.isMesh && /^(Hair_|Bang_)/.test(o.name||'')) o.visible=!hide; }); }
-function shaveHair(){ S.hairShaved=true; S.hairFridays=0; save(); updatePlayerHair(); }   // tıraş → saç kesildi
+function updatePlayerHair(){ applyCharCustom(); }   // eski isim (boot + onNewDay çağırır) → tek merkezden
+function shaveHair(){ S.hairShaved=true; S.hairFridays=0; save(); applyCharCustom(); }   // tıraş → saç kesildi
+// ── 🌅 YENİ DOĞUŞ PANELİ: sinematik metin → görünüm seçimi → şehre (yeni hayata) başlangıç ──
+let nbStep='cine';
+function openNewBirth(afterHajj){ nbStep=afterHajj?'cine':'custom';
+  if(!S.charCustom||typeof S.charCustom!=='object') S.charCustom={hair:'normal',beard:0,boyK:1,kiloK:1};
+  renderNewBirth(); document.getElementById('newbirth').classList.add('show'); }
+function closeNewBirth(){ document.getElementById('newbirth').classList.remove('show'); }
+function nbRow(label,key,opts){ const c=S.charCustom; let h='<div class="exq" style="margin:9px 0 5px">'+label+'</div><div class="exopts" style="grid-template-columns:repeat('+opts.length+',1fr)">';
+  for(const o of opts){ const sel=(String(c[key])===String(o.v)); h+='<button class="exOpt'+(sel?' correct':'')+'" onclick="__nbSet(\''+key+'\',\''+o.v+'\')">'+o.l+'</button>'; }
+  return h+'</div>'; }
+function renderNewBirth(){
+  const t=document.getElementById('nbTitle'), body=document.getElementById('nbBody'); if(!body) return;
+  if(t) t.textContent='🌅 '+(tU('nb_title')||'Yeni Doğuş');
+  if(nbStep==='cine'){
+    body.innerHTML='<div class="sub" style="margin:6px 0 10px;line-height:1.6">'
+      +(tU('nb_cine1')||'«Kim Allah için hacceder, kötü söz ve günah işlemezse, <b>anasından doğduğu gün gibi</b> döner.» (Buhârî)')+'<br><br>'
+      +(tU('nb_cine2')||'Hac seni yeniledi. Artık iş değişti: önünde <b>yeni bir hayat</b> ve seni adım adım yetiştirecek bir <b>eğitim yolu</b> var. Önce aynaya bak — kendini seç.')+'</div>'
+      +'<button class="do" onclick="__nbAct(\'toCustom\')">🪞 '+(tU('nb_cont')||'Aynaya bak')+'</button>';
+    return;
+  }
+  let h='<div class="sub" style="margin:2px 0 6px;opacity:.85">'+(tU('nb_note')||'Yaşına uygun, ölçülü seçenekler — değişiklikler anında karakterinde görünür.')+'</div>';
+  h+=nbRow('💇 '+(tU('nb_hair')||'Saç'),'hair',[{v:'normal',l:tU('nb_h_n')||'Normal'},{v:'kisa',l:tU('nb_h_k')||'Kısa'},{v:'tiras',l:tU('nb_h_t')||'Tıraşlı'}]);
+  if(isAdult()&&isMale()) h+=nbRow('🧔 '+(tU('nb_beard')||'Sakal'),'beard',[{v:0,l:tU('nb_b_0')||'Yok'},{v:1,l:tU('nb_b_1')||'Kısa'},{v:2,l:tU('nb_b_2')||'Sakallı'}]);
+  h+=nbRow('📏 '+(tU('nb_boy')||'Boy'),'boyK',[{v:0.92,l:tU('nb_boy_k')||'Kısa'},{v:1,l:tU('nb_boy_o')||'Orta'},{v:1.08,l:tU('nb_boy_u')||'Uzun'}]);
+  h+=nbRow('⚖️ '+(tU('nb_kilo')||'Beden'),'kiloK',[{v:0.94,l:tU('nb_k_i')||'İnce'},{v:1,l:tU('nb_k_o')||'Orta'},{v:1.06,l:tU('nb_k_g')||'Geniş'}]);
+  h+='<button class="do" style="margin-top:12px" onclick="__nbAct(\'start\')">🏙️ '+(tU('nb_start')||'Böyle iyiyim — yeni hayata başla')+'</button>';
+  body.innerHTML=h;
+}
+window.__nbSet=function(key,v){ if(!S.charCustom) S.charCustom={};
+  S.charCustom[key] = (key==='hair') ? v : +v;
+  applyCharCustom(); save(); renderNewBirth(); sndChime(); };
+window.__nbAct=function(kind){
+  if(kind==='toCustom'){ nbStep='custom'; renderNewBirth(); return; }
+  if(kind==='start'){ save(); closeNewBirth();
+    banner('🌅 '+(tU('nb_welcome')||'Yeni hayatın mübârek olsun'));
+    setTimeout(()=>toast(tU('nb_welcome2')||'🏙️ İhya — Bugün: öğrendiklerini hayata taşıma vakti. Eğitim yolun adım adım açılacak inşâallah.'),900);
+    if(S.modernUnlocked && !inModern && typeof enterModern==='function') setTimeout(()=>enterModern(),1600);   // şehre geçiş (İ3'te tam onboarding gelecek)
+    return; }
+};
 function hacTick(dt){
   if(!hacMode||!hacPilgrim) return;
   updateBsGlow(dt);   // Hacer-i Esved yeşil ışık sönümü (istilâm sonrası)
@@ -6863,7 +6938,7 @@ function buildWorld(){
   // #4 takke YEŞİL olsun — Cap+Cap_Rim kahveydi (saça çok yakındı), net ayrışsın
   { const capG=new THREE.Color(0x2e7d46);
     pl.meshes.forEach(x=>{ if(x.m.name==='Cap'||x.m.name==='Cap_Rim'){ x.m.material.color.copy(capG); x.orig.copy(capG); x.gray.copy(grayOf(capG)); } }); }
-  player=pl.g; player.position.set(-5,0,0); player.rotation.order='YXZ'; player.rotation.y=Math.PI/2; player.scale.setScalar(1.95); scene.add(player);
+  player=pl.g; player.position.set(-5,0,0); player.rotation.order='YXZ'; player.rotation.y=Math.PI/2; applyPlayerScale(); scene.add(player);
   const pgob=n=>player.getObjectByName(n);
   const prig=(main,...ex)=>{ const m=pgob(main); if(!m)return null; const parts=[m]; ex.forEach(e=>{const x=pgob(e);if(x)parts.push(x);}); return {parts, piv:limbPivot(m)}; };
   PP={ legL:prig('Pant_L','Shoe_L','Sole_L'), legR:prig('Pant_R','Shoe_R','Sole_R'),
@@ -8050,6 +8125,11 @@ function tick(){
       tmp.x=mix(tmp.x,sx,namazCamK); tmp.y=mix(tmp.y,player.position.y+H,namazCamK); tmp.z=mix(tmp.z,sz,namazCamK);
       lookTY=mix(lookTY,player.position.y+(fc.lookY!=null?fc.lookY:1.0),namazCamK);   // evreye göre bakış yüksekliği (secde alçak, kıyam yüksek)
     }
+    // 🌅 YENİ DOĞUŞ açıkken: AYNA görünümü — kamera karakterin önüne (seçimler canlı görünsün)
+    { const _nb=document.getElementById('newbirth');
+      if(_nb && _nb.classList.contains('show') && player){ const ry=player.rotation.y;
+        tmp.set(player.position.x+Math.sin(ry)*3.4, player.position.y+1.5, player.position.z+Math.cos(ry)*3.4);
+        lookTX=player.position.x; lookTY=player.position.y+1.05; lookTZ=player.position.z; } }
     camera.position.lerp(tmp,0.12);
     camera.lookAt(lookTX,lookTY,lookTZ);
   }
@@ -8352,7 +8432,7 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     sell:(k,all)=>sellGood(k,all), dirhem:()=>S.dirhem||0, prices:()=>PRICES,
     marketBuilt:()=>!!marketRec,
     enterMosque:()=>enterMosque(), exitMosque:()=>exitMosque(), mosqueAct:(k)=>window.__mosqueAct(k),
-    enterHac:(full)=>enterHac(full), exitHac:()=>exitHac(), hacAct:(k)=>window.__hacAct(k), hacState:()=>({mode:hacMode, ...hacState}), hacGate:()=>openHacGate(), worldRevived:()=>worldRevived(), startFullHajj:()=>{ _hajjFull=true; startHacScene(); hacIntroT=0; document.getElementById('hac').classList.add('show'); return hacState.phase; }, openHacReg:()=>openHacReg(), hajjReg:()=>S.hajjReg,
+    enterHac:(full)=>enterHac(full), exitHac:()=>exitHac(), hacAct:(k)=>window.__hacAct(k), hacState:()=>({mode:hacMode, ...hacState}), hacGate:()=>openHacGate(), worldRevived:()=>worldRevived(), openNewBirth:(c)=>openNewBirth(!!c), charCustom:()=>Object.assign({},S.charCustom), setBeardPos:(hy,dz)=>{ BEARD_POS=[hy,dz]; applyCharCustom(); return BEARD_POS; }, startFullHajj:()=>{ _hajjFull=true; startHacScene(); hacIntroT=0; document.getElementById('hac').classList.add('show'); return hacState.phase; }, openHacReg:()=>openHacReg(), hajjReg:()=>S.hajjReg,
     setPrayerYaw:(r)=>{ PRAYER_YAW=r; return PRAYER_YAW; }, prayerState:()=>({loaded:!!prayerModel, active:prayerActive, scale:+prayerScale.toFixed(4), yaw:+PRAYER_YAW.toFixed(2), end:prayerGlbEnd}), loadPrayer:()=>loadPrayerModel(),
     // ── HAC NAMAZ (Makām-ı İbrâhîm) CİHAZ İNCE AYARI ── kıble + kamera CANLI ayarlanır; güzel değerleri bulunca söyleyin, varsayılan yaparım
     hacPrayerTest:()=>{ if(!hacMode){ _hajjFull=true; startHacScene(); hacIntroT=0; document.getElementById('hac').classList.add('show'); } hacState.phase='namaz'; startHacPrayer(true);   // KENDİ karakterimiz kıyamda SABİT durur (tuning)
