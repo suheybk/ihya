@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.96</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 6.97</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1557,6 +1557,7 @@ const UI_STR={ en:{
   ab_exam_again:'📝 Retake the exam', ex_again_s:' — knowledge refreshed (+5 nur)', ex_again_done:'✓ Done (+5 nur)', ex_again_b:'Knowledge refreshed — +5 nur',
   fb_mail_sent:'A sign-in link was sent to your email', fb_email_confirm:'Enter your email to verify the sign-in link:', fb_signed_in:'Signed in: ',
   fb_cloud_first:'Your save is now backed up to the cloud — safe even if you change devices', fb_cloud_title:'Cloud Save Found', fb_cloud_txt:'This account has a more advanced save:', fb_cloud_day:'Day', fb_cloud_q:'Load the CLOUD save instead of the one on this device?', fb_cloud_yes:'☁️ Load cloud save', fb_cloud_no:'📱 Continue with this device\'s save',
+  ab_hacgate:'🕋 Umrah / Hajj', hg_title:'Journey to Mecca', hg_txt:'You have revived the world — the gate of Mecca is open to you. What would you like to do?', hg_umre:'🕋 Intend Umrah', hg_hac:'🧳 Go to Hajj (application)', hg_end:'🏁 View the revival keepsake (end screen)', hg_back:'🚪 Not now',
   hj_tiras_sub:'Shave or trim your hair; thus you exit ihram and your Hajj is complete. May Allah accept it.', hj_tiras_btn:'✂️ Shave — complete the Hajj (+60 nur)',
   hj_done_banner:'🕋 A blessed Hajj — Hajj accepted', hj_done_toast:'«Whoever performs Hajj for Allah and commits no obscenity or sin returns as the day his mother bore him (free of sin).» (Bukhari)',
   hj_fee_need:'Not enough dirhams for Hajj — needed: ',
@@ -1693,6 +1694,7 @@ ar:{
   ab_exam_again:'📝 أعِدِ الامتحان', ex_again_s:' — تجدَّدت معرفتُك (+٥ نور)', ex_again_done:'✓ تمّ (+٥ نور)', ex_again_b:'تجدَّدت معرفتُك — +٥ نور',
   fb_mail_sent:'أُرسل رابطُ الدخول إلى بريدك', fb_email_confirm:'اكتب بريدك للتحقق من رابط الدخول:', fb_signed_in:'تمّ الدخول: ',
   fb_cloud_first:'حُفظ تقدُّمك في السحابة — آمنٌ حتى لو غيّرتَ جهازك', fb_cloud_title:'وُجد حفظٌ سحابيّ', fb_cloud_txt:'لهذا الحساب حفظٌ أكثرُ تقدّمًا:', fb_cloud_day:'اليوم', fb_cloud_q:'أيُحمَّل الحفظُ السحابيُّ بدلَ حفظِ هذا الجهاز؟', fb_cloud_yes:'☁️ حمِّلِ الحفظَ السحابيّ', fb_cloud_no:'📱 تابِع بحفظِ هذا الجهاز',
+  ab_hacgate:'🕋 عمرة / حجّ', hg_title:'رحلةُ مكة', hg_txt:'لقد أحييتَ الدنيا — بابُ مكة مفتوحٌ لك. ماذا تريد؟', hg_umre:'🕋 انوِ العمرة', hg_hac:'🧳 اذهب إلى الحجّ (التسجيل)', hg_end:'🏁 شاهِد ذكرى الإحياء (شاشة النهاية)', hg_back:'🚪 ليس الآن',
   hj_tiras_sub:'احلِق شعرك أو قصِّره؛ بذلك تتحلّل من الإحرام ويتمُّ حجُّك. تقبّل الله.', hj_tiras_btn:'✂️ احلِق — أتمِمِ الحجّ (+٦٠ نور)',
   hj_done_banner:'🕋 حجٌّ مبرور — تقبّل الله', hj_done_toast:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع كيومَ ولدته أمُّه.» (البخاري)',
   hj_fee_need:'لا دراهم كافية للحجّ — يلزم: ',
@@ -3208,6 +3210,17 @@ function startHacScene(){   // sahneyi Kâbe'ye çevir + 360° orbit sinematiği
   const pe=document.getElementById('prompt'); if(pe){ pe.classList.remove('show'); pe.style.display='none'; }
   document.getElementById('hac').classList.remove('show');     // panel orbit bitince açılır
   renderHac(); banner('🕋 Kâbe\'ye yöneliyorsun…');
+}
+function worldRevived(){ return WORLD.islands.filter(i=>!i.side).every(i=>S.conquered[i.id]); }   // tüm ana adalar fethedildi mi (Dünya İhyâ)
+// 🕋 MEKKE KAPISI: dünya ihyâ edildiyse bitiş ekranı bir daha gelmez → HAC BAŞVURUSU'na kalıcı erişim burası (Faz 6.97)
+function openHacGate(){
+  if(!worldRevived()){ enterHac(); return; }   // henüz bitmemiş oyun: eskisi gibi doğrudan Umre
+  openDialog({ ic:'🕋', title:tU('hg_title')||'Mekke Yolculuğu', start:'s0', steps:{
+    s0:{ who:'', txt:(tU('hg_txt')||'Dünyayı ihyâ ettin — Mekke kapısı sana açık. Ne yapmak istersin?'), opts:[
+      { l:(tU('hg_umre')||'🕋 Umre\'ye niyet et'), act:()=>enterHac() },
+      { l:(tU('hg_hac')||'🧳 Hacca git (başvuru)'), act:()=>openHacReg() },
+      { l:(tU('hg_end')||'🏁 İhyâ hâtırasını gör (bitiş ekranı)'), act:()=>showEnd() },
+      { l:(tU('hg_back')||'🚪 Vazgeç') } ]}}});
 }
 function enterHac(full){
   _hajjFull=!!full;
@@ -7604,7 +7617,7 @@ function doAct(){ if(!near) return;
   if(near.thief){ strikeThief(); return; }   // ⚔️ hırsıza vur (her Space/dokunuş = bir vuruş)
   if(near.seccadePickup){ pickupSeccade(); return; }
   if(near.mosque){ enterMosque(); return; }
-  if(near.hac){ enterHac(); return; }
+  if(near.hac){ openHacGate(); return; }   // 🕋 Mekke kapısı: dünya ihyâ edildiyse Umre/HAC-başvurusu/bitiş-ekranı seçimi, değilse Umre
   if(near.muahat){ doMuahat(near); return; }
   if(near.station){ doStation(near); return; }
   if(near.scenario){ doScenario(near); return; }
@@ -8046,7 +8059,7 @@ function tick(){
         if(near.thief){ actBtn.textContent='⚔️ '+(tU('thief_btn')||'Karşı koy'); }
         else if(near.seccadePickup){ actBtn.textContent=tU('ab_seccade')||'🧎 Seccadeni al'; }
         else if(near.mosque){ actBtn.textContent=tU('ab_mosque')||'🕌 Mescide gir'; }
-        else if(near.hac){ actBtn.textContent=tU('ab_hac')||'🕋 Umre\'ye niyet'; }
+        else if(near.hac){ actBtn.textContent = worldRevived() ? (tU('ab_hacgate')||'🕋 Umre / Hac') : (tU('ab_hac')||'🕋 Umre\'ye niyet'); }
         else if(near.muahat){ actBtn.textContent = S.muahat ? (tU('ab_greet')||'🤝 Selâm ver') : (tU('ab_broth')||'🤝 Kardeş ol'); }
         else if(near.station){ actBtn.textContent = near.sBtn; }
         else if(near.scenario){ actBtn.textContent = (near.renew ? !scenArmed(near) : (near.q && S.done[near.q.id])) ? (tU('ab_done')||'✓ Tamam') : scenBtn(near); }
@@ -8333,7 +8346,7 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     sell:(k,all)=>sellGood(k,all), dirhem:()=>S.dirhem||0, prices:()=>PRICES,
     marketBuilt:()=>!!marketRec,
     enterMosque:()=>enterMosque(), exitMosque:()=>exitMosque(), mosqueAct:(k)=>window.__mosqueAct(k),
-    enterHac:(full)=>enterHac(full), exitHac:()=>exitHac(), hacAct:(k)=>window.__hacAct(k), hacState:()=>({mode:hacMode, ...hacState}), startFullHajj:()=>{ _hajjFull=true; startHacScene(); hacIntroT=0; document.getElementById('hac').classList.add('show'); return hacState.phase; }, openHacReg:()=>openHacReg(), hajjReg:()=>S.hajjReg,
+    enterHac:(full)=>enterHac(full), exitHac:()=>exitHac(), hacAct:(k)=>window.__hacAct(k), hacState:()=>({mode:hacMode, ...hacState}), hacGate:()=>openHacGate(), worldRevived:()=>worldRevived(), startFullHajj:()=>{ _hajjFull=true; startHacScene(); hacIntroT=0; document.getElementById('hac').classList.add('show'); return hacState.phase; }, openHacReg:()=>openHacReg(), hajjReg:()=>S.hajjReg,
     setPrayerYaw:(r)=>{ PRAYER_YAW=r; return PRAYER_YAW; }, prayerState:()=>({loaded:!!prayerModel, active:prayerActive, scale:+prayerScale.toFixed(4), yaw:+PRAYER_YAW.toFixed(2), end:prayerGlbEnd}), loadPrayer:()=>loadPrayerModel(),
     // ── HAC NAMAZ (Makām-ı İbrâhîm) CİHAZ İNCE AYARI ── kıble + kamera CANLI ayarlanır; güzel değerleri bulunca söyleyin, varsayılan yaparım
     hacPrayerTest:()=>{ if(!hacMode){ _hajjFull=true; startHacScene(); hacIntroT=0; document.getElementById('hac').classList.add('show'); } hacState.phase='namaz'; startHacPrayer(true);   // KENDİ karakterimiz kıyamda SABİT durur (tuning)
