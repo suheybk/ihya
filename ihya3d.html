@@ -226,7 +226,7 @@
   /* sheet */
   .veil{position:fixed;inset:0;background:#0006;backdrop-filter:blur(3px);display:none;align-items:flex-end;z-index:20}
   .veil.show{display:flex}
-  .sheet{width:100%;max-width:520px;margin:0 auto;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px #0005;animation:up .25s}
+  .sheet{width:100%;max-width:520px;margin:0 auto;background:#fff;border-radius:24px 24px 0 0;padding:10px 20px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px #0005;animation:up .25s;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
   @keyframes up{from{transform:translateY(40px)}to{transform:none}}
   .grip{width:42px;height:4px;border-radius:3px;background:#0002;margin:6px auto 12px}
   .sheet .ic{font-size:30px}
@@ -543,7 +543,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.03</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.04</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -6000,7 +6000,7 @@ const tplAnim={};     // 🦴 R3: modelin AnimationClip'leri (boy_rig: idle/walk
 const tplSkinned={};  // 🦴 R3: modelde SkinnedMesh var mı → instance() SkeletonUtils.clone kullanır
 const loadBar=document.getElementById('loadBar');
 function b64ToBuf(u){ const b=atob(u.split(',')[1]); const a=new Uint8Array(b.length); for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i); return a.buffer; }
-const MODELV='f8';   // model sürümü (well v2 yuvarlak+linear-renk → cache-bust)
+const MODELV='f9';   // model sürümü (f9: boy_rig namaz klip düzeltmeleri — selâm çevirme·oturuş zemin·rükû el·secde → cache-bust)
 // v2 detaylı modeller: gömülü (eski) sürümü ATLA, models/*.glb'den (yeni) fetch et.
 // (models büyüdü → embed HTML'i şişirmesin; SW cache'ler, offline PWA çalışır. file:// bu modelleri yükleyemez.)
 const FETCH_ONLY = new Set(['boy_takke','boy_rig','camel','goat','sheep','chicken','rooster','traveler','date_palm','date_palm_bare','item_date','item_mulberry',
