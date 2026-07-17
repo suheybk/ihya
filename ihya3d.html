@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.0</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.01</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1405,7 +1405,7 @@ if(!S.homeCd || typeof S.homeCd!=='object') S.homeCd={};   // modern EV rutini: 
 if(typeof S.hastaCd!=='number') S.hastaCd=0;     // modern KLİNİK hasta ziyareti ödül cooldown (ms)
 if(typeof S.fitness!=='number') S.fitness=0;     // KONDİSYON/disiplin 0..100 (spor salonu artırır, her gün azıcık düşer)
 if(typeof S.gymCd!=='number') S.gymCd=0;         // spor salonu antrenman cooldown (ms)
-if(!S.charCustom || typeof S.charCustom!=='object') S.charCustom={hair:'normal',beard:0,boyK:1,kiloK:1};   // 🌅 Yeni Doğuş görünümü (saç/sakal/boy/kilo — Hac sonrası seçilir)
+if(!S.charCustom || typeof S.charCustom!=='object') S.charCustom={hair:'normal',beard:0,mustache:0,boyK:1,kiloK:1};   // 🌅 Yeni Doğuş görünümü (saç/sakal/bıyık/boy/kilo — Hac sonrası seçilir)
 const save=()=>{ try{ S.savedAt=Date.now(); localStorage.setItem('ihya3d_v1',JSON.stringify(S)); if(typeof window!=='undefined') window.__fbDirty=true; }catch(e){} };   // savedAt+dirty → ☁️ bulut senkronu (M0) karşılaştırma/throttle için
 const today=()=>new Date().toISOString().slice(0,10);
 const yesterday=()=>new Date(Date.now()-86400000).toISOString().slice(0,10);
@@ -1568,7 +1568,7 @@ const UI_STR={ en:{
   fb_mail_sent:'A sign-in link was sent to your email', fb_email_confirm:'Enter your email to verify the sign-in link:', fb_signed_in:'Signed in: ',
   fb_cloud_first:'Your save is now backed up to the cloud — safe even if you change devices', fb_cloud_title:'Cloud Save Found', fb_cloud_txt:'This account has a more advanced save:', fb_cloud_day:'Day', fb_cloud_q:'Load the CLOUD save instead of the one on this device?', fb_cloud_yes:'☁️ Load cloud save', fb_cloud_no:'📱 Continue with this device\'s save',
   hd_hac_full:'Hajj', hd_hac_u:'Umrah',
-  nb_title:'A New Birth', nb_cine1:'«Whoever performs Hajj for Allah and does not utter obscenity or commit sin returns <b>as on the day his mother bore him</b>.» (Bukhari)', nb_cine2:'Hajj has renewed you. Things have changed: ahead lies a <b>new life</b> and a <b>path of learning</b> that will raise you step by step. First, look in the mirror — choose yourself.', nb_cont:'Look in the mirror', nb_note:'Age-appropriate, modest options — changes appear on your character instantly.', nb_hair:'Hair', nb_h_n:'Normal', nb_h_k:'Short', nb_h_t:'Shaved', nb_beard:'Beard', nb_b_0:'None', nb_b_1:'Short', nb_b_2:'Full', nb_boy:'Height', nb_boy_k:'Short', nb_boy_o:'Medium', nb_boy_u:'Tall', nb_kilo:'Build', nb_k_i:'Slim', nb_k_o:'Medium', nb_k_g:'Broad', nb_start:'I\'m ready — begin the new life', nb_welcome:'May your new life be blessed', nb_welcome2:'🏙️ Ihya — Today: time to carry what you learned into life. Your path of learning will open step by step, insha\'Allah.',
+  nb_title:'A New Birth', nb_cine1:'«Whoever performs Hajj for Allah and does not utter obscenity or commit sin returns <b>as on the day his mother bore him</b>.» (Bukhari)', nb_cine2:'Hajj has renewed you. Things have changed: ahead lies a <b>new life</b> and a <b>path of learning</b> that will raise you step by step. First, look in the mirror — choose yourself.', nb_cont:'Look in the mirror', nb_note:'Age-appropriate, modest options — changes appear on your character instantly.', nb_hair:'Hair', nb_h_n:'Normal', nb_h_k:'Short', nb_h_t:'Shaved', nb_beard:'Beard', nb_b_0:'None', nb_b_1:'Short', nb_b_2:'Full', nb_mus:'Mustache', nb_m_0:'None', nb_m_1:'Yes', nb_boy:'Height', nb_boy_k:'Short', nb_boy_o:'Medium', nb_boy_u:'Tall', nb_kilo:'Build', nb_k_i:'Slim', nb_k_o:'Medium', nb_k_g:'Broad', nb_start:'I\'m ready — begin the new life', nb_welcome:'May your new life be blessed', nb_welcome2:'🏙️ Ihya — Today: time to carry what you learned into life. Your path of learning will open step by step, insha\'Allah.',
   ab_hacgate:'🕋 Umrah / Hajj', hg_title:'Journey to Mecca', hg_txt:'You have revived the world — the gate of Mecca is open to you. What would you like to do?', hg_umre:'🕋 Intend Umrah', hg_hac:'🧳 Go to Hajj (application)', hg_end:'🏁 View the revival keepsake (end screen)', hg_back:'🚪 Not now',
   hj_tiras_sub:'Shave or trim your hair; thus you exit ihram and your Hajj is complete. May Allah accept it.', hj_tiras_btn:'✂️ Shave — complete the Hajj (+60 nur)',
   hj_done_banner:'🕋 A blessed Hajj — Hajj accepted', hj_done_toast:'«Whoever performs Hajj for Allah and commits no obscenity or sin returns as the day his mother bore him (free of sin).» (Bukhari)',
@@ -1708,7 +1708,7 @@ ar:{
   fb_mail_sent:'أُرسل رابطُ الدخول إلى بريدك', fb_email_confirm:'اكتب بريدك للتحقق من رابط الدخول:', fb_signed_in:'تمّ الدخول: ',
   fb_cloud_first:'حُفظ تقدُّمك في السحابة — آمنٌ حتى لو غيّرتَ جهازك', fb_cloud_title:'وُجد حفظٌ سحابيّ', fb_cloud_txt:'لهذا الحساب حفظٌ أكثرُ تقدّمًا:', fb_cloud_day:'اليوم', fb_cloud_q:'أيُحمَّل الحفظُ السحابيُّ بدلَ حفظِ هذا الجهاز؟', fb_cloud_yes:'☁️ حمِّلِ الحفظَ السحابيّ', fb_cloud_no:'📱 تابِع بحفظِ هذا الجهاز',
   hd_hac_full:'الحجّ', hd_hac_u:'العمرة',
-  nb_title:'ولادةٌ جديدة', nb_cine1:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع <b>كيومَ ولدته أمُّه</b>.» (البخاري)', nb_cine2:'جدَّدك الحجُّ. تغيّر الأمر: أمامك <b>حياةٌ جديدة</b> و<b>طريقُ تعلُّمٍ</b> يربّيك خطوةً خطوة. انظر أولًا في المرآة — اختر نفسك.', nb_cont:'انظر في المرآة', nb_note:'خياراتٌ محتشمةٌ مناسبةٌ للعمر — تظهر التغييرات على شخصيّتك فورًا.', nb_hair:'الشعر', nb_h_n:'عاديّ', nb_h_k:'قصير', nb_h_t:'محلوق', nb_beard:'اللحية', nb_b_0:'بلا', nb_b_1:'قصيرة', nb_b_2:'كاملة', nb_boy:'الطول', nb_boy_k:'قصير', nb_boy_o:'متوسّط', nb_boy_u:'طويل', nb_kilo:'البِنية', nb_k_i:'نحيف', nb_k_o:'متوسّط', nb_k_g:'عريض', nb_start:'أنا جاهز — ابدأ الحياةَ الجديدة', nb_welcome:'باركَ اللهُ حياتَك الجديدة', nb_welcome2:'🏙️ إحياء — اليوم: وقتُ حملِ ما تعلّمتَه إلى الحياة. سينفتح طريقُ تعلُّمك خطوةً خطوة إن شاء الله.',
+  nb_title:'ولادةٌ جديدة', nb_cine1:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع <b>كيومَ ولدته أمُّه</b>.» (البخاري)', nb_cine2:'جدَّدك الحجُّ. تغيّر الأمر: أمامك <b>حياةٌ جديدة</b> و<b>طريقُ تعلُّمٍ</b> يربّيك خطوةً خطوة. انظر أولًا في المرآة — اختر نفسك.', nb_cont:'انظر في المرآة', nb_note:'خياراتٌ محتشمةٌ مناسبةٌ للعمر — تظهر التغييرات على شخصيّتك فورًا.', nb_hair:'الشعر', nb_h_n:'عاديّ', nb_h_k:'قصير', nb_h_t:'محلوق', nb_beard:'اللحية', nb_b_0:'بلا', nb_b_1:'قصيرة', nb_b_2:'كاملة', nb_mus:'الشارب', nb_m_0:'بلا', nb_m_1:'نعم', nb_boy:'الطول', nb_boy_k:'قصير', nb_boy_o:'متوسّط', nb_boy_u:'طويل', nb_kilo:'البِنية', nb_k_i:'نحيف', nb_k_o:'متوسّط', nb_k_g:'عريض', nb_start:'أنا جاهز — ابدأ الحياةَ الجديدة', nb_welcome:'باركَ اللهُ حياتَك الجديدة', nb_welcome2:'🏙️ إحياء — اليوم: وقتُ حملِ ما تعلّمتَه إلى الحياة. سينفتح طريقُ تعلُّمك خطوةً خطوة إن شاء الله.',
   ab_hacgate:'🕋 عمرة / حجّ', hg_title:'رحلةُ مكة', hg_txt:'لقد أحييتَ الدنيا — بابُ مكة مفتوحٌ لك. ماذا تريد؟', hg_umre:'🕋 انوِ العمرة', hg_hac:'🧳 اذهب إلى الحجّ (التسجيل)', hg_end:'🏁 شاهِد ذكرى الإحياء (شاشة النهاية)', hg_back:'🚪 ليس الآن',
   hj_tiras_sub:'احلِق شعرك أو قصِّره؛ بذلك تتحلّل من الإحرام ويتمُّ حجُّك. تقبّل الله.', hj_tiras_btn:'✂️ احلِق — أتمِمِ الحجّ (+٦٠ نور)',
   hj_done_banner:'🕋 حجٌّ مبرور — تقبّل الله', hj_done_toast:'«من حجَّ لله فلم يرفُث ولم يفسُق رجع كيومَ ولدته أمُّه.» (البخاري)',
@@ -3390,16 +3390,17 @@ function applyCharCustom(){ if(!player) return; const c=S.charCustom||{};
   player.traverse(o=>{ if(!o.isMesh||!o.name) return;
     if(/^Hair_/.test(o.name)) o.visible = !shaved && h!=='tiras';
     if(/^Bang_/.test(o.name)) o.visible = !shaved && h==='normal'; });   // kısa: perçemsiz · tıraşlı: saçsız
-  // SAKAL — yalnız YETİŞKİN ERKEK profili (çocukta/kadında yok; "yaşına göre, abartmadan")
+  // SAKAL + BIYIK — yalnız YETİŞKİN ERKEK profili (çocukta/kadında yok; "yaşına göre, abartmadan"); seçim ANINDA karakterde görünür
   if(beardMesh){ player.remove(beardMesh); beardMesh=null; }
-  const want=(isAdult()&&isMale())?(+c.beard||0):0;
-  if(want>0){
+  const wantB=(isAdult()&&isMale())?(+c.beard||0):0, wantM=(isAdult()&&isMale())?(+c.mustache||0):0;
+  if(wantB>0 || wantM>0){
     const bb=new THREE.Box3().setFromObject(player); const sz=new THREE.Vector3(); bb.getSize(sz);
     const localH=sz.y/(player.scale.y||1), localD=Math.max(0.2, sz.z/(player.scale.z||1));
     const m=new THREE.MeshStandardMaterial({color:0x35261a,roughness:0.95});
-    const w=want===2?0.20:0.165, hh=want===2?0.085:0.05;
     const g=new THREE.Group();
-    const b=new THREE.Mesh(new THREE.BoxGeometry(w,hh,0.055), m); b.frustumCulled=false; g.add(b);
+    if(wantB>0){ const w=wantB===2?0.20:0.165, hh=wantB===2?0.085:0.05;
+      const b=new THREE.Mesh(new THREE.BoxGeometry(w,hh,0.055), m); b.frustumCulled=false; g.add(b); }
+    if(wantM>0){ const mu=new THREE.Mesh(new THREE.BoxGeometry(0.115,0.026,0.04), m); mu.position.set(0,0.062,0.012); mu.frustumCulled=false; g.add(mu); }   // bıyık: üst dudak hizası
     g.position.set(0, localH*BEARD_POS[0], localD*BEARD_POS[1]);
     beardMesh=g; player.add(g);
   }
@@ -3429,7 +3430,8 @@ function renderNewBirth(){
   }
   let h='<div class="sub" style="margin:2px 0 6px;opacity:.85">'+(tU('nb_note')||'Yaşına uygun, ölçülü seçenekler — değişiklikler anında karakterinde görünür.')+'</div>';
   h+=nbRow('💇 '+(tU('nb_hair')||'Saç'),'hair',[{v:'normal',l:tU('nb_h_n')||'Normal'},{v:'kisa',l:tU('nb_h_k')||'Kısa'},{v:'tiras',l:tU('nb_h_t')||'Tıraşlı'}]);
-  if(isAdult()&&isMale()) h+=nbRow('🧔 '+(tU('nb_beard')||'Sakal'),'beard',[{v:0,l:tU('nb_b_0')||'Yok'},{v:1,l:tU('nb_b_1')||'Kısa'},{v:2,l:tU('nb_b_2')||'Sakallı'}]);
+  if(isAdult()&&isMale()){ h+=nbRow('🧔 '+(tU('nb_beard')||'Sakal'),'beard',[{v:0,l:tU('nb_b_0')||'Yok'},{v:1,l:tU('nb_b_1')||'Kısa'},{v:2,l:tU('nb_b_2')||'Sakallı'}]);
+    h+=nbRow('〰️ '+(tU('nb_mus')||'Bıyık'),'mustache',[{v:0,l:tU('nb_m_0')||'Yok'},{v:1,l:tU('nb_m_1')||'Var'}]); }
   h+=nbRow('📏 '+(tU('nb_boy')||'Boy'),'boyK',[{v:0.92,l:tU('nb_boy_k')||'Kısa'},{v:1,l:tU('nb_boy_o')||'Orta'},{v:1.08,l:tU('nb_boy_u')||'Uzun'}]);
   h+=nbRow('⚖️ '+(tU('nb_kilo')||'Beden'),'kiloK',[{v:0.94,l:tU('nb_k_i')||'İnce'},{v:1,l:tU('nb_k_o')||'Orta'},{v:1.06,l:tU('nb_k_g')||'Geniş'}]);
   h+='<button class="do" style="margin-top:12px" onclick="__nbAct(\'start\')">🏙️ '+(tU('nb_start')||'Böyle iyiyim — yeni hayata başla')+'</button>';
@@ -8145,11 +8147,11 @@ function tick(){
       tmp.x=mix(tmp.x,sx,namazCamK); tmp.y=mix(tmp.y,player.position.y+H,namazCamK); tmp.z=mix(tmp.z,sz,namazCamK);
       lookTY=mix(lookTY,player.position.y+(fc.lookY!=null?fc.lookY:1.0),namazCamK);   // evreye göre bakış yüksekliği (secde alçak, kıyam yüksek)
     }
-    // 🌅 YENİ DOĞUŞ açıkken: AYNA görünümü — kamera karakterin önüne (seçimler canlı görünsün)
+    // 🌅 YENİ DOĞUŞ açıkken: AYNA görünümü — kamera karakterin önünde, YÜZE yakın (saç/sakal/bıyık canlı görünsün)
     { const _nb=document.getElementById('newbirth');
       if(_nb && _nb.classList.contains('show') && player){ const ry=player.rotation.y;
-        tmp.set(player.position.x+Math.sin(ry)*3.4, player.position.y+1.5, player.position.z+Math.cos(ry)*3.4);
-        lookTX=player.position.x; lookTY=player.position.y+1.05; lookTZ=player.position.z; } }
+        tmp.set(player.position.x+Math.sin(ry)*2.5, player.position.y+1.6, player.position.z+Math.cos(ry)*2.5);
+        lookTX=player.position.x; lookTY=player.position.y+1.3; lookTZ=player.position.z; } }
     camera.position.lerp(tmp,0.12);
     camera.lookAt(lookTX,lookTY,lookTZ);
   }
