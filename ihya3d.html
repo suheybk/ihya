@@ -544,7 +544,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.06</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.07</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -3672,7 +3672,7 @@ const MODERN_BLD={ tr:{
   market:{t:'السوق · البقالة'}, banka:{t:'المصرف (البنك)'}, durak:{t:'موقف الحافلة'}, klinik:{t:'العيادة · عيادة المريض'}, gym:{t:'النادي الرياضي'},
 } };
 function moBld(k){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return (MODERN_BLD[L]&&MODERN_BLD[L][k])||MODERN_BLD.tr[k]; }
-function modernBldNm(rec){ if(rec.modern==='wallet') return moWallet().t; if(rec.modern==='komsu') return tU('mo_greet_lbl')||'Selâm ver'; if(rec.modern==='dilenci') return tU('dl_title')||'Bir Muhtaç'; return moBld(rec.modern).t; }
+function modernBldNm(rec){ if(rec.modern==='wallet') return moWallet().t; if(rec.modern==='city'){ const ev=CITY_EVENTS.find(e=>e.id===rec.cityId); return ev?cityData(ev).t:'İyilik'; } if(rec.modern==='komsu') return tU('mo_greet_lbl')||'Selâm ver'; if(rec.modern==='dilenci') return tU('dl_title')||'Bir Muhtaç'; return moBld(rec.modern).t; }
 function openModernBuilding(rec){
   if(rec.modern==='ev'){ enterHome(); return; }                 // EV: girilebilir oda (içeride seccade·yatak·kanepe·rahle·mutfak + kapıda çıkış duası)
   // TÜM BİNALAR GİRİLEBİLİR: yaklaş → iç mekâna gir → istasyonla etkileşim (aksiyonlar içeride)
@@ -3681,6 +3681,7 @@ function openModernBuilding(rec){
   if(rec.modern==='dilenci'){ const t=S.gather['dilenci']; if(t&&Date.now()<t){ toast(tU('dl_justgave')||'🤲 Az önce verdin — biraz sonra tekrar.'); return; } openDialog(dlgDilenci()); return; }   // modern dilenci → gizli sadaka
   if(rec.modern==='market'){ enterBld('market'); return; }      // MARKET içi → 🛒 alışveriş istasyonu
   if(rec.modern==='wallet'){ openWalletEvent(rec); return; }    // modern olay: bulunan cüzdan (emanet)
+  if(rec.modern==='city'){ openCityEvent(rec); return; }        // 🏙️ şehir hayatı: spontane iyilik olayı (poşet/eziyet/yol/su/teselli/kedi)
   if(rec.modern==='banka'){ enterBld('banka'); return; }        // BANKA içi → 🏦 gişe (faizden uzak dur)
   if(rec.modern==='is'){ enterBld('is'); return; }              // İŞ/OFİS içi → 💼 iş ilanları + 📋 dürüstlük istasyonları
   if(rec.modern==='cami'){ enterBld('cami'); return; }          // CAMİ içi → 🧎 namaz istasyonu
@@ -3801,6 +3802,67 @@ function openWalletEvent(rec){ const M=moWallet();
   openDialog({ ic:'👛', title:M.t, start:'s0', steps:{ s0:{ who:M.who, txt:M.x, ref:M.ref, opts:[
     { l:M.ret, act:()=>{ addNur(20); dgBump('m_emanet'); S.walletCd=Date.now()+WALLET_CD; save(); refreshHUD(); sndFanfare(); banner('👛 '+M.retb); setTimeout(()=>toast(M.retd),450); despawnModernWallet(); if(typeof closeDialog==='function') closeDialog(); } },
     { l:M.keep, act:()=>{ S.walletCd=Date.now()+WALLET_CD; save(); toast(M.keepd); if(typeof dismissGuardian==='function') dismissGuardian(); despawnModernWallet(); if(typeof closeDialog==='function') closeDialog(); } }   // emanete hıyanet → melek ayrılır
+  ] } }});
+}
+/* ============ 🏙️ ŞEHİR HAYATI — SPONTANE İYİLİK OLAYLARI (Faz 7.07) [[vision-ihya-2026]] ============
+   Şehir telaşesi içinde küçük ihsân fırsatları: yaşlı teyzeye poşet, yoldan eziyet kaldırma, yol
+   gösterme, susamışa su, dertliye güzel söz, aç kediye yem. Cüzdan olayı deseni (spawn→dialog→resolve+cd);
+   her biri SAHİH bir nudge ile. Sırayla döner (S.cityIdx), ~2.5dk cooldown → şehir canlı ama spam değil. */
+const CITY_EVENTS=[
+  {id:'poset', ic:'👜', people:true, nur:12, anim:'give',
+    tr:{t:'Yaşlı Teyzenin Poşetleri', who:'Pazar dönüşü…', x:'Yaşlı bir teyze ağır poşetlerle zorlanıyor, durup dinleniyor. Ne yaparsın?', ref:'«Büyüğümüze saygı, küçüğümüze merhamet göstermeyen bizden değildir.» (Tirmizî — hasen)', doo:'🛍️ Poşetlerini taşı, kapısına götür', skip:'🚶 Acelem var, geçerim', done:'Poşetleri taşıdın, teyze gönülden duâ etti — büyüğe hürmet, zayıfa ihsân (+12 nûr).', skipd:'Aceleye kapıldın; bir iyilik fırsatı geçip gitti.'},
+    en:{t:'The Old Aunt\'s Bags', who:'Back from the market…', x:'An elderly woman struggles with heavy bags and stops to rest. What do you do?', ref:'«He is not of us who does not respect our elders and show mercy to our young.» (Tirmidhi — hasan)', doo:'🛍️ Carry her bags to her door', skip:'🚶 I\'m in a hurry, pass by', done:'You carried the bags; she prayed for you — respect for elders, kindness to the weak (+12 nur).', skipd:'You rushed on; a chance for good slipped away.'},
+    ar:{t:'أكياسُ العجوز', who:'عائدةً من السوق…', x:'امرأةٌ مسنّةٌ تُعاني من أكياسٍ ثقيلة وتقف لتستريح. ماذا تفعل؟', ref:'«ليس منّا من لم يوقّر كبيرنا ويرحم صغيرنا.» (الترمذي — حسن)', doo:'🛍️ احمِل أكياسها إلى بابها', skip:'🚶 أنا مستعجل، أمرّ', done:'حملتَ الأكياس فدعتْ لك — توقيرُ الكبير وإحسانٌ للضعيف (+١٢ نور).', skipd:'استعجلتَ؛ ففاتتك فرصةُ خير.'}},
+  {id:'eziyet', ic:'🧹', people:false, nur:8, anim:'reap',
+    tr:{t:'Yolda Eziyet', who:'Kaldırımda…', x:'Yolun ortasında kırık cam ve bir engel var; geçenler incinebilir. Ne yaparsın?', ref:'«Îmân yetmiş küsur şubedir… en aşağısı yoldan eziyeti kaldırmaktır.» (Buhârî · Müslim)', doo:'🧹 Eziyeti yoldan kaldır', skip:'🚶 Bana ne, geçerim', done:'Yolu emniyete aldın — yoldan eziyeti gidermek sadakadır (+8 nûr).', skipd:'Eziyeti bırakıp geçtin; belki biri incinecek.'},
+    en:{t:'Harm on the Path', who:'On the pavement…', x:'Broken glass and an obstacle lie in the road; passers-by could be hurt. What do you do?', ref:'«Faith is some seventy branches… the least is removing harm from the road.» (Bukhari · Muslim)', doo:'🧹 Remove the harm from the road', skip:'🚶 Not my problem, pass by', done:'You made the way safe — removing harm from the road is charity (+8 nur).', skipd:'You left the harm; someone may be hurt.'},
+    ar:{t:'أذًى في الطريق', who:'على الرصيف…', x:'زجاجٌ مكسور وعائقٌ في وسط الطريق؛ قد يتأذّى المارّة. ماذا تفعل؟', ref:'«الإيمانُ بضعٌ وسبعون شعبة… أدناها إماطةُ الأذى عن الطريق.» (البخاري · مسلم)', doo:'🧹 أمِط الأذى عن الطريق', skip:'🚶 لا يعنيني، أمرّ', done:'أمّنتَ الطريق — إماطةُ الأذى صدقة (+٨ نور).', skipd:'تركتَ الأذى؛ قد يتأذّى أحد.'}},
+  {id:'yol', ic:'🧭', people:true, nur:8, anim:'salam',
+    tr:{t:'Yolunu Soran', who:'Şaşkın bir yolcu…', x:'Kaybolmuş biri sana yol soruyor. Ne yaparsın?', ref:'«Kim bir hayra vesile olursa, onu yapan gibi ecir alır.» (Müslim)', doo:'🧭 Güler yüzle yolu güzelce tarif et', skip:'🤷 Bilmiyorum de, geç', done:'Doğru yolu gösterdin — hayra delâlet eden onu yapan gibidir (+8 nûr).', skipd:'Yardımı esirgedin; kişi şaşkın kaldı.'},
+    en:{t:'Someone Lost', who:'A confused traveller…', x:'A lost person asks you for directions. What do you do?', ref:'«Whoever guides to good has a reward like the doer of it.» (Muslim)', doo:'🧭 Kindly show the way', skip:'🤷 Say you don\'t know, pass', done:'You showed the right way — guiding to good is like doing it (+8 nur).', skipd:'You withheld help; they stayed lost.'},
+    ar:{t:'حائرٌ يسأل الطريق', who:'مسافرٌ حائر…', x:'شخصٌ تائهٌ يسألك عن الطريق. ماذا تفعل؟', ref:'«من دلَّ على خيرٍ فله مثلُ أجر فاعله.» (مسلم)', doo:'🧭 دلّه على الطريق ببِشر', skip:'🤷 قل لا أعرف وامضِ', done:'دللتَه على الطريق — الدالُّ على الخير كفاعله (+٨ نور).', skipd:'منعتَ العون؛ بقي حائرًا.'}},
+  {id:'su', ic:'💧', people:true, nur:9, anim:'give',
+    tr:{t:'Susamış Yolcu', who:'Sıcak bir günde…', x:'Yorgun, susamış biri gölgede soluklanıyor. Ne yaparsın?', ref:'Bir köpeğe su veren bağışlandı (Buhârî); «Sadakanın en faziletlisi su (vermek)tir.» (İbn Mâce)', doo:'💧 Bir bardak su ikram et', skip:'🚶 Geçip giderim', done:'Su ikram ettin — su, sadakanın en faziletlisi (+9 nûr).', skipd:'Susuz bıraktın; bir ikram fırsatı kaçtı.'},
+    en:{t:'A Thirsty Traveller', who:'On a hot day…', x:'A tired, thirsty person rests in the shade. What do you do?', ref:'One who gave a dog water was forgiven (Bukhari); «The best charity is giving water.» (Ibn Majah)', doo:'💧 Offer a cup of water', skip:'🚶 Just walk past', done:'You gave water — water is the best of charity (+9 nur).', skipd:'You left them thirsty; a chance to serve passed.'},
+    ar:{t:'مسافرٌ عطشان', who:'في يومٍ حار…', x:'شخصٌ متعبٌ عطشانُ يستريح في الظل. ماذا تفعل؟', ref:'سُقِيَ كلبٌ فغُفِر لصاحبه (البخاري)؛ «أفضلُ الصدقة سقيُ الماء.» (ابن ماجه)', doo:'💧 اسقِه كأسًا من الماء', skip:'🚶 امضِ', done:'سقيتَه الماء — الماءُ أفضلُ الصدقة (+٩ نور).', skipd:'تركتَه عطشان؛ فاتتك خدمة.'}},
+  {id:'teselli', ic:'🫂', people:true, nur:8, anim:'hug',
+    tr:{t:'Dertli Bir Komşu', who:'Bankta, başı önünde…', x:'Biri üzgün, yalnız oturuyor; içi daralmış. Ne yaparsın?', ref:'«Güzel söz sadakadır.» (Buhârî · Müslim); mü\'minin bir sıkıntısını gideren…', doo:'🫂 Yanına otur, güzel bir söz söyle', skip:'🚶 Karışmam, geçerim', done:'Gönlünü aldın — güzel söz sadakadır, kardeşinin sıkıntısını giderdin (+8 nûr).', skipd:'Bir gönül yalnız kaldı.'},
+    en:{t:'A Grieving Neighbour', who:'On a bench, head down…', x:'Someone sits sad and alone, heavy-hearted. What do you do?', ref:'«A good word is charity.» (Bukhari · Muslim); whoever relieves a believer\'s distress…', doo:'🫂 Sit with them, say a kind word', skip:'🚶 Not my business, pass', done:'You lifted their heart — a good word is charity; you eased a brother\'s grief (+8 nur).', skipd:'A heart was left alone.'},
+    ar:{t:'جارٌ مهموم', who:'على مقعدٍ مطرقًا…', x:'شخصٌ حزينٌ وحيدٌ ضاق صدره. ماذا تفعل؟', ref:'«الكلمةُ الطيّبة صدقة.» (البخاري · مسلم)؛ من نفّس عن مؤمنٍ كربة…', doo:'🫂 اجلس معه وقل كلمةً طيبة', skip:'🚶 لا يعنيني، أمرّ', done:'واسيتَه — الكلمةُ الطيبة صدقة، ونفّستَ كربةَ أخيك (+٨ نور).', skipd:'بقي قلبٌ وحيدًا.'}},
+  {id:'kedi', ic:'🐈', people:false, nur:7, anim:'give',
+    tr:{t:'Aç Sokak Kedisi', who:'Duvar dibinde…', x:'Zayıf, aç bir kedi acıkmış miyavlıyor. Ne yaparsın?', ref:'«Her (yaş) ciğer (sahibine iyilikte) ecir vardır.» (Buhârî); kediyi aç hapseden kadın azap gördü.', doo:'🐈 Yiyecek ve su ver', skip:'🚶 Aldırmam', done:'Aç kediyi doyurdun — her canlıya ihsânda ecir vardır (+7 nûr).', skipd:'Aç bir cana sırtını döndün.'},
+    en:{t:'A Hungry Street Cat', who:'By the wall…', x:'A thin, hungry cat mews for food. What do you do?', ref:'«In every living being there is a reward (for kindness).» (Bukhari); a woman was punished for starving a cat.', doo:'🐈 Give it food and water', skip:'🚶 Ignore it', done:'You fed the hungry cat — kindness to every living thing is rewarded (+7 nur).', skipd:'You turned from a hungry creature.'},
+    ar:{t:'قِطٌّ جائع', who:'عند الجدار…', x:'قطٌّ نحيلٌ جائعٌ يموء طلبًا للطعام. ماذا تفعل؟', ref:'«في كلِّ كبدٍ رطبةٍ أجر.» (البخاري)؛ عُذّبت امرأةٌ في هرّةٍ حبستها.', doo:'🐈 أطعِمه واسقِه', skip:'🚶 تجاهَله', done:'أطعمتَ القطَّ الجائع — في كلِّ ذي كبدٍ أجر (+٧ نور).', skipd:'أعرضتَ عن مخلوقٍ جائع.'}},
+];
+const CITY_CD=155000;   // ~2.5 dk (şehir canlı ama spam değil)
+let cityEvent=null;
+function cityData(ev){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return ev[L]||ev.tr; }
+const CITY_SPOTS=[[-18,10],[15,13],[-9,24],[18,2],[8,20]];   // MODERN_ORIGIN'e göreli konumlar (yol/meydan kenarları)
+function spawnCityEvent(){ if(cityEvent||!modernGroup) return; if(S.cityCd && Date.now()<S.cityCd) return;
+  const idx=(S.cityIdx||0)%CITY_EVENTS.length; S.cityIdx=(idx+1)%CITY_EVENTS.length;
+  const ev=CITY_EVENTS[idx]; const sp=CITY_SPOTS[idx%CITY_SPOTS.length];
+  const ox=MODERN_ORIGIN[0], oz=MODERN_ORIGIN[2], x=ox+sp[0], z=oz+sp[1];
+  const g=new THREE.Group(); let meshes=[];
+  if(ev.people){ let it; try{ it=instance('neighbor'); }catch(e){ try{ it=instance('traveler'); }catch(e2){ it=null; } }
+    if(it){ if(typeof tintNpc==='function') tintNpc(it.g, ev.id==='poset'?'orphan':'neighbor'); it.g.position.set(0,0,0); it.g.rotation.y=Math.PI*0.15; it.g.scale.setScalar(ev.id==='poset'?1.55:1.75); g.add(it.g); meshes=it.meshes; }
+    if(ev.id==='poset'){ for(const dx of [-0.5,0.5]){ const bag=mkBox(0.34,0.42,0.26,0xcdbb8e,dx,0.24,0.55); g.add(bag); } }   // poşetler
+  } else if(ev.id==='eziyet'){ for(let i=0;i<4;i++){ const b=mkBox(0.18+Math.random()*0.16,0.1,0.16,i%2?0x8a8f96:0x6b6f74,(i-1.5)*0.35,0.06,Math.random()*0.3-0.15); g.add(b); } }   // kırık cam/moloz
+  else if(ev.id==='kedi'){ g.add(mkBox(0.42,0.2,0.2,0x3a3330,0,0.12,0)); g.add(mkBox(0.2,0.2,0.18,0x3a3330,0.24,0.2,0)); const t=mkBox(0.05,0.05,0.28,0x3a3330,-0.24,0.16,0); g.add(t); }   // küçük kedi (gövde+baş+kuyruk)
+  g.position.set(x,0,z); modernGroup.add(g);
+  const spr=(typeof emojiSprite==='function')?emojiSprite(ev.ic,0.8):null; if(spr){ spr.position.set(0,ev.people?2.6:1.1,0); g.add(spr); }
+  const rec={ modern:'city', cityId:ev.id, q:{id:'m_city_'+ev.id, pos:[x,0,z], nm:'', ic:ev.ic}, g:new THREE.Object3D(), meshes:[], reach:3.0 };
+  rec.g.position.set(x,0,z); interactables.push(rec); cityEvent={ g, rec, ev };
+}
+function despawnCityEvent(){ if(!cityEvent) return; if(modernGroup) modernGroup.remove(cityEvent.g);
+  const i=interactables.indexOf(cityEvent.rec); if(i>=0) interactables.splice(i,1); if(near===cityEvent.rec) near=null; cityEvent=null; }
+function openCityEvent(rec){ const ce=cityEvent; if(!ce||ce.rec!==rec) return; const ev=ce.ev, M=cityData(ev);
+  openDialog({ ic:ev.ic, title:M.t, start:'s0', steps:{ s0:{ who:M.who, txt:M.x, ref:M.ref, opts:[
+    { l:M.doo, act:()=>{ addNur(ev.nur); save(); refreshHUD(); sndChime();
+        if(typeof facePlayer==='function' && ce.g) facePlayer(ce.g.position); if(typeof playAction==='function') playAction(1.5, ev.anim);
+        banner(ev.ic+' +'+ev.nur+(tU('nur_suffix')||' nûr')); setTimeout(()=>toast(ev.ic+' '+M.done),450);
+        if(typeof onboardMark==='function') onboardMark('yardim');   // 🗺️ İlk Hafta: şehirde yardım adımı
+        S.cityCd=Date.now()+CITY_CD; save(); despawnCityEvent(); if(typeof closeDialog==='function') closeDialog(); } },
+    { l:M.skip, act:()=>{ S.cityCd=Date.now()+Math.round(CITY_CD*0.6); save(); toast(ev.ic+' '+M.skipd); despawnCityEvent(); if(typeof closeDialog==='function') closeDialog(); } }
   ] } }});
 }
 // DİSİPLİN BONUSU: güçlü/disiplinli beden-irade nefse (sabır) ve harama direnişte daha güçlü → +0..6 bereket (kondisyonla ölçekli)
@@ -4452,6 +4514,7 @@ function enterModern(){
   spawnModernBeggar();      // sokak kenarında bir muhtaç → gizli sadaka
   buildBus();   // şehir çevresinde dolaşan gerçek otobüs (durakta durur, komşular biner)
   spawnModernWallet();   // modern olay: cooldown geçtiyse cüzdan belirir
+  spawnCityEvent();      // 🏙️ şehir hayatı: cooldown geçtiyse bir iyilik olayı (poşet/eziyet/yol…)
   if(typeof onboardStart==='function') onboardStart();   // 🗺️ İ3: ilk girişte İlk Hafta rehberli zinciri başlar
   if(!S.modernJobAsked) setTimeout(openJobAsk, 900);
 }
@@ -5920,6 +5983,7 @@ const ONBOARD_STEPS=[
   {id:'is', ic:'💼', evt:null, tr:{t:'Bir meşguliyet seç',h:'🧭 meşguliyetini belirle (öğrenci/çalışan/…) — hayatın ona göre şekillensin'}, en:{t:'Choose an occupation',h:'Set your occupation (student/worker/…)'}, ar:{t:'اختر شغلًا',h:'حدّد شغلك (طالب/موظف/…)'}},
   {id:'namaz', ic:'🧎', evt:'pray', tr:{t:'Vaktinde namaz kıl',h:'Vakit gelince 🧎 ile namazını kıl'}, en:{t:'Pray on time',h:'When the time comes, pray with 🧎'}, ar:{t:'صلِّ في وقتها',h:'إذا دخل الوقت صلِّ بـ🧎'}},
   {id:'sadaka', ic:'🤲', evt:'m_sadaka', tr:{t:'Bir muhtaca sadaka ver',h:'Sokak kenarındaki muhtaca yaklaş, gizli sadaka ver'}, en:{t:'Give charity to someone in need',h:'Approach the one in need and give secret charity'}, ar:{t:'تصدّق على محتاج',h:'اقترب من المحتاج وتصدّق سرًّا'}},
+  {id:'yardim', ic:'🤝', evt:null, tr:{t:'Şehirde birine yardım et',h:'Sokakta bir ihsân fırsatı çıkar (poşet·yol·su·kedi…) — yardım et'}, en:{t:'Help someone in the city',h:'A chance for kindness appears (bags·directions·water·cat…) — help'}, ar:{t:'أعِن أحدًا في المدينة',h:'تظهر فرصةُ إحسان (أكياس·طريق·ماء·قطّ…) — أعِن'}},
   {id:'defter', ic:'📔', evt:null, tr:{t:'Kendini tanı',h:'📔 İhya Defteri\'nden bir soruyu cevapla'}, en:{t:'Know yourself',h:'Answer a question in your 📔 Revival Journal'}, ar:{t:'اعرِف نفسك',h:'أجِب عن سؤال في 📔 دفتر الإحياء'}},
 ];
 function onboardInit(){ if(!S.onboard||typeof S.onboard!=='object') S.onboard={done:{},started:false,complete:false}; if(!S.onboard.done) S.onboard.done={}; }
@@ -8846,6 +8910,7 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     if(_ld){ if(loadBar) loadBar.style.width='100%'; requestAnimationFrame(()=>_ld.classList.add('fade')); setTimeout(()=>{ _ld.style.display='none'; }, 900); } }
   // yeni gün artık gün/gece döngüsü tamamlanınca (updateDayNight → onNewDay) olur
   setInterval(updateGatherRegrow, 3000);   // hasat ağaçları yeniden verir
+  setInterval(()=>{ if(inModern && typeof spawnCityEvent==='function') spawnCityEvent(); }, 6000);   // 🏙️ şehir hayatı: cooldown geçince yeni iyilik olayı belirir (self-gate)
   window.__ihya3d={S, applyLang:()=>applyLang(), interactables, player:()=>player, move:(x,z)=>{jVec.x=x;jVec.y=z;},
     test:(id)=>{ near=interactables.find(x=>x.q.id===id); openSheet(near.q); },
     doTest:()=>doQuest(),
@@ -8939,6 +9004,12 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     onboardMark:(id)=>{ onboardMark(id); return onboardCount(); },
     onboardEvt:(evt)=>{ onboardHit(evt); return onboardCount(); },
     onboardReset:()=>{ S.onboard={done:{},started:false,complete:false}; save(); updateOnboardBtn(); return 'ilk hafta sıfırlandı'; },
+    // 🏙️ Şehir hayatı iyilik olayları debug
+    cityEvent:()=>cityEvent?{id:cityEvent.ev.id, pos:[Math.round(cityEvent.rec.g.position.x),Math.round(cityEvent.rec.g.position.z)]}:null,
+    spawnCity:(id)=>{ if(cityEvent) despawnCityEvent(); S.cityCd=0; if(id){ const i=CITY_EVENTS.findIndex(e=>e.id===id); if(i>=0) S.cityIdx=i; } spawnCityEvent(); return cityEvent?cityEvent.ev.id:null; },
+    cityList:()=>CITY_EVENTS.map(e=>e.id),
+    cityOpen:()=>{ if(cityEvent) openCityEvent(cityEvent.rec); return cityEvent?cityEvent.ev.id:null; },
+    cityLabel:()=>cityEvent?modernBldNm(cityEvent.rec):null,
     mosqueState:()=>({mode:mosqueMode, cumaDone:S.cumaDone, sat:S.mosqueSat, interiorNodes:mosqueGroup?mosqueGroup.children.length:0}),
     mosqueWeek:()=>({vDay:S.mosqueVDay, vSet:S.mosqueVSet.slice(), streak:S.mosqueStreak, streakDay:S.mosqueStreakDay, unlocked:S.mosqueUnlocked}),
     imamState:()=>({consec:S.mosqueConsec, mark:S.mosqueConsecMark, met:S.imamMet, ready:(!S.imamMet&&S.mosqueConsec>=5)}),
