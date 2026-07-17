@@ -542,7 +542,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.01</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.02</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -832,6 +832,7 @@ Object.assign(window.IHYA_WORLD,{date_palm:"data:model/gltf-binary;base64,Z2xURg
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as skClone } from './vendor/addons/utils/SkeletonUtils.js?v=r3b';   // 🦴 R3: SkinnedMesh instance'ı (clone(true) iskeleti klonlamaz). ?v: dosya güncellenince artır (cache-bust)
 
 /* ============ QUEST DATA (mekândaki nesnelere bağlı) ============ */
 const QUESTS = [
@@ -873,7 +874,7 @@ const QUESTS = [
     nm:'Topluma faydalı bir iş yap', rem:'İnsanların en hayırlısı, insanlara faydalı olandır.',
     refs:[{tag:'Hadis',txt:'İnsanların en hayırlısı, insanlara en faydalı olanıdır.',cite:'Taberânî, el-Mu\'cemü\'l-Evsat'}]},
 ];
-const MODELS = ['player','boy_takke','prayer','rahle','book','door','tree','plot','plot_sprout','fountain','mosque','island_tile','bridge',
+const MODELS = ['player','boy_takke','boy_rig','prayer','rahle','book','door','tree','plot','plot_sprout','fountain','mosque','island_tile','bridge',
   // Medine — hasat/toplama (Faz 1) + kuyu (Faz 9)
   'date_palm','date_palm_bare','mulberry_tree','mulberry_tree_bare','item_date','item_mulberry','well','wheat',
   // Medine — çobanlık (Faz 2)
@@ -2723,6 +2724,7 @@ function limbPivot(mesh){ if(!mesh.geometry.boundingBox) mesh.geometry.computeBo
 // bacağı (varsa toynağıyla) X ekseninde `ang` kadar EKLEM etrafında rigid döndür (yumuşak lerp)
 function swingLeg(entry, ang){
   if(!entry) return;
+  if(entry.isBone) return swingBone(entry, ang);   // 🦴 R3: iskeletli karakterde giriş bir KEMİK → kemik adaptörü (aynı açı sözleşmesi)
   if(entry.piv){ // v2: kalça pivotu — rigid rotation, position kompanzasyonu
     const cur=entry.parts[0]; const a=cur.rotation.x + (ang-cur.rotation.x)*0.35;
     const c=Math.cos(a), s=Math.sin(a), py=entry.piv.y, pz=entry.piv.z;
@@ -3132,11 +3134,20 @@ function buildKaabaScene(){
   const mesa=new THREE.Mesh(new THREE.BoxGeometry(SAY_HALF*2+1.4,0.05,2.0),M(0xe7dfc7,0.9)); mesa.position.set(MESA_X,0.06,cz); mesa.frustumCulled=false; g.add(mesa);   // mes'â (sa'y yolu)
   for(let i=0;i<10;i++){ const a=i/10*6.2832, r=MATAF_R+(i%3)*0.7; const p=instance('traveler'); p.g.position.set(cx+Math.cos(a)*r,0,cz+Math.sin(a)*r); p.g.rotation.y=a+Math.PI/2; p.g.scale.setScalar(1.35);
     p.g.traverse(o=>{ if(o.isMesh){ o.material=o.material.clone(); o.material.color.setHex(0xeeece4); } }); g.add(p.g); }   // ihrâmlı hacılar (beyaz) dekor
-  hacPilgrim=instance('boy_takke'); hacPilgrim.g.scale.setScalar(1.9); hacPilgrim.g.rotation.order='YXZ';
+  // 🦴 R3: hacı da İSKELETLİ (boy_rig) — tavâf/sa'y'da walk klibi, tavâf namazında GERÇEK namaz klibi; yoksa boy_takke prosedürel fallback
+  HRIG=null; hacPilgrim=null;   // (yeniden build'de eski hacı kalıntısı kullanılmasın)
+  if(tpl['boy_rig'] && tplSkinned['boy_rig'] && (tplAnim['boy_rig']||[]).length){
+    hacPilgrim=instance('boy_rig'); HRIG=buildRig(hacPilgrim.g, tplAnim['boy_rig']);
+    if(!HRIG) hacPilgrim=null;
+  }
+  if(!hacPilgrim) hacPilgrim=instance('boy_takke');
+  hacPilgrim.g.scale.setScalar(1.9); hacPilgrim.g.rotation.order='YXZ';
   hacPilgrim.g.traverse(o=>{ if(o.isMesh){ o.material=o.material.clone(); if(/Tunic|Sleeve|Pant|Hem|Hand/.test(o.name)) o.material.color.setHex(0xf3f2ec); } });   // beyaz ihrâm
   hacPilgrim.g.position.set(cx+Math.cos(Math.PI/4)*MATAF_R,0,cz+Math.sin(Math.PI/4)*MATAF_R); g.add(hacPilgrim.g);
-  // hacPilgrim RIG (player ile aynı boy_takke) → tavâf namazında KENDİ karakterimiz prosedürel namaz kılar (GLB adam YOK)
-  { const hg=n=>hacPilgrim.g.getObjectByName(n);
+  // hacPilgrim RIG: rig'de KEMİK girdileri (cemre kol savurma vb. prosedürel jestler kemikte çalışır);
+  // fallback'te eski mesh-pivot girdileri → tavâf namazı prosedürel namazPoseN ile kılınır (GLB adam YOK)
+  if(HRIG){ hacPilgrimRig=rigLimbs(hacPilgrim.g); if(!hacPilgrimRig){ HRIG=null; } }
+  if(!HRIG){ const hg=n=>hacPilgrim.g.getObjectByName(n);
     const hr=(m,...ex)=>{ const o=hg(m); if(!o)return null; const parts=[o]; ex.forEach(e=>{const x=hg(e);if(x)parts.push(x);}); return {parts,piv:limbPivot(o)}; };
     hacPilgrimRig={ legL:hr('Pant_L','Shoe_L','Sole_L'), legR:hr('Pant_R','Shoe_R','Sole_R'), armL:hr('Sleeve_L','Hand_L'), armR:hr('Sleeve_R','Hand_R') }; }
   buildArafat(g);   // ARAFAT (Cebel-i Rahme): tepe + beyaz sütun anıt + ihrâmlı hacılar (vakfe evresinde kamera oraya kayar)
@@ -3448,10 +3459,29 @@ window.__nbAct=function(kind){
     if(S.modernUnlocked && !inModern && typeof enterModern==='function') setTimeout(()=>enterModern(),1600);   // şehre geçiş (İ3'te tam onboarding gelecek)
     return; }
 };
+let hacClipOn=false;   // 🦴 bu karede hacı pozunu HRIG klibi mi sürüyor? (rest-kol swingLeg'leri klibi ezmesin)
 function hacTick(dt){
   if(!hacMode||!hacPilgrim) return;
   updateBsGlow(dt);   // Hacer-i Esved yeşil ışık sönümü (istilâm sonrası)
   if(hacThrowT>0) hacThrowT=Math.max(0,hacThrowT-dt);
+  // 🦴 HAC RIG SÜRÜCÜSÜ: evreye göre klip — namaz (kılarken) · walk (tavâf/sa'y hareketi) · idle (bekleme);
+  // cemre ATIŞI PROSEDÜREL kalır (7.0 tam-kol + jamStone parabol senkronu bozulmasın), müzdelife eğilme g.rotation ile klibin üstünde
+  hacClipOn=false;
+  if(HRIG){
+    const ph0=hacState.phase; let want=null;
+    if(ph0==='namaz' && hacPraying) want='namaz';
+    else if(hacThrowT>0) want=null;
+    else if(ph0==='tavaf'||ph0==='say') want='walk';
+    else want='idle';
+    if(want==='namaz'){
+      const a=HRIG.actions.namaz;
+      if(HRIG.active!==a){ if(HRIG.active) HRIG.active.fadeOut(0.12);
+        a.reset(); a.setLoop(THREE.LoopOnce,1); a.clampWhenFinished=true; a.timeScale=Math.max(0.5,NAMAZ_CLIP_SPEED); a.fadeIn(0.12).play(); HRIG.active=a; }
+      if(hacPrayHold){ a.paused=true; a.time=Math.min(4.5, a.getClip().duration*0.12); } else a.paused=false;   // hold: KIYAM karesinde sabit (kıble/kamera tuning)
+    } else if(want){ rigPlay(HRIG, want); }
+    else if(HRIG.active){ HRIG.active.fadeOut(0.1); HRIG.active=null; }   // prosedürel jest (atış) → mixer donar, kemikler koda kalır
+    if(HRIG.active){ HRIG.mixer.update(dt); hacClipOn=true; }
+  }
   const cx=KABE_IC.x, cz=KABE_IC.z, g=hacPilgrim.g, ph=hacState.phase, bob=Math.abs(Math.sin(clock.elapsedTime*8))*0.03;
   if(ph==='muzdelife'){   // gece: eğilip taş topla
     g.visible=true; const bend=Math.abs(Math.sin(clock.elapsedTime*2.0))*0.18;
@@ -3472,13 +3502,20 @@ function hacTick(dt){
         jamStone.position.set(px+0.3*(1-t), 1.95+(ty-1.95)*t+Math.sin(t*Math.PI)*0.6, (JAM.z+2.3)+( (JAM.z+0.15)-(JAM.z+2.3) )*t); }
     } else if(jamStone) jamStone.visible=false;
     g.rotation.x=bodyX;
-    if(hacPilgrimRig){ swingLeg(hacPilgrimRig.armR, armA); swingLeg(hacPilgrimRig.armL, 0.08); }   // el-bilek-kol-omuz omuz-pivotuyla birlikte döner
+    if(hacPilgrimRig && !hacClipOn){ swingLeg(hacPilgrimRig.armR, armA); swingLeg(hacPilgrimRig.armL, 0.08); }   // el-bilek-kol-omuz omuz-pivotuyla birlikte döner (🦴 atışta klip kapalı → kemikte çalışır)
     return;
   }
   if(jamStone) jamStone.visible=false;   // cemre dışı: uçan taş gizli
   if(ph==='kurban'){ g.rotation.x=0; g.visible=true; g.position.set(KURBAN.x+1.6, bob, KURBAN.z+1.2); g.rotation.y=-Math.PI/2;
-    if(hacPilgrimRig){ swingLeg(hacPilgrimRig.armR,0); swingLeg(hacPilgrimRig.armL,0); } return; }   // koyuna dönük, kollar rest
+    if(hacPilgrimRig && !hacClipOn){ swingLeg(hacPilgrimRig.armR,0); swingLeg(hacPilgrimRig.armL,0); } return; }   // koyuna dönük, kollar rest (klip yoksa)
   if(ph==='namaz'){ g.visible=true; g.rotation.y=hacPrayerBaseYaw+PRAYER_YAW;   // KENDİ karakterimiz Kâbe'ye döner (kullanıcı ayarı PRAYER_YAW)
+    if(hacPraying && HRIG){   // 🦴 GERÇEK NAMAZ KLİBİ (2 rekât tam, Blender keyframe) — poz tümüyle mixer'de, konum MAKAM sabit
+      if(!hacPrayHold) hacNamazT+=dt;
+      const pp=Math.min(1, hacNamazT/Math.max(0.01,hacNamazDur));
+      g.rotation.x=0; g.position.set(MAKAM.x, 0, MAKAM.z);                     // alçalmayı klip hips ile yapar
+      if(!hacPrayHold && pp>=1) finishHacNamaz();
+      return;
+    }
     if(hacPraying && hacPilgrimRig){
       if(!hacPrayHold) hacNamazT+=dt;
       const pp = hacPrayHold ? 0.05 : Math.min(1, hacNamazT/Math.max(0.01,hacNamazDur));   // hold: kıyamda dur (tuning)
@@ -3492,7 +3529,7 @@ function hacTick(dt){
     return;
   }
   g.rotation.x=0; g.visible=true;
-  if(hacPilgrimRig){ swingLeg(hacPilgrimRig.armR,0); swingLeg(hacPilgrimRig.armL,0); }   // tavâf/sa'y: kollar rest
+  if(hacPilgrimRig && !hacClipOn){ swingLeg(hacPilgrimRig.armR,0); swingLeg(hacPilgrimRig.armL,0); }   // tavâf/sa'y: kollar rest (🦴 klipte walk kolları mixer'de)
   if(ph==='say'){
     hacState.sayPos += (hacState.sayT-hacState.sayPos)*Math.min(1,dt*1.6);
     g.position.set(MESA_X+hacState.sayPos*SAY_HALF, bob, cz);   // Kâbe'den ayrı Mes'â'da Safâ↔Merve
@@ -4943,7 +4980,7 @@ function occlusionLift(px,pz,cx,cz){
   }
   return lift;
 }
-function playAction(dur,kind){ actionT=dur||0.9; actionDur=actionT; actionKind=kind||'work'; }
+function playAction(dur,kind){ actionT=dur||0.9; actionDur=actionT; actionKind=kind||'work'; actionSeq++; }   // 🦴 seq: rig one-shot klibi (namaz/slash/throw) her aksiyonda baştan oynar
 // Namaz: vaktin REKAT sayısı + her 2 rekatta TEŞEHHÜD (diz kırık otur). poz = [kolAçısı, gövdeEğimi, dizKırma(0=ayakta,1=otur)].
 // (kol: swingLeg X açısı, 0=yanda; gövde: player.rotation.x öne eğim, 0=dik; diz: swingLeg bacak → teşehhüd/secde'de kırılır)
 function _lp(a,b,t){ t=t<0?0:t>1?1:t; return a+(b-a)*t; }
@@ -4951,7 +4988,9 @@ const REKAT_SAYI={Fecir:2, 'Öğle':4, 'İkindi':4, 'Akşam':3, 'Yatsı':4};   /
 function rekatCount(vn){ return REKAT_SAYI[vn] || 2; }                     // nafile/kuşluk/gece: 2
 function namazEnding(i,R){ return (i===R)?'sitStay':((i%2===0)?'sitStand':'stand'); }   // son→final teşehhüd, çift→orta teşehhüd(kalk), tek→ayakta
 function namazWeight(e){ return e==='sitStand'?1.5:(e==='sitStay'?1.4:1.0); }
-function namazDur(R){ let w=0; for(let i=1;i<=R;i++) w+=namazWeight(namazEnding(i,R)); return w*1.7; }   // toplam süre (sn)
+function namazDur(R){   // toplam süre (sn) — 🦴 rig varsa GERÇEK klip süresinden (2 rekât/çevrim, NAMAZ_CLIP_SPEED hızında)
+  if(RIG&&RIG.actions&&RIG.actions.namaz) return RIG.actions.namaz.getClip().duration*Math.max(1,Math.ceil(R/2))/Math.max(0.5,NAMAZ_CLIP_SPEED);
+  let w=0; for(let i=1;i<=R;i++) w+=namazWeight(namazEnding(i,R)); return w*1.7; }
 function _mix(A,B,t){ return [_lp(A[0],B[0],t),_lp(A[1],B[1],t),_lp(A[2],B[2],t)]; }
 const _KIYAM=[-0.85,0,0], _RUKU=[-0.35,1.00,0], _SECDE=[-1.40,1.36,1], _CELSE=[-0.55,0.30,1], _TESH=[-0.30,0.12,1];   // duruşlar [kol,gövde,diz]
 function rekatFrame(q, ending){   // tek rekat q(0→1); ending: stand / sitStand(orta teşehhüd, kalkar) / sitStay(final teşehhüd)
@@ -5775,12 +5814,14 @@ function renderInv(){
 }
 const loader=new GLTFLoader();
 const tpl={};
+const tplAnim={};     // 🦴 R3: modelin AnimationClip'leri (boy_rig: idle/walk/namaz/throw/slash) — gltf.scene klipleri taşımaz
+const tplSkinned={};  // 🦴 R3: modelde SkinnedMesh var mı → instance() SkeletonUtils.clone kullanır
 const loadBar=document.getElementById('loadBar');
 function b64ToBuf(u){ const b=atob(u.split(',')[1]); const a=new Uint8Array(b.length); for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i); return a.buffer; }
 const MODELV='f8';   // model sürümü (well v2 yuvarlak+linear-renk → cache-bust)
 // v2 detaylı modeller: gömülü (eski) sürümü ATLA, models/*.glb'den (yeni) fetch et.
 // (models büyüdü → embed HTML'i şişirmesin; SW cache'ler, offline PWA çalışır. file:// bu modelleri yükleyemez.)
-const FETCH_ONLY = new Set(['boy_takke','camel','goat','sheep','chicken','rooster','traveler','date_palm','date_palm_bare','item_date','item_mulberry',
+const FETCH_ONLY = new Set(['boy_takke','boy_rig','camel','goat','sheep','chicken','rooster','traveler','date_palm','date_palm_bare','item_date','item_mulberry',
   'jar','market_stall','merchant','mulberry_tree','mulberry_tree_bare','neighbor','orphan',
   'sack','scale','seccade','shepherd','well','basket','wheat',
   'arg_villager_a','arg_villager_b','qadi','plaintiff','beggar','trust_owner','trust_pouch',
@@ -5789,10 +5830,10 @@ function load(name){
   return new Promise(res=>{
     const data = (!FETCH_ONLY.has(name)) && window.IHYA_WORLD && window.IHYA_WORLD[name];
     if(data){ // gömülü base64 (file:// üzerinde fetch/CORS olmadan çalışır)
-      try{ loader.parse(b64ToBuf(data),'',g=>{tpl[name]=g.scene;fixupTpl(name);res();},e=>{console.warn('parse fail',name,e);res();}); }
+      try{ loader.parse(b64ToBuf(data),'',g=>{tpl[name]=g.scene;tplAnim[name]=g.animations||[];fixupTpl(name);res();},e=>{console.warn('parse fail',name,e);res();}); }
       catch(e){ console.warn('decode fail',name,e); res(); }
     } else { // yedek: relatif dosya (sunucudan açılırsa) — ?v ile cache-bust (model güncellenince taze gelir)
-      loader.load('models/'+name+'.glb?v='+MODELV, g=>{tpl[name]=g.scene;fixupTpl(name);res();}, undefined, e=>{res();});
+      loader.load('models/'+name+'.glb?v='+MODELV, g=>{tpl[name]=g.scene;tplAnim[name]=g.animations||[];fixupTpl(name);res();}, undefined, e=>{res();});
     }
   });
 }
@@ -5801,6 +5842,7 @@ function grayOf(c){ const l=c.r*0.3+c.g*0.59+c.b*0.11; return new THREE.Color(l*
 // zeytin (163,157,102) baked → soluk görünüyor; canlı hurma yeşiline boya (üst taç yaprakları daha açık).
 // tpl'de düzeltilir → hem tüm instance'lar hem alive/dead 'orig' rengi taze yeşili alır.
 function fixupTpl(name){ const g=tpl[name]; if(!g) return;
+  tplSkinned[name]=false; g.traverse(o=>{ if(o.isSkinnedMesh) tplSkinned[name]=true; });   // 🦴 R3: iskeletli model tespiti
   if(name==='date_palm'){ g.traverse(o=>{ if(!o.isMesh || !o.name) return;
     if(/^Leaf/.test(o.name)) o.material.color.setHex(/^LeafTop/.test(o.name)?0x8fae4e:0x6f9a3b);   // taç: açık, alt yapraklar: koyu yeşil
     else if(/^Trunk_/.test(o.name)){ const i=+((o.name.match(/_(\d+)$/)||[0,0])[1]); o.material.color.setHex(i%2?0x6f4a2a:0x8a6238); }   // segmentli sıcak kahve gövde
@@ -5818,7 +5860,8 @@ const BASE_HIDE=new Set(['camel','orphan','shepherd','traveler','date_palm','dat
   'arg_villager_a','arg_villager_b','qadi','plaintiff','trust_owner','beggar']);
 function instance(name){
   const t=tpl[name];
-  const g = t ? t.clone(true) : new THREE.Mesh(new THREE.BoxGeometry(0.6,0.6,0.6),new THREE.MeshStandardMaterial({color:0xc99}));
+  // 🦴 R3: iskeletli model (boy_rig) → SkeletonUtils.clone (clone(true) skeleton'ı klonlamaz, klon orijinal kemiklere bağlı kalırdı)
+  const g = t ? (tplSkinned[name]?skClone(t):t.clone(true)) : new THREE.Mesh(new THREE.BoxGeometry(0.6,0.6,0.6),new THREE.MeshStandardMaterial({color:0xc99}));
   const meshes=[];
   const hideBase=BASE_HIDE.has(name);
   g.traverse(o=>{ if(o.isMesh){
@@ -5833,6 +5876,64 @@ function reviveTint(meshes,g){ const a=Math.max(0,Math.min(0.78,g)); for(const x
 /* ============ BUILD WORLD ============ */
 const interactables=[]; // {q, g, meshes, done}  (exam düğümleri: r.exam=true)
 let player, PP=null, walkPhase=0;
+/* ============ 🦴 R3: İSKELET-RIG (boy_rig.glb — Blender armature/skin + 5 klip) ============
+   Klipler: idle · walk · namaz (2 rekât TAM, ~39sn, Elbânî edâsıyla keyframe) · throw · slash.
+   PP PROSEDÜREL SİSTEM FALLBACK KALIR: boy_rig yüklenmezse oyuncu boy_takke'den kurulur, her şey eskisi gibi.
+   Rig modunda da prosedürel actionKind'lar (sağma/kırpma/ikram/koşu...) çalışır: swingLeg → swingBone
+   kemik adaptörü, kemiği GÖVDE-uzayında X (omuz/kalça) ekseni etrafında döndürür — mesh sistemle birebir
+   aynı açı sözleşmesi (negatif = öne/yukarı). Klip aktifken (idle/walk/namaz/throw/slash) mixer kazanır. */
+let RIG=null, HRIG=null;                 // oyuncu + hac hacısı rig durumu {mixer, actions, active, proc, seq}
+let actionSeq=0;                          // playAction her çağrıda artar → one-shot klip yeniden tetiklenir
+let NAMAZ_CLIP_SPEED=3.0;                 // namaz klibi hızı (39sn/3≈13sn per 2 rekât) — __ihya3d.setNamazSpeed ile cihazda ayarla
+let WALK_CLIP_SPEED=1.5;                  // yürüyüş klibi hızı (adım frekansı) — __ihya3d.setWalkClipSpeed
+const RIG_CLIP_NAMES=['idle','walk','namaz','throw','slash'];
+const RIG_ONESHOT={namaz:1,throw:1,slash:1};
+const RIG_ACT_CLIP={namaz:'namaz',slash:'slash',throw:'throw'};   // actionKind → klip; haritada olmayanlar prosedürel kalır
+function buildRig(root, anims){           // 5 klip de varsa mixer+action seti kur; eksikse null (tam fallback)
+  try{
+    if(!root||!anims||!anims.length) return null;
+    const mixer=new THREE.AnimationMixer(root), actions={};
+    for(const n of RIG_CLIP_NAMES){ const c=anims.find(a=>a.name===n); if(!c) return null; actions[n]=mixer.clipAction(c); }
+    return {mixer, actions, active:null, proc:false, seq:-1};
+  }catch(e){ console.warn('buildRig fail',e); return null; }
+}
+function rigPlay(R, name){                 // klibe geç (kısa crossfade); one-shot'lar actionSeq ile yeniden tetiklenir
+  const a=R.actions[name]; if(!a) return false;
+  const one=!!RIG_ONESHOT[name];
+  if(R.active===a && (!one || R.seq===actionSeq)) return true;
+  if(one){                                 // süreyi oyun aksiyon süresine eşle (namaz: her 2 rekât = 1 klip çevrimi)
+    const cd=a.getClip().duration;
+    let reps=1;
+    if(name==='namaz') reps=Math.max(1,Math.ceil(namazRekat/2));
+    a.reset(); a.setLoop(THREE.LoopRepeat, reps); a.clampWhenFinished=true;
+    a.timeScale=cd*reps/Math.max(0.05,actionDur); R.seq=actionSeq;
+  } else { a.reset(); a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished=false; a.timeScale=(name==='walk'?WALK_CLIP_SPEED:1); }
+  if(R.active && R.active!==a) R.active.fadeOut(0.12);
+  a.fadeIn(0.12).play(); R.active=a; return true;
+}
+function rigStopAll(R){ if(!R||!R.active) return; R.active.fadeOut(0.1); R.active=null; }
+// ---- prosedürel fallback KEMİK adaptörü: local' = P⁻¹ · RotY(yaw)·RotX(ang) · P · rest ----
+// (P = kemiğin EBEVEYNİNİN model-uzayı REST dönüşü; kemik eklemden döner, mesh-pivot kompanzasyonu gerekmez)
+function boneEntry(b, rootStop){
+  if(!b) return null;
+  const P=new THREE.Quaternion(); const chain=[];
+  for(let n=b.parent; n && n!==rootStop; n=n.parent) chain.unshift(n);
+  for(const n of chain) P.multiply(n.quaternion);
+  return {isBone:true, bone:b, rest:b.quaternion.clone(), P, Pi:P.clone().invert(), ang:0, yaw:0, parts:[b], piv:null};
+}
+const _swQ1=new THREE.Quaternion(), _swQ2=new THREE.Quaternion(), _swAX=new THREE.Vector3(1,0,0), _swAY=new THREE.Vector3(0,1,0);
+function swingBone(e, ang){
+  e.ang += (ang-e.ang)*0.35;
+  _swQ1.setFromAxisAngle(_swAX, e.ang);
+  if(e.yaw){ _swQ2.setFromAxisAngle(_swAY, e.yaw); _swQ2.multiply(_swQ1); } else _swQ2.copy(_swQ1);
+  e.bone.quaternion.copy(e.Pi).multiply(_swQ2).multiply(e.P).multiply(e.rest);
+}
+function rigLimbs(root){                   // oyuncu/hacı için kemik tabanlı PP girdileri (thigh=bacak, upperarm=kol)
+  const bn=n=>{ let f=null; root.traverse(o=>{ if(!f && o.isBone && o.name===n) f=o; }); return f; };
+  const L={ legL:boneEntry(bn('thigh_L'),root), legR:boneEntry(bn('thigh_R'),root),
+            armL:boneEntry(bn('upperarm_L'),root), armR:boneEntry(bn('upperarm_R'),root) };
+  return (L.legL&&L.legR&&L.armL&&L.armR)?L:null;
+}
 let lastActT=performance.now()/1000, sitAmount=0;   // AFK oturma: son aktivite zamanı (sn) + oturma miktarı (0=ayakta,1=oturur)
 function wake(){ lastActT=performance.now()/1000; }  // dokunma/tuş → aktivite (oturuyorsa kalkar)
 ['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{ wake(); },{passive:true}));
@@ -6954,16 +7055,26 @@ function buildWorld(){
   // KÜMES görseli — Hâne adası FARMYARD ses kümesine (tavuk/horoz sesleri Faz 11.26'da hazırdı)
   OBSTACLES.push({x:4,z:4,r:1.0});   // kümes artık yumurta gather-düğümü (GATHER_DEFS coop_ev) — etrafından dolan, yaklaşınca yumurta topla
 
-  // player — boy_takke (takkeli çocuk): bacak/kol kalça-omuz pivotuyla animasyonlu
-  const pl=instance('boy_takke');
+  // player — 🦴 R3: boy_rig (İSKELETLİ, 5 klip) varsa ondan; yoksa boy_takke (prosedürel FALLBACK — eski davranış birebir)
+  let pl=null; RIG=null;
+  if(tpl['boy_rig'] && tplSkinned['boy_rig'] && (tplAnim['boy_rig']||[]).length){
+    pl=instance('boy_rig'); RIG=buildRig(pl.g, tplAnim['boy_rig']);
+    if(!RIG) pl=null;   // klipler eksik/bozuk → tam fallback
+  }
+  if(!pl) pl=instance('boy_takke');
   // #4 takke YEŞİL olsun — Cap+Cap_Rim kahveydi (saça çok yakındı), net ayrışsın
   { const capG=new THREE.Color(0x2e7d46);
     pl.meshes.forEach(x=>{ if(x.m.name==='Cap'||x.m.name==='Cap_Rim'){ x.m.material.color.copy(capG); x.orig.copy(capG); x.gray.copy(grayOf(capG)); } }); }
   player=pl.g; player.position.set(-5,0,0); player.rotation.order='YXZ'; player.rotation.y=Math.PI/2; applyPlayerScale(); scene.add(player);
   const pgob=n=>player.getObjectByName(n);
   const prig=(main,...ex)=>{ const m=pgob(main); if(!m)return null; const parts=[m]; ex.forEach(e=>{const x=pgob(e);if(x)parts.push(x);}); return {parts, piv:limbPivot(m)}; };
-  PP={ legL:prig('Pant_L','Shoe_L','Sole_L'), legR:prig('Pant_R','Shoe_R','Sole_R'),
+  if(RIG){ const L=rigLimbs(player);   // kemik tabanlı PP: aynı arayüz (swingLeg dispatch eder), prosedürel kodlar değişmeden çalışır
+    if(L) PP={ legL:L.legL, legR:L.legR, armL:L.armL, armR:L.armR, boy:true, bone:true };
+    else { PP=null; RIG=null; }   // kemikler bulunamadı (beklenmez) → yine de mesh fallback'e düşme: PP'siz kal, aşağıda kurulur
+  }
+  if(!RIG) PP={ legL:prig('Pant_L','Shoe_L','Sole_L'), legR:prig('Pant_R','Shoe_R','Sole_R'),
        armL:prig('Sleeve_L','Hand_L'), armR:prig('Sleeve_R','Hand_R'), boy:true };
+  console.log('[İhya] karakter rig:', RIG?'🦴 boy_rig (iskelet+klip)':'PP prosedürel (boy_takke)');
   buildScenarios();     // senaryo kümeleri (barıştırma/adalet/emanet/dilenci/sebil) — player kurulduktan sonra (emanet kesesi ele takılır)
 }
 
@@ -7930,30 +8041,49 @@ function tick(){
     const fl=Math.sin(et*17);
     swingLeg(PP.armL, -2.35+fl*0.55); swingLeg(PP.armR, -2.35-fl*0.55);      // kollar yukarı, çırpınır (kurtulmaya çalışır)
     swingLeg(PP.legL, -0.45); swingLeg(PP.legR, -0.45);                       // ayaklar girdaba (aşağı-arka)
-    for(const q of PP.legL.parts){ q.rotation.order='XYZ'; q.rotation.y=0; }
-    for(const q of PP.legR.parts){ q.rotation.order='XYZ'; q.rotation.y=0; }
+    if(PP.bone){ PP.legL.yaw=0; PP.legR.yaw=0; }   // 🦴 rig: yaw kompozit kuaterniyonda sıfırlanır
+    else { for(const q of PP.legL.parts){ q.rotation.order='XYZ'; q.rotation.y=0; }
+           for(const q of PP.legR.parts){ q.rotation.order='XYZ'; q.rotation.y=0; } }
     // KENDİ EKSENİNDE DÖNME YOK (mide bulanması) — dönüşü YALNIZ kamera yapar. Karakter sadece çekilir/batar/küçülür.
     player.rotation.x = vp*0.22;                                              // hafif öne (girdaba çekilir)
     player.rotation.z = 0;
     player.position.y = -vp*0.6;                                              // aşağı çekilir
     player.scale.setScalar(1.95*(1-vp*0.35));                                 // küçülerek girdaba girer
   }
+  // 🦴 RIG SÜRÜCÜSÜ: hangi klip? (idle/walk sürekli; namaz/slash/throw one-shot; null → prosedürel fallback kemiklerde sürer)
+  if(RIG && PP && PP.bone){
+    let want=null;
+    if(hacVortexT>0 || introMode) want=null;                                  // girdap/intro pozunu prosedürel kod sürer
+    else if(actionT>0) want=RIG_ACT_CLIP[actionKind]||null;                   // klipli aksiyon; kalanlar (sağma/ikram/koşu...) prosedürel
+    else if(moving) want='walk';
+    else if(sitAmount>0.25) want=null;                                        // AFK bağdaş: prosedürel (kemik fold+yaw)
+    else want='idle';
+    RIG.proc=!want;
+    if(want){ rigPlay(RIG, want); RIG.mixer.update(dt); }                     // klip yoksa mixer güncellenmez → kemikler prosedürel koda kalır
+  }
   // BACAK + KOL salınımı (boy_takke: kalça/omuz pivotu, swingLeg). Yürürken sall, otururken kıvrık, dururken sıfır.
-  if(hacVortexT<=0 && PP && PP.legL){
+  // 🦴 rig klibi aktifken (idle/walk/namaz/...) pozu mixer sürer → bu prosedürel blok atlanır
+  if(hacVortexT<=0 && PP && PP.legL && !(RIG && !RIG.proc)){
     // OTURUŞ = BAĞDAŞ: bacaklar öne katlanır (X) + içe YAW'lanır (Y) → önde çaprazlanır (ne uzatılmış ne arkada).
     const sw = moving ? Math.sin(walkPhase) : 0, legSit = sitAmount*SIT_FOLD;
     const _namazLegs = (actionT>0 && actionKind==='namaz');   // namaz sırasında bacakları namaz bloğu kontrol etsin (çekişme yok)
+    const cross = sitAmount*SIT_CROSS;   // İÇE yaw (çapraz) — ayaklar önde karşı tarafa geçsin (bağdaş). yürürken 0
+    if(PP.bone){ PP.legL.yaw=cross; PP.legR.yaw=-cross; }                     // 🦴 kemik: yaw, swingBone kompozitine girer (order='YXZ' eşdeğeri)
     if(!_namazLegs){ swingLeg(PP.legL, legSit + sw*0.5); swingLeg(PP.legR, legSit - sw*0.5); }
-    // İÇE yaw (çapraz) — ayaklar önde karşı tarafa geçsin (bağdaş). yürürken 0. order='YXZ' (yaw dıştan)
-    const cross = sitAmount*SIT_CROSS;
-    for(const p of PP.legL.parts){ p.rotation.order='YXZ'; p.rotation.y = cross; }
-    for(const p of PP.legR.parts){ p.rotation.order='YXZ'; p.rotation.y = -cross; }
+    if(!PP.bone){ for(const p of PP.legL.parts){ p.rotation.order='YXZ'; p.rotation.y = cross; }
+                  for(const p of PP.legR.parts){ p.rotation.order='YXZ'; p.rotation.y = -cross; } }
     if(actionT<=0){ swingLeg(PP.armL, -sw*0.42 + sitAmount*0.5); swingLeg(PP.armR, sw*0.42 + sitAmount*0.5); }   // otururken eller dizlere/kucağa
   }
   // ÇALIŞMA animasyonu — eyleme göre FARKLI kol hareketi (toplama/sağma/kırpma/namaz)
   if(hacVortexT<=0 && PP && PP.armL){
     if(actionT>0){ actionT-=dt; const et=clock.elapsedTime; let aL,aR;
-      if(actionKind==='pluck'){ const w=Math.sin(et*9);  aL=-2.1+w*0.45; aR=-2.1-w*0.45; }        // meyve: kollar yukarı, sırayla koparır
+      if(RIG && !RIG.proc){   // 🦴 KLİPLİ AKSİYON (namaz/slash/throw): pozu mixer sürer — prosedürel poz atlanır
+        if(actionKind==='namaz'){   // kıbleye yumuşak dönüş kalır; gövde/konum nötr (alçalmayı klip hips ile yapar)
+          let dy=QIBLA_ANGLE-player.rotation.y; while(dy>Math.PI)dy-=6.28318530718; while(dy<-Math.PI)dy+=6.28318530718;
+          player.rotation.y += dy*0.12;
+          player.rotation.x += (0-player.rotation.x)*0.2; player.position.y += (0-player.position.y)*0.25; }
+      }
+      else if(actionKind==='pluck'){ const w=Math.sin(et*9);  aL=-2.1+w*0.45; aR=-2.1-w*0.45; }        // meyve: kollar yukarı, sırayla koparır
       else if(actionKind==='milk'){ const w=Math.sin(et*13); aL=-0.5+Math.max(0,w)*0.45; aR=-0.5+Math.max(0,-w)*0.45; }  // süt: eller alçakta sırayla çeker
       else if(actionKind==='shear'){ const w=Math.sin(et*15); aL=-0.6; aR=-1.0+w*0.6; }            // yün: sağ el süpürerek kırpar
       else if(actionKind==='give'){ const w=Math.max(0,Math.sin(et*4.2)); aL=-1.48-w*0.22; aR=-1.48-w*0.22;   // #1 ikram: iki el simetrik öne uzanır
@@ -8041,7 +8171,7 @@ function tick(){
         aR=-1.05-k*0.25; aL=-1.05-k*0.25;                                                             // iki kol önde (siper)
         player.rotation.x += (-0.13*k - player.rotation.x)*0.3; }                                     // geriye sendeleme
       else { const w=Math.sin(et*17); aL=-1.15+w*0.5; aR=-1.15-w*0.5; }                             // genel çalışma: kollar öne-aşağı
-      swingLeg(PP.armL, aL); swingLeg(PP.armR, aR);
+      if(!(RIG && !RIG.proc)){ swingLeg(PP.armL, aL); swingLeg(PP.armR, aR); }   // 🦴 klipli aksiyonda kol pozu mixer'den
       if(actionT<=0 && actionKind==='namaz') lastActT = nowS - 11;   // namaz bitti + AFK → seccadede otur (10sn beklemeden)
     }
     // gövde eğimi: namaz/ikram sırasında pozdan; bitince ayakta dik. OTURURKEN gövde DİK dursun
@@ -8516,6 +8646,13 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     playSnd:(k,g)=>playSnd(k,g==null?0.5:g),
     farmyard:()=>FARMYARD,
     setSitLegs:(f,c)=>{ if(f!=null)SIT_FOLD=f; if(c!=null)SIT_CROSS=c; return {fold:SIT_FOLD,cross:SIT_CROSS}; },
+    // 🦴 R3 rig debug/tuning
+    rigState:()=>({ rig:!!RIG, hacRig:!!HRIG, bonePP:!!(PP&&PP.bone), proc:RIG?RIG.proc:null,
+      active:RIG&&RIG.active?RIG.active.getClip().name:null, hacActive:HRIG&&HRIG.active?HRIG.active.getClip().name:null,
+      clips:RIG?Object.keys(RIG.actions):[], namazSpeed:NAMAZ_CLIP_SPEED, walkSpeed:WALK_CLIP_SPEED,
+      tplRig:!!tpl['boy_rig'], tplSkinned:!!tplSkinned['boy_rig'], animCount:(tplAnim['boy_rig']||[]).length }),
+    setNamazSpeed:(x)=>{ NAMAZ_CLIP_SPEED=Math.max(0.5,+x||3); return NAMAZ_CLIP_SPEED; },   // namaz klip hızı (39sn/x per 2 rekât)
+    setWalkClipSpeed:(x)=>{ WALK_CLIP_SPEED=Math.max(0.3,+x||1.5); return WALK_CLIP_SPEED; },
     legInfo:()=>{ if(!player) return null; player.updateMatrixWorld(true);
       const ry=player.rotation.y, cx=player.position.x, cz=player.position.z;
       const gw=(name)=>{ const o=player.getObjectByName(name); if(!o||!o.geometry) return null;
