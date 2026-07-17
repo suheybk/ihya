@@ -520,6 +520,7 @@
   <button class="iconbtn" id="muteBtn" title="Ses aç/kapat">🔊</button>
   <button class="iconbtn" id="hayirBtn" title="Hayır Çeşmesi — nûrunu sadakaya dönüştür">🤲</button>
   <button class="iconbtn" id="scenBtn" title="Senaryo Defteri — sulh · adalet · emanet meseleleri">📜</button>
+  <button class="iconbtn" id="ihyaDefBtn" title="İhya Defteri — kendini tanı, hedeflerini kur" style="display:none">📔</button>
   <button class="iconbtn" id="modernBtn" title="İhya — Bugün (modern şehir)" style="display:none">🏙️</button>
   <button class="iconbtn" id="cumaBtn" title="Cuma Sünnetleri (gusül · koku · Kehf…)" style="display:none">🌿</button>
   <button class="iconbtn" id="shotBtn" title="Ekran görüntüsü kaydet / paylaş (P)">📷</button>
@@ -542,7 +543,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.02</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.03</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -606,6 +607,16 @@
     <div class="sub" data-i18n="cuma_sub" style="margin-bottom:10px">Cuma, günlerin efendisi. Gusül, temizlik, güzel koku ve Kehf sûresi ile Cuma'yı ihyâ et — iki Cuma arası bağışlanır. (Buhârî)</div>
     <div id="cumaList"></div>
     <button class="cl" data-i18n="u_close" id="cumaClose">Kapat</button>
+  </div>
+</div>
+
+<div class="veil" id="ihyadef">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="exhead"><h3 data-i18n="hd_ihyadef">📔 İhya Defteri</h3><span class="exprog"><b id="ihyaDefProg">0/0</b></span></div>
+    <div class="sub" data-i18n="ihyadef_sub" style="margin-bottom:10px">Yeni hayatın için kendini tanı. Damla damla, dilediğinde cevapla — cevapların kendi defterinde saklanır, seni doğru işlere yönlendirir.</div>
+    <div id="ihyaDefBody"></div>
+    <button class="cl" data-i18n="u_close" id="ihyaDefClose">Kapat</button>
   </div>
 </div>
 
@@ -1383,6 +1394,7 @@ if(typeof S.mosqueStreak!=='number') S.mosqueStreak=0;   // ardışık tam-cami 
 if(typeof S.mosqueStreakDay!=='number') S.mosqueStreakDay=-1;
 if(typeof S.mosqueFullDay!=='number') S.mosqueFullDay=-1;
 if(S.mosqueUnlocked===undefined) S.mosqueUnlocked=false; // imam/cemaat sohbeti açıldı mı (KALICI)
+if(!S.ihyaDef||typeof S.ihyaDef!=='object') S.ihyaDef={ans:{},lastAskDay:-1};   // 📔 İhya Defteri (İ2 Tanışma Motoru) — cevaplar (bulut-senkron)
 // İMAM QUEST-GIVER (Faz 6): 5 vakit ÜST ÜSTE cemaatle namaz → imam vazife verir → Senaryo Defteri (barıştır/hükmet/emanet) açılır
 if(typeof S.mosqueConsec!=='number') S.mosqueConsec=0;   // ardışık cemaat-farz namazı sayısı (kaçırınca sıfırlanır)
 if(typeof S.mosqueConsecMark!=='number') S.mosqueConsecMark=-1;  // son cemaat-farzın global vakit indeksi (dayNum*5+vakitIdx)
@@ -1483,6 +1495,7 @@ const UI_STR={ en:{
   shot_saved:'📷 Screenshot saved', shot_share:'İhya — revive your world · ihyagame.com', shot_fail:'📷 Could not capture', set_shot:'📷 Screenshot / share',
   host_eve:'until the evening', host_morn:'until the morning', home_enter:'You entered your home — find peace',
   hd_cuma:'🌿 Friday Sunnahs', cuma_sub:'Friday is the master of days. Revive it with ghusl, cleanliness, fragrance and Surah al-Kahf — forgiveness between the two Fridays. (Bukhari)', cuma_do:'🌿 Done', cuma_notfri:'🌿 These sunnahs are special to Friday', cuma_full:'🌿 You completed the Friday sunnahs — blessing! (+10)',
+  hd_ihyadef:'📔 Revival Journal', ihyadef_sub:'Get to know yourself for your new life. Drop by drop, answer when you wish — your answers are kept in your own journal and guide you to the right deeds.', ihyadef_skip:'Not now', ihyadef_title_lbl:'Your title: ', ihyadef_notitle:'Begin knowing yourself — answer the first question', ihyadef_unanswered:'Not answered yet', ihyadef_ask:'Answer the next question', ihyadef_alldone:'All questions answered', ihyadef_newtitle:'New title: ', ihyadef_drip:'📔 Your Revival Journal wants to know you — tap 📔 to answer a question',
   hd_settings:'⚙️ Settings', set_controls_h:'🎮 Controls', set_move:'Move (direction keys)', set_act:'Interact · advance dialog', set_esc:'Close panel / go back', set_nums:'Action bar: prayer·water·food·wudu·fast·memorize·satchel·charity·cases·qibla', set_mc:'M map · C modern city', set_touch:'Touch: joystick + 🔘 action button', set_prefs_h:'Preferences', spacekey_s:'Space', set_sound:'🔊 Sound', set_guide:'💡 Guide light', set_lang:'🌐 Language', set_on:'On', set_off:'Off',
   u_close:'Close', u_dirhem:'dirhams', u_meselesuf:'cases', u_steps:'📖 Show steps',
   scen_sub:'Solve Medina\'s cases: judge with justice, reconcile the estranged, deliver the trust. Each case leads to a title.',
@@ -1671,6 +1684,7 @@ ar:{
   shot_saved:'📷 حُفظت لقطة الشاشة', shot_share:'إحياء — أحيِ عالمك · ihyagame.com', shot_fail:'📷 تعذّر الالتقاط', set_shot:'📷 لقطة شاشة / مشاركة',
   host_eve:'حتى المساء', host_morn:'حتى الصباح', home_enter:'دخلتَ بيتك — تجد السكينة',
   hd_cuma:'🌿 سُنن الجمعة', cuma_sub:'الجمعةُ سيّدُ الأيام. أحيِها بالغُسل والنظافة والطِّيب وسورة الكهف — يُغفر لك ما بين الجمعتين. (البخاري)', cuma_do:'🌿 فعلتُ', cuma_notfri:'🌿 هذه السُّنن خاصّةٌ بيوم الجمعة', cuma_full:'🌿 أتممتَ سُنن الجمعة — بركة! (+10)',
+  hd_ihyadef:'📔 دفتر الإحياء', ihyadef_sub:'اعرِف نفسك لحياتك الجديدة. قطرةً قطرة، أجِب متى شئت — تُحفظ إجاباتك في دفترك وتوجّهك إلى الأعمال الصالحة.', ihyadef_skip:'ليس الآن', ihyadef_title_lbl:'لقبك: ', ihyadef_notitle:'ابدأ بمعرفة نفسك — أجِب عن السؤال الأول', ihyadef_unanswered:'لم تُجِب بعد', ihyadef_ask:'أجِب عن السؤال التالي', ihyadef_alldone:'أُجيبت كلُّ الأسئلة', ihyadef_newtitle:'لقبٌ جديد: ', ihyadef_drip:'📔 دفترُ الإحياء يريد أن يعرفك — انقر 📔 لتجيب عن سؤال',
   hd_settings:'⚙️ الإعدادات', set_controls_h:'🎮 التحكّم', set_move:'الحركة (مفاتيح الاتجاه)', set_act:'التفاعل · متابعة الحوار', set_esc:'إغلاق اللوحة / رجوع', set_nums:'شريط الإجراءات: صلاة·ماء·طعام·وضوء·صوم·حفظ·جَعبة·صدقة·قضايا·قبلة', set_mc:'M الخريطة · C المدينة العصرية', set_touch:'اللمس: عصا التحكّم + زر 🔘', set_prefs_h:'التفضيلات', spacekey_s:'المسافة', set_sound:'🔊 الصوت', set_guide:'💡 ضوء الإرشاد', set_lang:'🌐 اللغة', set_on:'مُفعّل', set_off:'مُغلق',
   hd_hayir:'🤲 نبع الخير', hd_hac:'🕋 العُمرة', hd_ezber:'📖 دفتر الحِفظ',
   u_close:'إغلاق', u_dirhem:'دراهم', u_meselesuf:'قضايا', u_steps:'📖 اعرض الخطوات',
@@ -1931,6 +1945,7 @@ function onNewDay(){
   if(typeof checkReminders==='function') checkReminders();   // 📅 takvim: bugüne uygun hatırlatmaları bildir
   if(S.hairShaved && isFriday()){ S.hairFridays=(S.hairFridays||0)+1;   // tıraştan sonra 3 Cuma → saç yeniden uzar
     if(S.hairFridays>=3){ S.hairShaved=false; save(); if(typeof updatePlayerHair==='function') updatePlayerHair(); setTimeout(()=>toast('💈 '+(tU('hair_grown')||'Saçların yeniden uzadı')),900); } }
+  if(typeof ihyaDefDrip==='function') ihyaDefDrip();   // 📔 İhya Defteri: nazik günlük hatırlatma (cevaplanmamış soru varsa)
 }
 
 /* ============ THREE SETUP ============ */
@@ -4429,7 +4444,8 @@ function exitModern(){ inModern=false; near=null; if(!player) return;
 }
 function updateModernBtn(){ const b=document.getElementById('modernBtn'); if(!b) return;
   b.style.display=(S.modernUnlocked && !inHome && !inBld)?'block':'none'; b.textContent=inModern?'🕌':'🏙️';   // evin/binanın içindeyken gizli (çıkış kapıdan)
-  b.title=inModern?(tU('mo_btn_back')||'Medine\'ye dön'):(tU('mo_btn_go')||'İhya — Bugün (modern şehir)'); }
+  b.title=inModern?(tU('mo_btn_back')||'Medine\'ye dön'):(tU('mo_btn_go')||'İhya — Bugün (modern şehir)');
+  if(typeof updateIhyaDefBtn==='function') updateIhyaDefBtn(); }   // 📔 İhya Defteri butonu da aynı eşikte (Hac sonrası) güncellenir
 // haftalık cami namazı: bir vakti camide kılınca kaydet; 7 gün ardışık tam → imam sohbeti açılır
 function recordMosquePrayer(vn){
   if(!FARZ_VAKIT.includes(vn)) return;
@@ -5650,6 +5666,172 @@ function doCumaAct(id){ cumaReset(); if(!isFriday()){ toast(tU('cuma_notfri')||'
 }
 function openCuma(){ audio(); renderCuma(); document.getElementById('cuma').classList.add('show'); }
 function closeCuma(){ document.getElementById('cuma').classList.remove('show'); }
+
+/* ============ 📔 İHYA DEFTERİ — TANIŞMA MOTORU (İ2, Faz 7.03) [[vision-ihya-2026]] ============
+   "Yeni Doğuş" eşiğinden sonra oyun oyuncuyu damla damla, ATLANABİLİR sorularla tanır → Kişisel İhya
+   Defteri. Cevaplar S.ihyaDef.ans'ta (M0 bulut kaydına otomatik yedeklenir). KVKK/çocuk emniyeti: derin/
+   iç muhâsebe soruları (adult:true) yalnız yetişkine (isAdult) sorulur; serbest metin YOK (yalnız seçenek →
+   kişisel veri toplanmaz). Her soru bir SAHİH nudge ile hayata/işlere yönlendirir. */
+const IHYA_Q={ tr:[
+  {id:'niyet', ic:'🎯', cat:'hedef', q:'Bu yeni hayatta en çok neyi düzeltmek istersin?',
+    opts:[{v:'namaz',l:'Namazımı'},{v:'quran',l:'Kur\'an\'la bağımı'},{v:'ahlak',l:'Ahlâkımı'},{v:'ilim',l:'İlmimi'}],
+    nudge:'Niyet, amelin ruhudur: «Ameller ancak niyetlere göredir.» (Buhârî · Müslim) — küçük ama sürekli bir adımla başla.'},
+  {id:'vakit', ic:'🕗', cat:'amel', q:'Günün hangi vaktinde Allah\'a en yakın hissedersin?',
+    opts:[{v:'seher',l:'Seher/sabah'},{v:'gunduz',l:'Gündüz'},{v:'aksam',l:'Akşam'},{v:'gece',l:'Gece'}],
+    nudge:'Rabbimiz gecenin son üçte birinde en yakındır (Buhârî). O vaktini bir zikir/duâ ile taçlandır.'},
+  {id:'salah', ic:'🧎', cat:'amel', q:'Namazların için ne diyebilirsin?',
+    opts:[{v:'duzenli',l:'Düzenliyim'},{v:'bazen',l:'Bazen kaçırıyorum'},{v:'basliyorum',l:'Yeni başlıyorum'},{v:'ogreniyorum',l:'Öğreniyorum'}],
+    nudge:'Namaz "kılınan" değil ikāmetu\'s-salât — Rabbinle BAĞ kurmaktır. Vaktinde ve huşû ile; kaçındıysan hemen kaza et (Müslim).'},
+  {id:'oku', ic:'📚', cat:'ilim', q:'Şu sıralar neyi öğrenmek/okumak istersin?',
+    opts:[{v:'meal',l:'Kur\'an meâli'},{v:'siyer',l:'Siyer (Rasûlullah ﷺ)'},{v:'fikih',l:'İlmihâl/fıkıh'},{v:'hadis',l:'Hadîs'}],
+    nudge:'«İlim talebi her Müslümana farzdır.» (İbn Mâce — hasen). Günde bir sayfa, bir hadîs — az ve devamlı.'},
+  {id:'iyilik', ic:'🤝', cat:'ihsan', q:'Bu hafta önce kime iyilik ulaştırmak istersin?',
+    opts:[{v:'anne',l:'Anne-babama'},{v:'komsu',l:'Komşuma'},{v:'akraba',l:'Akrabama (sıla)'},{v:'muhtac',l:'Bir muhtaca'}],
+    nudge:'Birr, yüzü güzelleştirir: anne-baba rızâsı Rabbin rızâsıdır (Tirmizî). Bugün bir telefon/ziyaret/selâm ile başla.'},
+  {id:'istikamet', ic:'🔥', cat:'hedef', q:'Kendine bir istikamet hedefi seç:',
+    opts:[{v:'40namaz',l:'40 gün vaktinde namaz'},{v:'sayfa',l:'Günde 1 sayfa Kur\'an'},{v:'sila',l:'Haftada 1 sıla-i rahim'},{v:'dil',l:'Dilimi koru (gıybetsiz)'}],
+    nudge:'«En sevimli amel, az da olsa DEVAMLI olanıdır.» (Buhârî · Müslim). Seçtiğini günlük hedefinde takip edeceğiz inşâallah.'},
+  {id:'ilgi', ic:'🌿', cat:'ilim', q:'Boş vaktini nasıl değerlendirmek istersin?',
+    opts:[{v:'faydali',l:'Faydalı içerik izlemek'},{v:'kitap',l:'Kitap okumak'},{v:'zikir',l:'Zikir/tefekkür'},{v:'spor',l:'Spor/sağlık'}],
+    nudge:'«İki nimette çok insan aldanır: sıhhat ve boş vakit.» (Buhârî). Vaktini seni yükseltene ayır.'},
+  {id:'dil', ic:'👂', cat:'ihsan', q:'Dilini korumak için niyetin ne?',
+    opts:[{v:'giybet',l:'Gıybeti bırakmak'},{v:'sus',l:'Faydasızsa susmak'},{v:'guzel',l:'Güzel söz söylemek'},{v:'selam',l:'Selâmı yaymak'}],
+    nudge:'«Allah\'a ve âhirete iman eden ya hayır söylesin ya sussun.» (Buhârî · Müslim). Dil, cennete ve ateşe götüren en büyük sebep.'},
+  {id:'kalp', ic:'🤲', cat:'amel', adult:true, q:'Kalbini şu sıralar en çok ne yoruyor?',
+    opts:[{v:'dunya',l:'Dünya telaşı'},{v:'gaflet',l:'Gaflet/uzaklık'},{v:'gecmis',l:'Geçmişin yükü'},{v:'yalniz',l:'Yalnızlık'}],
+    nudge:'«Kalpler ancak Allah\'ı anmakla huzur bulur.» (Ra\'d 28). Tevbe kapısı açıktır; bir istiğfar, bir secde ile hafifle.'},
+  {id:'rizik', ic:'💰', cat:'hedef', adult:true, q:'Rızkını nasıl aramak istersin?',
+    opts:[{v:'helal',l:'Helâl kazanç'},{v:'sukur',l:'Şükür/kanaat'},{v:'paylas',l:'Paylaşmak/infak'},{v:'emek',l:'Sağlam/dürüst emek'}],
+    nudge:'«Helâl kazanç, farzlardan sonra bir farzdır.» (Beyhakî — hasen li-gayrihî). Rızık Allah\'tandır; sen sebebe sarıl, gerisi tevekkül.'},
+], en:[
+  {id:'niyet', ic:'🎯', cat:'hedef', q:'In this new life, what do you most want to set right?',
+    opts:[{v:'namaz',l:'My prayer'},{v:'quran',l:'My bond with the Qur\'an'},{v:'ahlak',l:'My character'},{v:'ilim',l:'My knowledge'}],
+    nudge:'Intention is the soul of the deed: «Deeds are but by intentions.» (Bukhari · Muslim) — begin with one small, steady step.'},
+  {id:'vakit', ic:'🕗', cat:'amel', q:'At which time of day do you feel closest to Allah?',
+    opts:[{v:'seher',l:'Pre-dawn/morning'},{v:'gunduz',l:'Daytime'},{v:'aksam',l:'Evening'},{v:'gece',l:'Night'}],
+    nudge:'Our Lord descends in the last third of the night (Bukhari). Crown that hour with a remembrance or supplication.'},
+  {id:'salah', ic:'🧎', cat:'amel', q:'How would you describe your prayers?',
+    opts:[{v:'duzenli',l:'Consistent'},{v:'bazen',l:'Sometimes I miss them'},{v:'basliyorum',l:'Just starting'},{v:'ogreniyorum',l:'Learning'}],
+    nudge:'Prayer is not merely "performed" — it is iqamat as-salah, building a BOND with your Lord. On time, with presence; make up any missed at once (Muslim).'},
+  {id:'oku', ic:'📚', cat:'ilim', q:'What would you like to learn/read these days?',
+    opts:[{v:'meal',l:'Qur\'an meaning'},{v:'siyer',l:'Sirah (the Messenger ﷺ)'},{v:'fikih',l:'Fiqh basics'},{v:'hadis',l:'Hadith'}],
+    nudge:'«Seeking knowledge is an obligation upon every Muslim.» (Ibn Majah — hasan). One page, one hadith a day — little and lasting.'},
+  {id:'iyilik', ic:'🤝', cat:'ihsan', q:'Whom will you reach with kindness first this week?',
+    opts:[{v:'anne',l:'My parents'},{v:'komsu',l:'My neighbour'},{v:'akraba',l:'My kin (ties)'},{v:'muhtac',l:'Someone in need'}],
+    nudge:'Righteousness beautifies: parents\' pleasure is the Lord\'s pleasure (Tirmidhi). Begin today with a call, a visit, a greeting.'},
+  {id:'istikamet', ic:'🔥', cat:'hedef', q:'Choose a steadfastness goal:',
+    opts:[{v:'40namaz',l:'40 days of on-time prayer'},{v:'sayfa',l:'1 page of Qur\'an daily'},{v:'sila',l:'1 kinship visit weekly'},{v:'dil',l:'Guard my tongue (no backbiting)'}],
+    nudge:'«The most beloved deed is the most CONSISTENT, even if small.» (Bukhari · Muslim). We will track your choice in your daily goals, insha\'Allah.'},
+  {id:'ilgi', ic:'🌿', cat:'ilim', q:'How would you like to spend your free time?',
+    opts:[{v:'faydali',l:'Beneficial content'},{v:'kitap',l:'Reading books'},{v:'zikir',l:'Dhikr/reflection'},{v:'spor',l:'Sport/health'}],
+    nudge:'«Two blessings many are deceived in: health and free time.» (Bukhari). Give your time to what raises you.'},
+  {id:'dil', ic:'👂', cat:'ihsan', q:'What is your intention for guarding your tongue?',
+    opts:[{v:'giybet',l:'Leave backbiting'},{v:'sus',l:'Stay silent if useless'},{v:'guzel',l:'Speak good words'},{v:'selam',l:'Spread greetings'}],
+    nudge:'«Let whoever believes in Allah and the Last Day speak good or stay silent.» (Bukhari · Muslim). The tongue is the greatest cause for Paradise and Fire.'},
+  {id:'kalp', ic:'🤲', cat:'amel', adult:true, q:'What weighs on your heart most these days?',
+    opts:[{v:'dunya',l:'Worldly worries'},{v:'gaflet',l:'Heedlessness/distance'},{v:'gecmis',l:'The past\'s burden'},{v:'yalniz',l:'Loneliness'}],
+    nudge:'«Hearts find rest only in the remembrance of Allah.» (Ra\'d 28). The door of repentance is open; lighten with an istighfar, a prostration.'},
+  {id:'rizik', ic:'💰', cat:'hedef', adult:true, q:'How do you wish to seek your provision?',
+    opts:[{v:'helal',l:'Lawful earning'},{v:'sukur',l:'Gratitude/contentment'},{v:'paylas',l:'Sharing/infaq'},{v:'emek',l:'Honest, solid work'}],
+    nudge:'«Seeking lawful earning is an obligation after the obligations.» (Bayhaqi — hasan). Provision is from Allah; take the means, then trust.'},
+], ar:[
+  {id:'niyet', ic:'🎯', cat:'hedef', q:'في هذه الحياة الجديدة، ما أكثرُ ما تريد إصلاحه؟',
+    opts:[{v:'namaz',l:'صلاتي'},{v:'quran',l:'صِلتي بالقرآن'},{v:'ahlak',l:'أخلاقي'},{v:'ilim',l:'علمي'}],
+    nudge:'النيةُ روحُ العمل: «إنما الأعمال بالنيات.» (البخاري · مسلم) — ابدأ بخطوةٍ صغيرةٍ دائمة.'},
+  {id:'vakit', ic:'🕗', cat:'amel', q:'في أيِّ وقتٍ من اليوم تشعر بأقربِ ما تكون إلى الله؟',
+    opts:[{v:'seher',l:'السَّحَر/الصباح'},{v:'gunduz',l:'النهار'},{v:'aksam',l:'المساء'},{v:'gece',l:'الليل'}],
+    nudge:'ينزل ربُّنا في الثلث الأخير من الليل (البخاري). توِّج ذلك الوقت بذكرٍ أو دعاء.'},
+  {id:'salah', ic:'🧎', cat:'amel', q:'ماذا تقول عن صلواتك؟',
+    opts:[{v:'duzenli',l:'منتظمة'},{v:'bazen',l:'أحيانًا أفوّتها'},{v:'basliyorum',l:'أبدأ الآن'},{v:'ogreniyorum',l:'أتعلّم'}],
+    nudge:'الصلاة ليست "أداءً" فحسب، بل إقامةُ صلة بربّك. في وقتها وبخشوع؛ وما فاتك فاقضِه فورًا (مسلم).'},
+  {id:'oku', ic:'📚', cat:'ilim', q:'ماذا تريد أن تتعلّم/تقرأ هذه الأيام؟',
+    opts:[{v:'meal',l:'معاني القرآن'},{v:'siyer',l:'السيرة (الرسول ﷺ)'},{v:'fikih',l:'الفقه/العبادات'},{v:'hadis',l:'الحديث'}],
+    nudge:'«طلبُ العلم فريضةٌ على كل مسلم.» (ابن ماجه — حسن). صفحةٌ وحديثٌ كلَّ يوم — قليلٌ دائم.'},
+  {id:'iyilik', ic:'🤝', cat:'ihsan', q:'مَن أوّلُ من تريد أن تُوصل إليه إحسانك هذا الأسبوع؟',
+    opts:[{v:'anne',l:'والديّ'},{v:'komsu',l:'جاري'},{v:'akraba',l:'رحمي (صلة)'},{v:'muhtac',l:'محتاجًا'}],
+    nudge:'البِرُّ يُجمِّل: رضا الوالدين رضا الرب (الترمذي). ابدأ اليوم باتصالٍ أو زيارةٍ أو سلام.'},
+  {id:'istikamet', ic:'🔥', cat:'hedef', q:'اختَر هدفَ استقامة:',
+    opts:[{v:'40namaz',l:'٤٠ يومًا صلاةً في وقتها'},{v:'sayfa',l:'صفحةُ قرآنٍ يوميًا'},{v:'sila',l:'صلةُ رحمٍ أسبوعيًا'},{v:'dil',l:'حفظُ اللسان (بلا غيبة)'}],
+    nudge:'«أحبُّ العمل أدومُه وإن قلّ.» (البخاري · مسلم). سنتابع اختيارك في هدفك اليومي بإذن الله.'},
+  {id:'ilgi', ic:'🌿', cat:'ilim', q:'كيف تحبّ أن تقضي وقت فراغك؟',
+    opts:[{v:'faydali',l:'محتوى نافع'},{v:'kitap',l:'قراءة الكتب'},{v:'zikir',l:'ذكر/تفكّر'},{v:'spor',l:'رياضة/صحة'}],
+    nudge:'«نعمتان مغبونٌ فيهما كثيرٌ من الناس: الصحةُ والفراغ.» (البخاري). اصرف وقتك لِما يرفعك.'},
+  {id:'dil', ic:'👂', cat:'ihsan', q:'ما نيّتك في حفظ لسانك؟',
+    opts:[{v:'giybet',l:'تركُ الغيبة'},{v:'sus',l:'الصمتُ إن لم ينفع'},{v:'guzel',l:'الكلمةُ الطيبة'},{v:'selam',l:'إفشاءُ السلام'}],
+    nudge:'«من كان يؤمن بالله واليوم الآخر فليقل خيرًا أو ليصمت.» (البخاري · مسلم). اللسانُ أعظمُ سببٍ للجنة والنار.'},
+  {id:'kalp', ic:'🤲', cat:'amel', adult:true, q:'ما أكثرُ ما يُثقل قلبك هذه الأيام؟',
+    opts:[{v:'dunya',l:'همُّ الدنيا'},{v:'gaflet',l:'الغفلة/البُعد'},{v:'gecmis',l:'ثِقلُ الماضي'},{v:'yalniz',l:'الوحدة'}],
+    nudge:'«ألا بذكر الله تطمئنّ القلوب.» (الرعد ٢٨). بابُ التوبة مفتوح؛ خفِّف بِاستغفارٍ وسجدة.'},
+  {id:'rizik', ic:'💰', cat:'hedef', adult:true, q:'كيف تحبّ أن تطلب رزقك؟',
+    opts:[{v:'helal',l:'كسبٌ حلال'},{v:'sukur',l:'شكرٌ/قناعة'},{v:'paylas',l:'مشاركة/إنفاق'},{v:'emek',l:'عملٌ صادقٌ متقن'}],
+    nudge:'«طلبُ الحلال فريضةٌ بعد الفريضة.» (البيهقي — حسن لغيره). الرزقُ من الله؛ خُذ بالأسباب ثم توكّل.'},
+] };
+function ihyaQData(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return IHYA_Q[L]||IHYA_Q.tr; }
+function ihyaQList(){ return ihyaQData().filter(q=>!q.adult || isAdult()); }   // çocuk emniyeti: derin sorular yalnız yetişkine
+function ihyaDefInit(){ if(!S.ihyaDef||typeof S.ihyaDef!=='object') S.ihyaDef={ans:{},lastAskDay:-1}; if(!S.ihyaDef.ans) S.ihyaDef.ans={}; }
+function ihyaNextQ(){ ihyaDefInit(); return ihyaQList().find(q=>S.ihyaDef.ans[q.id]==null)||null; }   // sıradaki cevaplanmamış (yaşa uygun)
+function ihyaDefCount(){ ihyaDefInit(); const list=ihyaQList(); return {ans:list.filter(q=>S.ihyaDef.ans[q.id]!=null).length, tot:list.length}; }
+// unvanlar: kendini tanıma yolunda kilometre taşları
+const IHYA_TITLES=[{n:3,t:'seeker'},{n:6,t:'muhasib'},{n:100,t:'arif'}];
+function ihyaTitleName(t){ const M={ tr:{seeker:'Kendini Arayan',muhasib:'Muhâsebe Ehli',arif:'Kendini Tanıyan'}, en:{seeker:'Self-Seeker',muhasib:'People of Reckoning',arif:'Self-Knower'}, ar:{seeker:'الباحثُ عن نفسه',muhasib:'أهلُ المحاسبة',arif:'العارفُ بنفسه'} }; const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return (M[L]||M.tr)[t]||t; }
+function ihyaCurTitle(){ const c=ihyaDefCount().ans; let cur=null; for(const m of IHYA_TITLES){ if(c>=m.n) cur=m; } return cur; }
+let ihyaDefMode='list';
+function openIhyaDef(ask){ audio(); ihyaDefInit(); ihyaDefMode=(ask&&ihyaNextQ())?'ask':'list'; renderIhyaDef(); document.getElementById('ihyadef').classList.add('show'); }
+function closeIhyaDef(){ document.getElementById('ihyadef').classList.remove('show'); }
+function renderIhyaDef(){
+  ihyaDefInit(); const body=document.getElementById('ihyaDefBody'); if(!body) return;
+  const cnt=ihyaDefCount(); const pe=document.getElementById('ihyaDefProg'); if(pe) pe.textContent=cnt.ans+'/'+cnt.tot;
+  if(ihyaDefMode==='ask'){
+    const q=ihyaNextQ();
+    if(!q){ ihyaDefMode='list'; return renderIhyaDef(); }
+    let h='<div class="exq" style="margin:4px 0 8px;font-weight:800;font-size:15px">'+emo(q.ic)+' '+q.q+'</div>';
+    h+='<div class="exopts" style="grid-template-columns:1fr">';
+    for(const o of q.opts) h+='<button class="exOpt" onclick="__ihyaAns(\''+q.id+'\',\''+o.v+'\')">'+o.l+'</button>';
+    h+='</div>';
+    h+='<div style="text-align:center;margin-top:8px"><button class="cl" style="background:none;border:0;text-decoration:underline;color:#9fd8bf;font-size:12px" onclick="__ihyaSkip()">'+(tU('ihyadef_skip')||'Şimdi değil')+'</button></div>';
+    body.innerHTML=h; return;
+  }
+  // liste modu: unvan + cevaplananlar + "sıradaki soru"
+  let h='';
+  const cur=ihyaCurTitle();
+  h+='<div style="margin:0 2px 10px;padding:8px 11px;background:#0000000f;border-radius:11px;font:700 12px system-ui;line-height:1.5">'
+    +(cur?('🏅 '+(tU('ihyadef_title_lbl')||'Unvanın: ')+'<b>'+ihyaTitleName(cur.t)+'</b>'):(tU('ihyadef_notitle')||'Kendini tanımaya başla — ilk soruyu cevapla'))+'</div>';
+  const list=ihyaQList();
+  for(const q of list){ const v=S.ihyaDef.ans[q.id]; const card=document.createElement('div');
+    const chosen=v!=null?(q.opts.find(o=>o.v===v)||{}).l:null;
+    const inner='<div class="hcard"><div class="hic">'+emo(q.ic)+'</div><div class="hbody"><div class="hnm">'+q.q+' <span class="hcnt">'+(v!=null?'✓':'—')+'</span></div>'
+      +'<div class="href">'+(v!=null?('<b>'+chosen+'</b> · '+q.nudge):(tU('ihyadef_unanswered')||'Henüz cevaplamadın'))+'</div></div></div>';
+    h+=inner; }
+  const nq=ihyaNextQ();
+  h+='<button class="do" style="margin-top:10px" onclick="'+(nq?'__ihyaAskNext()':'')+'"'+(nq?'':' disabled')+'>'
+    +(nq?('📔 '+(tU('ihyadef_ask')||'Sıradaki soruyu cevapla')):('✓ '+(tU('ihyadef_alldone')||'Tüm sorular cevaplandı')))+'</button>';
+  body.innerHTML=h;
+}
+window.__ihyaAskNext=function(){ ihyaDefMode='ask'; renderIhyaDef(); };
+window.__ihyaSkip=function(){ ihyaDefMode='list'; renderIhyaDef(); };
+window.__ihyaAns=function(qid,v){ ihyaDefInit(); if(S.ihyaDef.ans[qid]!=null){ ihyaDefMode='list'; renderIhyaDef(); return; }
+  const q=ihyaQList().find(x=>x.id===qid); if(!q) return;
+  S.ihyaDef.ans[qid]=v; addNur(3); save(); refreshHUD(); sndChime();
+  banner(emo(q.ic)+' +3'+(tU('nur_suffix')||' nûr'));
+  setTimeout(()=>toast(emo(q.ic)+' '+q.nudge),700);
+  // kilometre taşı unvanı → bonus nûr + kutlama
+  const c=ihyaDefCount().ans; const hit=IHYA_TITLES.find(m=>m.n===c);
+  if(hit){ addNur(8); save(); refreshHUD(); setTimeout(()=>{ banner('🏅 '+(tU('ihyadef_newtitle')||'Yeni unvan: ')+ihyaTitleName(hit.t)+' (+8)'); sndFanfare(); },1200); }
+  ihyaDefMode='list'; renderIhyaDef(); updateIhyaDefBtn();
+};
+function updateIhyaDefBtn(){ const b=document.getElementById('ihyaDefBtn'); if(!b) return;
+  const show=!!S.modernUnlocked && !(typeof inHome!=='undefined'&&inHome) && !(typeof inBld!=='undefined'&&inBld);   // "Yeni Doğuş" (Hac sonrası) eşiğinden itibaren; ev/bina içinde gizli
+  b.style.display=show?'block':'none';
+  const nq=show?ihyaNextQ():null;   // cevaplanmamış soru varsa hafif "•" işareti
+  b.textContent='📔'; if(nq){ b.textContent='📔'; b.style.filter='drop-shadow(0 0 3px #ffd766)'; } else b.style.filter='';
+  if(b.innerHTML.indexOf('<img')<0 && typeof emo==='function') b.innerHTML=emo('📔');
+}
+// DRIP: yeni günde (modern açıksa) cevaplanmamış soru varsa NAZİKÇE hatırlat (zorlamaz, günde bir)
+function ihyaDefDrip(){ ihyaDefInit(); if(!S.modernUnlocked) return; const d=S.dayNum||0;
+  if(S.ihyaDef.lastAskDay===d) return; if(!ihyaNextQ()) return;
+  S.ihyaDef.lastAskDay=d; save();
+  setTimeout(()=>toast('📔 '+(tU('ihyadef_drip')||'İhya Defterin seni tanımak istiyor — 📔 ile bir soruya cevap ver')),2600);
+}
 function updateCumaBtn(){ const b=document.getElementById('cumaBtn'); if(b) b.style.display=isFriday()?'block':'none'; }
 // 📷 EKRAN GÖRÜNTÜSÜ — taze kareyi yakala + markalı alt şerit (nûr/rütbe + ihyagame.com) → paylaş/indir (reklam)
 function captureScreenshot(){
@@ -7744,6 +7926,9 @@ document.getElementById('scenBtn').onclick=openScen;   // Senaryo Defteri artık
 document.getElementById('cumaBtn').onclick=openCuma;   // 🌿 Cuma Sünnetleri (sadece Cuma günü görünür)
 document.getElementById('cumaClose').onclick=closeCuma;
 document.getElementById('cuma').addEventListener('click',e=>{ if(e.target.id==='cuma') closeCuma(); });
+document.getElementById('ihyaDefBtn').onclick=()=>openIhyaDef(false);   // 📔 İhya Defteri (Tanışma Motoru, Hac sonrası görünür)
+document.getElementById('ihyaDefClose').onclick=closeIhyaDef;
+document.getElementById('ihyadef').addEventListener('click',e=>{ if(e.target.id==='ihyadef') closeIhyaDef(); });
 document.getElementById('shotBtn').onclick=captureScreenshot;   // 📷 ekran görüntüsü kaydet/paylaş
 document.getElementById('settingsBtn').onclick=openSettings;   // ⚙️ Ayarlar (kontroller + tercihler)
 document.getElementById('remindBtn').onclick=openReminders;   // 📅 Hatırlatıcı · Takvim
@@ -8603,6 +8788,11 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     hacPrayerInfo:()=>({praying:hacPraying, PRAYER_YAW:+PRAYER_YAW.toFixed(3), baseYaw:+hacPrayerBaseYaw.toFixed(3), pilgrimYaw:hacPilgrim?+hacPilgrim.g.rotation.y.toFixed(3):null, rigOK:!!(hacPilgrimRig&&hacPilgrimRig.armL), camPos:hacNamazCamPos.toArray().map(v=>+v.toFixed(2)), camLook:hacNamazCamLook.toArray().map(v=>+v.toFixed(2)), makam:MAKAM.toArray(), kabe:KABE_IC.toArray()}),
     enterModern:()=>enterModern(), exitModern:()=>exitModern(), unlockModern:()=>{ S.modernUnlocked=true; save(); updateModernBtn(); return true; }, modernState:()=>({unlocked:S.modernUnlocked, inModern, built:modernBuilt, job:S.modernJob, recs:modernRecs.map(r=>r.modern)}), openModern:(k)=>{ const r=modernRecs.find(x=>x.modern===k); if(r) openModernBuilding(r); return !!r; },
     busState:()=>modernBus?{theta:+modernBus.theta.toFixed(2), state:modernBus.state, pos:[Math.round(modernBus.g.position.x),Math.round(modernBus.g.position.z)], passenger:!!modernBus.passenger}:null,
+    // 📔 İhya Defteri (İ2 Tanışma Motoru) debug
+    ihyaDef:()=>({ ...ihyaDefCount(), ans:Object.assign({},S.ihyaDef&&S.ihyaDef.ans), next:(ihyaNextQ()||{}).id||null, title:ihyaCurTitle()?ihyaCurTitle().t:null, adultQ:isAdult() }),
+    openIhyaDef:(ask)=>openIhyaDef(!!ask),
+    ihyaAns:(qid,v)=>{ window.__ihyaAns(qid,v); return (S.ihyaDef.ans||{})[qid]; },
+    ihyaReset:()=>{ S.ihyaDef={ans:{},lastAskDay:-1}; save(); updateIhyaDefBtn(); return 'defter sıfırlandı'; },
     mosqueState:()=>({mode:mosqueMode, cumaDone:S.cumaDone, sat:S.mosqueSat, interiorNodes:mosqueGroup?mosqueGroup.children.length:0}),
     mosqueWeek:()=>({vDay:S.mosqueVDay, vSet:S.mosqueVSet.slice(), streak:S.mosqueStreak, streakDay:S.mosqueStreakDay, unlocked:S.mosqueUnlocked}),
     imamState:()=>({consec:S.mosqueConsec, mark:S.mosqueConsecMark, met:S.imamMet, ready:(!S.imamMet&&S.mosqueConsec>=5)}),
