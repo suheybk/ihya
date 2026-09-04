@@ -22,6 +22,15 @@
     document.head.appendChild(_s);
   }
 </script>
+<script>
+/* ===== PWA KURULUM İSTEMİ — ERKEN YAKALAMA (Faz 7.16) =====
+   'beforeinstallprompt' sayfa açılır açılmaz tetiklenebilir; ES modülü o an henüz
+   çalışmamış olur. Bu yüzden olay BURADA yakalanıp saklanır, oyun sonra kullanır. */
+window.__ihyaPwa = { evt:null, installed:false };
+addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); window.__ihyaPwa.evt = e; });
+addEventListener('appinstalled', function(){ window.__ihyaPwa.installed = true; window.__ihyaPwa.evt = null;
+  try{ if(typeof window.__ihyaOnInstalled==='function') window.__ihyaOnInstalled(); }catch(_){} });
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#2f8f63">
@@ -547,7 +556,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.15</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.16</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1599,6 +1608,18 @@ const UI_STR={ en:{
   wj_b:'😟 The needy were not looked after',
   // --- Faz 7.14d: profil ekranı · ezber listesi ---
   prof_head:'🌱 Your Ihya Journey',
+  // --- Faz 7.16: ana ekrana ekle levhası ---
+  pw_t:'Before You Set Out', pw_who:'The signpost at the bridge', pw_sign:'Take Ihya with you',
+  pw_x:'The road is long past this island. <b>Add Ihya to your home screen</b>: it opens with one tap, runs full screen, and works <b>even without internet</b> — your prayer times, your save and your lessons stay with you.\n\nIt is not required; the journey goes on either way.',
+  pw_ref:'<b>Verse:</b> «And take provision; but indeed, the best provision is God-consciousness.» (al-Baqara 2/197)',
+  pw_do:'📲 Add to home screen', pw_how:'📖 How do I add it?',
+  pw_skip:'🚶 Not now, carry on', pw_skip_t:'That is fine — the signpost stays here; come back whenever you like.',
+  pw_later_t:'You can return to this signpost any time.',
+  pw_manual_t:'Choose «Add to home screen» from the browser menu.',
+  pw_ios:'Share ⬆️ → «Add to Home Screen» — Ihya then opens like an app.',
+  pw_other:'Browser menu ⋮ → «Install app» / «Add to home screen».',
+  pw_ok_b:'📲 Ihya is in your pocket', pw_ok_t:'Added to your home screen — one tap, and it opens even offline (+10 nur).',
+  pw_btn:'Read the signpost',
   prof_sub:'A few questions for a journey suited to you. In Islam, obligations differ from person to person.',
   prof_start:'Begin ➤',
   ez_sec_sure:'Surahs', ez_sec_dua:'Daily Supplications',
@@ -1979,6 +2000,18 @@ ar:{
   wj_b:'😟 لم يُتعهَّد المحتاجون',
   // --- Faz 7.14d: شاشة التعريف · قائمة الحفظ ---
   prof_head:'🌱 رحلةُ إحيائك',
+  // --- Faz 7.16: لوحةُ الإضافة إلى الشاشة الرئيسة ---
+  pw_t:'قبل أن تمضي', pw_who:'اللوحةُ عند رأس الجسر', pw_sign:'خُذ إحياء معك',
+  pw_x:'الطريقُ بعد هذه الجزيرة طويل. <b>أضِف إحياء إلى شاشتك الرئيسة</b>: يُفتَح بلمسةٍ واحدة، ويملأ الشاشة، ويعمل <b>ولو بلا إنترنت</b> — تبقى معك مواقيتُ صلاتك وحفظُك ودروسُك.\n\nليس شرطًا؛ فالرحلةُ ماضيةٌ على كل حال.',
+  pw_ref:'<b>آية:</b> «وتزوَّدوا فإنَّ خيرَ الزادِ التقوى.» (البقرة ٢/١٩٧)',
+  pw_do:'📲 أضِف إلى الشاشة الرئيسة', pw_how:'📖 كيف أضيفه؟',
+  pw_skip:'🚶 ليس الآن، امضِ', pw_skip_t:'لا بأس — تبقى اللوحةُ هنا، وتعود إليها متى شئت.',
+  pw_later_t:'يمكنك العودة إلى هذه اللوحة في أي وقت.',
+  pw_manual_t:'اختَر «أضِف إلى الشاشة الرئيسة» من قائمة المتصفّح.',
+  pw_ios:'مشاركة ⬆️ ← «أضِف إلى الشاشة الرئيسة» — عندها يُفتَح إحياء كتطبيق.',
+  pw_other:'قائمة المتصفّح ⋮ ← «تثبيت التطبيق» / «أضِف إلى الشاشة الرئيسة».',
+  pw_ok_b:'📲 إحياءُ في جيبك', pw_ok_t:'أُضيف إلى شاشتك الرئيسة — لمسةٌ واحدة، ويُفتَح ولو بلا إنترنت (+١٠ نور).',
+  pw_btn:'اقرأ اللوحة',
   prof_answer_all:'أجِب عن الأسئلة الثلاثة جميعًا.',
   prof_sub:'أسئلةٌ قليلة لرحلةٍ تناسبك. التكاليفُ في الإسلام تختلف من شخصٍ لآخر.',
   prof_start:'ابدأ ➤',
@@ -2128,6 +2161,60 @@ function trackBoot(){
     const aktif=S.week?Object.keys(S.week).length:0;
     track('ihya_week_active', {days: aktif});
   }catch(e){}
+}
+/* ---- 📲 ANA EKRANA EKLE (Faz 7.16) — "yola çıkmadan azığını al" ----
+   İlk adadan (Hâne) çıkarken köprü başındaki LEVHA ile karşılaşılır. TAMAMEN İSTEĞE BAĞLI:
+   görev listesinde DEĞİL (allQuests'e girmez) → islandDone/imtihan/ada geçişi etkilenmez.
+   Kurulunca oyun tam ekran açılır, internetsiz çalışır (SW zaten önbellekliyor). */
+function pwaStandalone(){ try{ return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true; }catch(e){ return false; } }
+function pwaDone(){ return !!S.pwaDone || pwaStandalone() || (window.__ihyaPwa && window.__ihyaPwa.installed); }
+function pwaReward(){                       // kurulum gerçekleştiğinde: bir kez ödül + levhayı kaldır
+  if(S.pwaDone) return; S.pwaDone=1; addNur(10); save(); refreshHUD(); sndFanfare();
+  banner(tF('pw_ok_b','📲 İhya cebinde'));
+  setTimeout(()=>toast(tF('pw_ok_t','Ana ekranına eklendi — tek dokunuşla, internetsiz de açılır (+10 nûr).')),400);
+  removePwaSign();
+}
+window.__ihyaOnInstalled=function(){ try{ pwaReward(); }catch(e){} };
+let pwaSign=null;
+function removePwaSign(){ if(!pwaSign) return; scene.remove(pwaSign.g);
+  const i=interactables.indexOf(pwaSign.rec); if(i>=0) interactables.splice(i,1);
+  if(near===pwaSign.rec) near=null; pwaSign=null; }
+function spawnPwaSign(){
+  if(pwaSign || pwaDone()) return;          // kuruluysa/yapıldıysa levha hiç çıkmaz
+  const x=6.5, z=0, g=new THREE.Group();
+  const wood=new THREE.MeshStandardMaterial({color:0x8a5a2a,roughness:0.9});
+  const plank=new THREE.MeshStandardMaterial({color:0xc9a86a,roughness:0.85});
+  const post=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.08,1.5,7), wood); post.position.y=0.75; post.frustumCulled=false; g.add(post);
+  const bd=new THREE.Mesh(new THREE.BoxGeometry(0.95,0.5,0.07), plank); bd.position.set(0,1.45,0.03); bd.rotation.z=0.03; bd.frustumCulled=false; g.add(bd);
+  const frame=new THREE.Mesh(new THREE.BoxGeometry(1.02,0.09,0.05), wood); frame.position.set(0,1.72,0.03); frame.frustumCulled=false; g.add(frame);
+  const foot=new THREE.Mesh(new THREE.CylinderGeometry(0.22,0.26,0.12,8), wood); foot.position.y=0.06; foot.frustumCulled=false; g.add(foot);
+  g.position.set(x,0,z); g.rotation.y=-0.5; scene.add(g);
+  const spr=(typeof emojiSprite==='function')?emojiSprite('📲',0.7):null; if(spr){ spr.position.set(0,2.15,0); g.add(spr); }
+  const rec={ q:{id:'pwa_sign', pos:[x,0,z], nm:tF('pw_sign','İhya\'yı yanına al'), ic:'📲'}, g, meshes:[], pwa:true, islId:'ev', reach:2.6 };
+  interactables.push(rec); pwaSign={g, rec};
+  OBSTACLES.push({x:x,z:z,r:0.45});
+}
+function openPwaSign(){
+  const ev=(window.__ihyaPwa&&window.__ihyaPwa.evt)||null;
+  const iOS=/iPad|iPhone|iPod/.test(navigator.userAgent||'');
+  const opts=[];
+  if(ev){ opts.push({l:tF('pw_do','📲 Ana ekrana ekle'), act:()=>{
+      try{ ev.prompt(); ev.userChoice.then(r=>{ if(r&&r.outcome==='accepted') pwaReward();
+             else toast(tF('pw_later_t','Dilediğin zaman bu levhaya dönebilirsin.')); }); }catch(e){ toast(tF('pw_manual_t','Tarayıcı menüsünden «Ana ekrana ekle»yi seç.')); }
+      if(typeof closeDialog==='function') closeDialog(); } });
+  } else {
+    opts.push({l:tF('pw_how','📖 Nasıl eklenir?'), act:()=>{
+      toast(iOS ? tF('pw_ios','Paylaş ⬆️ → «Ana Ekrana Ekle» — İhya bir uygulama gibi açılır.')
+                : tF('pw_other','Tarayıcı menüsü ⋮ → «Uygulamayı yükle» / «Ana ekrana ekle».'));
+      if(typeof closeDialog==='function') closeDialog(); } });
+  }
+  opts.push({l:tF('pw_skip','🚶 Şimdi değil, yola devam'), act:()=>{ S.pwaSeen=1; save();
+    toast(tF('pw_skip_t','Olsun — levha burada kalır, istediğinde uğrarsın.')); if(typeof closeDialog==='function') closeDialog(); }});
+  openDialog({ic:'📲', title:tF('pw_t','Yola Çıkmadan'), start:'s0', steps:{ s0:{
+    who:tF('pw_who','Köprü başındaki levha'),
+    txt:tF('pw_x','Bu adadan sonra yol uzun. İhya\'yı <b>ana ekranına ekle</b>: tek dokunuşla açılır, tam ekran olur ve <b>internetin olmasa da</b> çalışır — namaz vakitlerin, kaydın ve derslerin yanında kalır.\n\nZorunlu değil; yolculuk buna bakmadan da sürer.'),
+    ref:tF('pw_ref','<b>Âyet:</b> «Azık edinin; şüphesiz azığın en hayırlısı takvâdır.» (Bakara 2/197)'),
+    opts} }});
 }
 /* ---- 📊 BU HAFTA (Faz 7.12) — "bu hafta ne yaptım" özeti [[vision-ihya-2026]] ----
    Araştırma bulgusu: oyunda ilerleme VAR (zincirler, unvanlar, imtihanlar) ama emeğin
@@ -6758,7 +6845,9 @@ function rebuildEvQuests(vname){
   // SADECE ev DERS quest'lerini kaldır — hayvan/gather/NPC/pazar/seccade/mescid/muâhât/exam'e DOKUNMA
   // (eski bug: geniş 'ev' filtresi ev hayvanlarını da siliyordu → vakit değişince hayvanlar "yok" oluyordu)
   for(let i=interactables.length-1;i>=0;i--){ const r=interactables[i];
-    if(r.exam||r.animal||r.gather||r.npc||r.market||r.muahat||r.scenario||r.mosque||r.seccadePickup||r.station||r.modern||r.home) continue;
+    // NOT: bu atlama listesine YENI ETKILESIM TURU eklemek ZORUNLU — yoksa vakit degisince
+    // nesne sessizce silinir (eski bug: ev hayvanlari; 7.16: pwa levhasi; hirsiz da Hane'de olabilir).
+    if(r.exam||r.animal||r.gather||r.npc||r.market||r.muahat||r.scenario||r.mosque||r.seccadePickup||r.station||r.modern||r.home||r.pwa||r.thief||r.hac) continue;
     if(questIslandId(r.q)==='ev'){ if(r.g.userData&&r.g.userData.duaTree) scene.remove(r.g.userData.duaTree); scene.remove(r.g); interactables.splice(i,1); } }
   setVakitQuests(vname);
   for(const q of evQuests) addInteractable(q);
@@ -7838,6 +7927,7 @@ function buildWorld(){
   buildIlimMeclisi();      // Cami adasında Suffa: 6 sahabe çember + gölgelik (ilim düğümü merkezde)
   buildAtolye();           // Atölye adası: değirmen/tandır/tezgâh craft istasyonları
   buildSadakaGarden();     // Sadaka Bahçesi adası: her hayır kaleminden birer sergi (Hâne önü)
+  spawnPwaSign();          // 📲 Hâne köprü başı: "yola çıkmadan azığını al" levhası (isteğe bağlı)
   refreshGardenViz();      // genişletme bahçelerini (satın alınmamış) gizle
   buildBees();             // çiçeklerin etrafında dolaşan minik arılar (ambient)
   // ağaç süsleri (adaların kenarlarında, z ~ ±4-5; görev/yol hattından uzak)
@@ -8672,6 +8762,7 @@ document.getElementById('market').addEventListener('click',e=>{ if(e.target.id==
 function doAct(){ if(!near) return;
   trackFirstAction();   // 📈 ilk etkileşime kadar geçen süre (yalnız bir kez)
   if(near.thief){ strikeThief(); return; }   // ⚔️ hırsıza vur (her Space/dokunuş = bir vuruş)
+  if(near.pwa){ openPwaSign(); return; }     // 📲 köprü başı levhası: ana ekrana ekle (isteğe bağlı)
   if(near.seccadePickup){ pickupSeccade(); return; }
   if(near.mosque){ enterMosque(); return; }
   if(near.hac){ openHacGate(); return; }   // 🕋 Mekke kapısı: dünya ihyâ edildiyse Umre/HAC-başvurusu/bitiş-ekranı seçimi, değilse Umre
@@ -9139,6 +9230,7 @@ function tick(){
     if(best!==near){ near=best;
       if(near){ actBtn.style.display='block';
         if(near.thief){ actBtn.textContent='⚔️ '+(tU('thief_btn')||'Karşı koy'); }
+        else if(near.pwa){ actBtn.textContent='📲 '+tF('pw_btn','Levhayı oku'); }
         else if(near.seccadePickup){ actBtn.textContent=tU('ab_seccade')||'🧎 Seccadeni al'; }
         else if(near.mosque){ actBtn.textContent=tU('ab_mosque')||'🕌 Mescide gir'; }
         else if(near.hac){ actBtn.textContent = worldRevived() ? (tU('ab_hacgate')||'🕋 Umre / Hac') : (tU('ab_hac')||'🕋 Umre\'ye niyet'); }
@@ -9162,6 +9254,8 @@ function tick(){
       promptEl.style.display='block'; promptEl.classList.add('show');
       promptEl.textContent = near.thief
         ? ('⚔️ '+(tU('thief_nm')||'Hırsız')+' — '+(tU('thief_btn')||'Karşı koy')+' ('+(thief?thief.hp:0)+'/'+THIEF_HP+')')
+        : near.pwa
+        ? ('📲 '+tF('pw_sign','İhya\'yı yanına al'))
         : near.seccadePickup
         ? (tU('pr_seccade')||'🧎 Seccaden burada')
         : near.mosque
@@ -9203,7 +9297,7 @@ function tick(){
   // NOT (Faz 7.15): r.thief MUTLAKA atlanmali — hirsiz bu listeye girince kara pelerinine
   // altin sarisi emissive basiliyor, simsiyah silueti parlayan soluk bir kutleye donusuyor ve
   // zeminde GORUNMEZ hale geliyordu (kullanici: 'hirsiz bana saldiriyor ama onu goremiyorum').
-  for(const r of interactables){ if(r.gather||r.animal||r.market||r.npc||r.muahat||r.scenario||r.mosque||r.seccadePickup||r.station||r.modern||r.home||r.thief) continue; const on=!r.done && questAvailable(r.q);
+  for(const r of interactables){ if(r.gather||r.animal||r.market||r.npc||r.muahat||r.scenario||r.mosque||r.seccadePickup||r.station||r.modern||r.home||r.thief||r.pwa) continue; const on=!r.done && questAvailable(r.q);
     for(const x of r.meshes){ if(x.m.material.emissive){ x.m.material.emissive.setHex(on?0xffcf55:0x000000); x.m.material.emissiveIntensity=on?glow:0; } } }
   if(particles.length) updateParticles(dt);
   if(examNodes.length) animateExamNodes(dt, clock.elapsedTime);
@@ -9302,6 +9396,9 @@ function applyLang(){ const L=(S.lang&&I18N[S.lang])?S.lang:'tr';
    typeof kontrolü tanımsız isimde bile patlamaz; her çağrı ayrı try içinde (biri hata verirse
    diğerleri yine çizilsin). */
 function rerenderOpenPanels(){
+  // eylem butonu/altyazı etiketi yalnız YAKIN NESNE DEĞİŞİNCE yazılıyor → dil değişince bayat kalıyordu.
+  // near=null: sonraki karede en yakın nesne yeniden bulunur ve etiket yeni dilde yazılır.
+  try{ near=null; }catch(e){}
   const PANELS=[
     ['scen',    typeof renderScen==='function'?renderScen:null],
     ['inv',     typeof renderInv==='function'?renderInv:null],
