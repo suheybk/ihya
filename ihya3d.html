@@ -556,7 +556,7 @@ addEventListener('appinstalled', function(){ window.__ihyaPwa.installed = true; 
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.16</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.17</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1620,6 +1620,15 @@ const UI_STR={ en:{
   pw_other:'Browser menu ⋮ → «Install app» / «Add to home screen».',
   pw_ok_b:'📲 Ihya is in your pocket', pw_ok_t:'Added to your home screen — one tap, and it opens even offline (+10 nur).',
   pw_btn:'Read the signpost',
+  pr_entered:'🕌 {n} has begun', pr_hint_rug:'(pray with 🧎)', nd_wudu_guide:'Renew Your Wudu',
+  // --- Faz 7.17: EN'de eksik kalan anahtarlar ---
+  ab_silk:'Take silk', bld_enter:'You stepped inside',
+  gym_coach_ready:'🧑‍🏫 The coach is watching you — go to the ring and he will set you a task',
+  hair_grown:'Your hair has grown back', hj_shaved:'Your head was shaved — you have left ihram',
+  mo_cong:'🕌 Your neighbours formed a congregation — praying together is twenty-seven times greater',
+  silk_got:'You took silk — drawn from the cocoon (work it at the loom)',
+  silk_notyet:'wait for the COCOON stage for silk (🧵)',
+  so_nur:'The blessing of the gathering: +5 nur', tavaf_salute:'Bismillah, Allahu akbar',
   prof_sub:'A few questions for a journey suited to you. In Islam, obligations differ from person to person.',
   prof_start:'Begin ➤',
   ez_sec_sure:'Surahs', ez_sec_dua:'Daily Supplications',
@@ -2012,6 +2021,43 @@ ar:{
   pw_other:'قائمة المتصفّح ⋮ ← «تثبيت التطبيق» / «أضِف إلى الشاشة الرئيسة».',
   pw_ok_b:'📲 إحياءُ في جيبك', pw_ok_t:'أُضيف إلى شاشتك الرئيسة — لمسةٌ واحدة، ويُفتَح ولو بلا إنترنت (+١٠ نور).',
   pw_btn:'اقرأ اللوحة',
+  pr_entered:'🕌 دخل وقتُ {n}', pr_hint_rug:'(صلِّ بـ 🧎)', nd_wudu_guide:'جدِّد وضوءك',
+  // --- Faz 7.17: AR'da eksik kalan anahtarlar ---
+  ab_silk:'خُذ الحرير', bld_enter:'دخلتَ',
+  ex_conquer:'افتَح ✦', ex_correct:'الصواب: ',
+  ex_fail_s:' — لم يكتمل، راجِع الموضوعات.', ex_fail_t:'لنتعلَّم من جديد',
+  ex_lock_done:'✓ هذه الجزيرة مفتوحةٌ بالفعل', ex_lock_first:'🔒 أتمِم دروس هذه الجزيرة أولًا',
+  ex_pass_s:' — جاهزٌ لفتح الجزيرة (+٣٠ نور)', ex_pass_t:'اجتزتَ الامتحان!',
+  ex_retry:'↺ حاوِل مرّةً أخرى', ex_review:'📕 راجِع الدروس', ex_review_toast:'📕 راجِع الدروس من جديد',
+  ex_school_fiqh:'⚖️ مدرسةُ الفقه', ex_school_hadith:'🕌 مدرسةُ الحديث', ex_school_verse:'📖 مجلسُ الآيات',
+  ex_title_suf:' الامتحان',
+  gym_coach_ready:'🧑‍🏫 المدرّبُ يراقبك — اذهب إلى الحلبة ليُسنِد إليك مهمّة',
+  hair_grown:'عاد شعرُك ينمو', hj_shaved:'حُلِق رأسُك — تحلَّلتَ من الإحرام',
+  hy_banner_suf:' صدقةٌ جارية', hy_toast_a:' — تُقبَّل (+',
+  mo_cong:'🕌 صار جيرانُك جماعة — وصلاةُ الجماعة تفضُل بسبعٍ وعشرين درجة',
+  mu_banner:'🤝 المؤاخاة — عهدُ الإخاء',
+  mu_greet:'🤝 أخوك الأنصاريُّ يُسلِّم عليك: «اطلُب رزقك من حلالٍ في السوق، وأنفِق من كسبك — فالأخوّةُ مشاركة.»',
+  mu_reward:'✦ +٢٥ نور — صار لك أخٌ من الأنصار',
+  mu_t1:'آخى رسولُ الله ﷺ في المدينة بين كلِّ مهاجرٍ وأنصاريّ؛ فشاركه الأنصاريُّ مالَه وبيتَه عن طِيبِ نفس.',
+  mu_t2:'عرَض سعدُ بنُ الربيع نصفَ ماله على عبد الرحمن بن عوف، فقال: «دُلَّني على السوق» — فاختار الكسبَ الحلال. (البخاري، مناقب الأنصار ٣)',
+  npc_banner_suf:' تُقبَّل صدقتُك', npc_cd_a:'🙏 أعطيتَ قبل قليل — ', npc_cd_b:' ثانية ثم أعِد',
+  npc_food:'طعام', npc_need_a:'🔒 اجمَع أولًا ', npc_need_b:' (', npc_need_c:' مطلوب', npc_need_food:'؛ تمر/توت/حليب',
+  prof_start_adult:'العبادة، والكسبُ الحلال، والإنفاق — معك من الألف إلى الياء 🕌',
+  prof_start_banner:'🌱 بدأت رحلةُ إحيائك الشخصية',
+  prof_start_child:'هيّا: صلِّ صلاتك، وتعلَّم سُوَرك وأدعيتك 📖🧎',
+  px_opened:' فُتِحت!', px_reconquer:' فُتِحت من جديد',
+  q_exam_open_a:'📝 ', q_exam_open_b:' فُتِح ميدانُ الامتحان!', q_exam_ready:'📝 أنت جاهزٌ للامتحان',
+  q_plus10:'+١٠ نور ✦', q_undo10:'↺ تراجعتَ (−١٠ نور)',
+  rank_up:'🌟 رتبةٌ جديدة: ',
+  silk_got:'أخذتَ الحرير — سحبتَه من الشرنقة (اشتغِل به على النَّول)',
+  silk_notyet:'انتظِر طورَ الشرنقة للحرير (🧵)',
+  so_nur:'بركةُ المجلس: +٥ نور', tavaf_salute:'بسم الله، الله أكبر',
+  world_revived:'☾ أُحييَتِ الدنيا ☾',
+  zk_due:'🕌 حان وقتُ الزكاة: ', zk_given:'🤲 أُدِّيت الزكاة', zk_notyet:'لم يبلُغ النِّصاب',
+  zk_reached:' بلغ النِّصاب — أخرِج زكاتك من الجَعبة', zk_toast_a:'الزكاة: ', zk_toast_b:' نور، بورك فيها',
+  zulum_banner:'⚠️ ظُلم',
+  zulum_hadith:'«اتقوا الظلمَ؛ فإنَّ الظلمَ ظلماتٌ يوم القيامة.» (مسلم) — تعهَّدِ المحتاجين تهدأِ المدينة.',
+  zulum_loss_a:' (−', zulum_loss_b:' 💰 درهمًا نُهِبت)',
   prof_answer_all:'أجِب عن الأسئلة الثلاثة جميعًا.',
   prof_sub:'أسئلةٌ قليلة لرحلةٍ تناسبك. التكاليفُ في الإسلام تختلف من شخصٍ لآخر.',
   prof_start:'ابدأ ➤',
@@ -2427,7 +2473,7 @@ function onVakitChange(v, prevV){
   rebuildEvQuests(v[1]);
   const rn=interactables.find(x=>x.q.id==='ev_namaz'); if(rn) rn.done=false;
   save();
-  toast('🕌 '+v[1]+' vakti girdi');
+  toast(tF('pr_entered','🕌 {n} vakti girdi',{n:vakitName(v[1])}));
   if(FARZ_VAKIT.includes(v[1])) sndEzan(); else sndVakit();  // farz vakti → ezan (derinden), diğerleri nazik ton
   if(FARZ_VAKIT.includes(v[1])){
     const cuma=(v[1]==='Öğle' && isFriday() && cumaActive());
@@ -2475,8 +2521,8 @@ function checkVakitWarning(){
   if((gameTime-start)/((end-start)||1) < 0.72) return; // vaktin son ~%28'i
   vakitWarned=true;
   const cuma=(name==='Öğle' && isFriday() && cumaActive());
-  const nm=NAMAZ_LABEL[name]||name;
-  const hint=(S.hasSeccade && !cuma)?' (🧎 ile kıl)':'';
+  const nm=namazLabel(name);   // dile göre (eskiden ham Türkçe NAMAZ_LABEL'dı → AR/EN'de "Öğle" yazıyordu)
+  const hint=(S.hasSeccade && !cuma)?(' '+tF('pr_hint_rug','(🧎 ile kıl)')):'';
   toast(cuma?tF('pr_jum_soon','⏳ Cuma namazının vakti çıkmak üzere — camiye git!'):tF('pr_soon','⏳ {n} namazının vakti çıkmak üzere!',{n:nm})+hint);
   banner(cuma?tF('pr_jum_soon_b','⏳ Cuma vakti çıkıyor'):tF('pr_soon_b','⏳ {n} vakti çıkıyor',{n:nm}));
   const el=document.getElementById('vakit'); if(el) el.classList.add('urgent');
@@ -5340,7 +5386,7 @@ function eat(){
 function refreshWudu(){
   if((S.toilet||0)<=1){ toast(tF('nd_no_toilet','🚻 Şimdilik tuvalet ihtiyacın yok')); return; }
   toast(tF('nd_toilet_adab','🚻 Tuvalet âdâbı: girerken sol ayak+besmele, çıkarken sağ ayak+«gufrâneke». Abdestin bozuldu — tazele.'));
-  openGuide({nm:'Abdest Tazele', ic:'💧', steps:ABDEST_STEPS}, ()=>{
+  openGuide({nm:tF('nd_wudu_guide','Abdest Tazele'), ic:'💧', steps:ABDEST_STEPS}, ()=>{
     S.toilet=0; toiletWarned=false;
     addNur(2); save(); refreshHUD(); updateNeedsHud(); sndChime();
     setTimeout(()=>{ banner(tF('nd_wudu_b','💧 Abdest tazelendi')); toast(tF('nd_wudu_t','Abdestini tazeledin — «Temizlik imanın yarısıdır.» (Müslim) +2 nûr şükür')); },250);
