@@ -51,7 +51,7 @@
         var nw=reg.installing; if(!nw) return;
         nw.addEventListener('statechange', function(){
           if(nw.state==='installed' && navigator.serviceWorker.controller && typeof toast==='function'){
-            toast('✨ Yeni sürüm hazır');
+            toast((typeof tF==='function'?tF('sys_update','✨ Yeni sürüm hazır'):'✨ Yeni sürüm hazır'));
           }
         });
       });
@@ -764,11 +764,11 @@
 <div class="veil" id="profile">
   <div class="sheet">
     <div class="grip"></div>
-    <h3 style="text-align:center;margin:2px 0 2px">🌱 İhyâ Yolculuğun</h3>
-    <div class="sub" style="text-align:center;margin-bottom:14px">Sana özel bir yolculuk için birkaç soru. İslâm'da yükümlülükler kişiye göre değişir.</div>
+    <h3 style="text-align:center;margin:2px 0 2px" data-i18n="prof_head">🌱 İhyâ Yolculuğun</h3>
+    <div class="sub" style="text-align:center;margin-bottom:14px" data-i18n="prof_sub">Sana özel bir yolculuk için birkaç soru. İslâm'da yükümlülükler kişiye göre değişir.</div>
     <div id="profQuestions"></div>
     <div class="sub" id="profSummary" style="margin:4px 0 12px;line-height:1.5"></div>
-    <button class="do" id="profStart" disabled>Başla ➤</button>
+    <button class="do" id="profStart" disabled data-i18n="prof_start">Başla ➤</button>
   </div>
 </div>
 
@@ -1534,6 +1534,77 @@ const UI_STR={ en:{
   cw_churn_done:'The milk separated in the churn (+{y} {yn}, +{a} {an}) — the milk you draw no longer goes to waste.',
   cw_cheese_b:'🧀 The cheese has set',
   cw_cheese_done:'You curdled the milk into cheese (+{n}) — provision that keeps, strength for the needy, valuable at the market.',
+  // --- Faz 7.14: namaz / vakit / kıble / seccade ---
+  pr_streak:'🔥 Steadfast for {d} days · +{b} nur', pr_newday:'🌙 A new day has dawned — {d}',
+  pr_fri_b:'🕌 Today is Friday', pr_fri_t:'When noon comes, go to the Mosque and pray the Friday prayer in congregation 🕌',
+  pr_biz_b:'🌕 Ayyam al-Bid — day {d} of the month',
+  pr_biz_t:'The full-moon days (13-14-15) are a sunnah fast: «Fasting three days of each month is like fasting the whole year.» (Bukhari) — make your intention with 🌙',
+  pr_fastday_b:'🌙 Today is {d}', pr_fastday_t:'A sunnah fasting day — make the intention at night or before noon, break the fast at sunset (🌙 button)',
+  pr_jum_pending:'🕌 The Friday prayer has not been prayed yet — go to the Mosque', pr_pending:'🧎 The {n} prayer has not been prayed yet',
+  pr_jum_b:'🕌 Today is Friday — Go to the Mosque', pr_jum_t:'It is time for the Friday prayer: cross to the Mosque isle, enter, and pray in congregation 🕌',
+  pr_iftar:'🌅 Sunset has come — it is time to break your fast (🌅)',
+  pr_jum_soon:'⏳ The time for the Friday prayer is running out — go to the mosque!', pr_soon:'⏳ The time for the {n} prayer is running out!',
+  pr_jum_soon_b:'⏳ Friday prayer time is ending', pr_soon_b:'⏳ {n} time is ending',
+  pr_rug_b:'🧎 The prayer rug is woven', pr_rug_again:'You left the old rug behind and wove a new one 🧎', pr_rug_new:'Now you can pray anywhere (🧎)',
+  pr_bag_have:'🎒 You already have this satchel (or a larger one)', pr_bag_cap:'Your carrying capacity is now {n}.',
+  pr_rug_take:'🧎 You picked up your prayer rug — you are carrying it', pr_rug_sold:'💰 +{n} dirhams (prayer rug sold)',
+  pr_rug_laid:'🧎 Your rug is spread on the ground — go and pick it up', pr_rug_none:'🧵 You have no prayer rug — weave one from wool in the Satchel',
+  pr_qib_b:'🧭 The qibla is this way',
+  pr_qib_ok:'✓ You are facing the qibla — you may begin the prayer. «Turn your face toward the Sacred Mosque.» (al-Baqara 144)',
+  pr_qib_no:'🧭 The qibla is where the arrow points. Face it in prayer — facing the qibla is a condition of the prayer (al-Baqara 144)',
+  pr_qib_learn:'🧭 You turned toward the qibla — facing the qibla is a condition of the prayer (al-Baqara 144)',
+  pr_only_mosque:'🕌 On Friday the noon prayer is prayed only in the mosque — go to the Mosque',
+  pr_kerahat:'🕗 A disliked time (sunrise / zenith / sunset) — prayer is discouraged now, wait a little',
+  pr_done:'🧎 The {n} prayer is done (+10 nur) — do not forget your prayer rug', pr_nafile:'🧎 You prayed a voluntary prayer (+5 nur) — may Allah accept it',
+  pr_mosque_locked:'🔒 The Mosque is not open yet',
+  // --- Faz 7.14b: toplama · oruç · ihtiyaçlar · ezber · imam · muhtaç ---
+  sys_update:'✨ A new version is ready', gt_locked:'🔒 This place is not open yet', gt_hen:'🐔 The hen clucks: cluck cluck!',
+  gt_bagfull:'🎒 Satchel is full ({n}) — sell or use, or weave a satchel at the Workshop',
+  gt_got:'+{n} {ic} {nm} gathered', gt_got_full:'+{n} {ic} {nm} (satchel filled up)',
+  pr_silk_need:'🧵 {n} silk needed (you have {have}) — gather from the 🧵 cocoons on the mulberry trees',
+  pr_silk_b:'🧵 The silk prayer rug is woven', pr_silk_t:'You worked the silk drawn from mulberry cocoons at the loom — a soft rug for a humble prayer (🧵)',
+  cw_bun_b:'🥯 The buns are baked', cw_mol_b:'🫙 The molasses has boiled', cw_fish_b:'🍢 The fish is grilled',
+  hj_need_city:'🔒 Medina (the City) must open first — the journey to Umrah begins there',
+  hj_mikat:'🕋 You have reached the Miqat — make your intention for Umrah',
+  mq_imam_b:'🕌 The imam has noticed you', mq_imam_t:'You prayed five prayers in a row in congregation — the imam wishes to give you a duty. Choose «Take a duty from the imam» below. 📜',
+  mq_meet_b:'🕌 You have met the imam and the congregation', mq_meet_t:'For seven days you prayed every prayer at the mosque — now you may sit with the imam and the congregation and learn.',
+  mq_streak:'🕌 Today you prayed all five at the mosque — {n}/7 days toward the imam\'s circle',
+  mq_need_task:'🔒 First take a duty from the imam — go to the Mosque and pray five prayers in a row in congregation',
+  pr_home_jum:'🕌 On Friday the noon prayer is not prayed at home but at the mosque — go to the Mosque',
+  fs_title_fasting:'You are fasting — break it at sunset', fs_title_iftar:'Break your fast',
+  fs_none:'🌙 Today is not a sunnah fasting day (Monday/Thursday)',
+  fs_fasting:'🤍 You are fasting — you will break it at sunset. «Fasting is a shield.» (Bukhari)',
+  fs_iftar_b:'🌅 Iftar — may your fast be accepted',
+  fs_iftar_t:'You broke your fast. «The fasting person has two joys: when he breaks his fast, and when he meets his Lord.» (Bukhari) — +25 nur',
+  fs_missed:'🌙 The time to intend today\'s fast has passed — the intention is made before noon',
+  nd_thirst:'💧 You are thirsty — draw water from the well, then drink with 🥤',
+  nd_hunger:'🍞 You are hungry — gather dates or bread, then eat with 🍽️',
+  nd_toilet:'🚻 You need the washroom — relieving yourself breaks your wudu, renew it with 🚿',
+  nd_drank:'💧 You drank water — alhamdulillah (+1 nur of gratitude)',
+  nd_nofood:'🍞 You have no food — gather dates, mulberries, bread or milk',
+  nd_ate:'🍞 You ate {nm} — bismillah, alhamdulillah (+1 nur of gratitude)',
+  nd_no_toilet:'🚻 You do not need the washroom right now',
+  nd_toilet_adab:'🚻 Washroom manners: enter with the left foot and the basmala, leave with the right foot and «ghufranak». Your wudu is broken — renew it.',
+  nd_wudu_b:'💧 Wudu renewed', nd_wudu_t:'You renewed your wudu — «Cleanliness is half of faith.» (Muslim) +2 nur of gratitude',
+  ez_wrong:'The order slipped — recall it from the beginning', ez_done_b:'📖 {ad} memorised',
+  ez_done_t:'Masha Allah! You have memorised it. «The best of you are those who learn the Qur\'an and teach it.» (Bukhari) — +{n} nur',
+  ez_again:'📖 You revised {ad} — well done, revision strengthens memory',
+  wj_neglect:'This week {who} went hungry — unease is growing. Look after them, give charity.',
+  wj_ok:'🕊️ The needy were looked after — the city is settling.',
+  rm_max:'📅 At most 12 reminders', pr_wool_ready:'🧵 The wool is ready — go to the loom on the Workshop isle (south of the Date Grove).',
+  fs_abstain:'🤍 You are fasting — be patient until iftar (sunset)',
+  // --- Faz 7.14c: dağarcık seccade satırı · muhtaç adları ---
+  iv_sec_head:'Your prayer rug', iv_sec_laid:'spread on the ground', iv_sec_carry:'with you',
+  needy_yetim:'the orphan', needy_komsu:'the neighbour', needy_misafir:'the traveller', needy_dilenci:'the beggar',
+  wj_b:'😟 The needy were not looked after',
+  // --- Faz 7.14d: profil ekranı · ezber listesi ---
+  prof_head:'🌱 Your Ihya Journey',
+  prof_sub:'A few questions for a journey suited to you. In Islam, obligations differ from person to person.',
+  prof_start:'Begin ➤',
+  ez_sec_sure:'Surahs', ez_sec_dua:'Daily Supplications',
+  ez_nm_d_yemek_once:'Before eating', ez_nm_d_yemek_sonra:'After eating', ez_nm_d_uyku:'Before sleeping',
+  ez_nm_d_uyanma:'On waking', ez_nm_d_tuvalet:'Entering the washroom',
+  pr_rug_has:'✓ You already have a prayer rug', pr_rug_ground:'🧎 Your rug is on the ground — pick it up first', pr_rug_missing:'You have no prayer rug',
   sc_cases:' cases', sc_case1:' case',
   sc_ledger:'Case Ledger', sc_open:'open ▸', sc_total:' — total ', sc_totcases:' cases',
   // --- Faz 2b: statik panel kabuğu (data-i18n) ---
@@ -1841,6 +1912,80 @@ ar:{
   cw_churn_done:'انفصل اللبنُ في المِمخضة (+{y} {yn}، +{a} {an}) — لم يعد الحليبُ الذي تحلبه يضيع.',
   cw_cheese_b:'🧀 تخثَّر الجبن',
   cw_cheese_done:'أنضجتَ الحليبَ جُبنًا (+{n}) — زادٌ يبقى، وقوةٌ للمحتاج، وثمينٌ في السوق.',
+  // --- Faz 7.14: الصلاة / الأوقات / القبلة / السجّادة ---
+  pr_streak:'🔥 استقامةٌ {d} يومًا · +{b} نور', pr_newday:'🌙 أشرق يومٌ جديد — {d}',
+  pr_fri_b:'🕌 اليومُ الجمعة', pr_fri_t:'إذا دخل وقتُ الظهر فاذهب إلى المسجد وصلِّ الجمعة جماعةً 🕌',
+  pr_biz_b:'🌕 أيّامُ البِيض — اليوم {d} من الشهر',
+  pr_biz_t:'أيّامُ البِيض (١٣-١٤-١٥) صيامُ سنّة: «صيامُ ثلاثةِ أيامٍ من كلِّ شهرٍ صيامُ الدهر كلِّه.» (البخاري) — انوِ بزرِّ 🌙',
+  pr_fastday_b:'🌙 اليوم {d}', pr_fastday_t:'يومُ صيامِ سنّة — انوِ ليلًا أو قبل الظهر، وأفطِر عند المغرب (زرّ 🌙)',
+  pr_jum_pending:'🕌 لم تُصلَّ الجمعةُ بعد — اذهب إلى المسجد', pr_pending:'🧎 لم تُصلَّ صلاةُ {n} بعد',
+  pr_jum_b:'🕌 اليومُ الجمعة — اذهب إلى المسجد', pr_jum_t:'حان وقتُ الجمعة: اعبُر إلى جزيرة المسجد، وادخُل، وصلِّ جماعةً 🕌',
+  pr_iftar:'🌅 دخل المغرب — حان وقتُ الإفطار (🌅)',
+  pr_jum_soon:'⏳ يكاد وقتُ الجمعة يخرج — إلى المسجد!', pr_soon:'⏳ يكاد وقتُ صلاةِ {n} يخرج!',
+  pr_jum_soon_b:'⏳ وقتُ الجمعة يخرج', pr_soon_b:'⏳ وقتُ {n} يخرج',
+  pr_rug_b:'🧎 نُسِجت السجّادة', pr_rug_again:'تركتَ سجّادتك القديمة ونسجتَ جديدة 🧎', pr_rug_new:'تستطيع الآن أن تصلّي في أي مكان (🧎)',
+  pr_bag_have:'🎒 هذه الجَعبة (أو أكبر منها) عندك بالفعل', pr_bag_cap:'صارت سعةُ حملك {n}.',
+  pr_rug_take:'🧎 أخذتَ سجّادتك — تحملها معك', pr_rug_sold:'💰 +{n} درهم (بِيعت السجّادة)',
+  pr_rug_laid:'🧎 سجّادتُك مفروشةٌ على الأرض — اذهب وخُذها', pr_rug_none:'🧵 لا سجّادةَ لك — انسِج واحدةً من الصوف في الجَعبة',
+  pr_qib_b:'🧭 القبلةُ في هذا الاتجاه',
+  pr_qib_ok:'✓ وجهُك إلى القبلة — يمكنك أن تبدأ الصلاة. «فولِّ وجهَك شطرَ المسجدِ الحرام.» (البقرة ١٤٤)',
+  pr_qib_no:'🧭 القبلةُ حيث يشير السهم. توجَّه إليها في الصلاة — استقبالُ القبلة شرطٌ للصلاة (البقرة ١٤٤)',
+  pr_qib_learn:'🧭 توجَّهتَ إلى القبلة — استقبالُ القبلة شرطٌ للصلاة (البقرة ١٤٤)',
+  pr_only_mosque:'🕌 صلاةُ الظهر يومَ الجمعة لا تكون إلا في المسجد — اذهب إلى المسجد',
+  pr_kerahat:'🕗 وقتُ كراهة (الشروق / الاستواء / الغروب) — الصلاةُ مكروهةٌ الآن، انتظِر قليلًا',
+  pr_done:'🧎 صُلِّيت صلاةُ {n} (+١٠ نور) — لا تنسَ سجّادتك', pr_nafile:'🧎 صلَّيتَ نافلة (+٥ نور) — تقبَّل اللهُ منك',
+  pr_mosque_locked:'🔒 لم يُفتَح المسجد بعد',
+  // --- Faz 7.14b: الجمع · الصيام · الحاجات · الحفظ · الإمام · المحتاجون ---
+  sys_update:'✨ نسخةٌ جديدة جاهزة', gt_locked:'🔒 لم يُفتَح هذا المكان بعد', gt_hen:'🐔 تُقَوقِئ الدجاجة: قاق قاق!',
+  gt_bagfull:'🎒 الجَعبة ممتلئة ({n}) — بِع أو استعمِل، أو انسِج جَعبةً في الورشة',
+  gt_got:'+{n} {ic} {nm} أخذتَ', gt_got_full:'+{n} {ic} {nm} (امتلأت الجَعبة)',
+  pr_silk_need:'🧵 تحتاج {n} حرير (لديك {have}) — اجمَعه من شرانق 🧵 على أشجار التوت',
+  pr_silk_b:'🧵 نُسِجت سجّادةُ الحرير', pr_silk_t:'شغَلتَ على النَّول الحريرَ المسحوبَ من شرانق التوت — سجّادةٌ ناعمةٌ لصلاةٍ خاشعة (🧵)',
+  cw_bun_b:'🥯 نَضِجت الأقراص', cw_mol_b:'🫙 غلى الدِّبس', cw_fish_b:'🍢 نَضِج السمك',
+  hj_need_city:'🔒 لا بدَّ أن تُفتَح المدينة أولًا — فمنها يبدأ سفرُ العمرة',
+  hj_mikat:'🕋 بلغتَ الميقات — انوِ العمرة',
+  mq_imam_b:'🕌 عرَفك الإمام', mq_imam_t:'صلَّيتَ خمسَ صلواتٍ متتاليةً جماعةً — يريد الإمامُ أن يُسنِد إليك مهمّة. اختَر «خُذ مهمّةً من الإمام» أدناه. 📜',
+  mq_meet_b:'🕌 تعرَّفتَ إلى الإمام والجماعة', mq_meet_t:'سبعةَ أيامٍ صلَّيتَ كلَّ وقتٍ في المسجد — يمكنك الآن أن تجالِس الإمامَ والجماعةَ وتأخذ العلم.',
+  mq_streak:'🕌 صلَّيتَ اليومَ الخمسَ كلَّها في المسجد — {n}/٧ أيام نحو مجلس الإمام',
+  mq_need_task:'🔒 خُذ مهمّةً من الإمام أولًا — اذهب إلى المسجد وصلِّ خمسَ صلواتٍ متتاليةً جماعةً',
+  pr_home_jum:'🕌 صلاةُ الظهر يومَ الجمعة لا تُصلَّى في البيت بل في المسجد — اذهب إلى المسجد',
+  fs_title_fasting:'أنت صائم — تُفطِر عند المغرب', fs_title_iftar:'أفطِر',
+  fs_none:'🌙 اليومُ ليس يومَ صيامِ سنّة (الاثنين/الخميس)',
+  fs_fasting:'🤍 أنت صائم — تُفطِر عند المغرب. «الصومُ جُنّة.» (البخاري)',
+  fs_iftar_b:'🌅 الإفطار — تقبَّل اللهُ صيامك',
+  fs_iftar_t:'أفطرتَ. «للصائمِ فرحتان: فرحةٌ عند فطره، وفرحةٌ عند لقاء ربه.» (البخاري) — +٢٥ نور',
+  fs_missed:'🌙 فات وقتُ النيّة لصيام اليوم — تُنوى قبل الظهر',
+  nd_thirst:'💧 عطِشتَ — استقِ من البئر ثم اشرَب بـ 🥤',
+  nd_hunger:'🍞 جُعتَ — اجمَع تمرًا أو خبزًا ثم كُل بـ 🍽️',
+  nd_toilet:'🚻 تحتاج إلى الخلاء — وقضاءُ الحاجة ينقُض الوضوء، فجدِّده بـ 🚿',
+  nd_drank:'💧 شرِبتَ الماء — الحمد لله (+١ نور شكر)',
+  nd_nofood:'🍞 لا طعامَ عندك — اجمَع تمرًا أو توتًا أو خبزًا أو حليبًا',
+  nd_ate:'🍞 أكلتَ {nm} — بسم الله، الحمد لله (+١ نور شكر)',
+  nd_no_toilet:'🚻 لا تحتاج إلى الخلاء الآن',
+  nd_toilet_adab:'🚻 آدابُ الخلاء: تدخُل باليسرى وبالبسملة، وتخرُج باليمنى وتقول «غُفرانك». انتقض وضوءك — جدِّده.',
+  nd_wudu_b:'💧 تجدَّد الوضوء', nd_wudu_t:'جدَّدتَ وضوءك — «الطهورُ شطرُ الإيمان.» (مسلم) +٢ نور شكر',
+  ez_wrong:'اختلَّ الترتيب — تذكَّر من البداية', ez_done_b:'📖 حَفِظتَ {ad}',
+  ez_done_t:'ما شاء الله! حفِظتَها. «خيرُكم من تعلَّم القرآنَ وعلَّمه.» (البخاري) — +{n} نور',
+  ez_again:'📖 راجعتَ {ad} — أحسنتَ، والمراجعةُ تُثبِّت الحفظ',
+  wj_neglect:'هذا الأسبوع جاع {who} — والقلقُ يزداد. تعهَّدهم وتصدَّق عليهم.',
+  wj_ok:'🕊️ تُعُهِّد المحتاجون — وهدأت المدينة.',
+  rm_max:'📅 اثنا عشر تذكيرًا على الأكثر', pr_wool_ready:'🧵 الصوفُ جاهز — اذهب إلى النَّول في جزيرة الورشة (جنوبَ بستان التمر).',
+  fs_abstain:'🤍 أنت صائم — اصبِر حتى الإفطار (المغرب)',
+  // --- Faz 7.14c: صفُّ السجّادة في الجَعبة · أسماء المحتاجين · أعمال الخير ---
+  hy_agac:'اغرِس شجرة', hy_kandil:'أوقِد قنديلًا', hy_cesme:'ابنِ سبيلَ ماء',
+  hy_ilim:'أوقِف مصحفًا', hy_sebil:'ابنِ سبيلًا للشرب', hy_golge:'ابنِ مظلّةً للاستظلال',
+  iv_sec_head:'سجّادتك', iv_sec_laid:'مفروشةٌ على الأرض', iv_sec_carry:'معك',
+  needy_yetim:'اليتيم', needy_komsu:'الجار', needy_misafir:'ابنُ السبيل', needy_dilenci:'السائل',
+  wj_b:'😟 لم يُتعهَّد المحتاجون',
+  // --- Faz 7.14d: شاشة التعريف · قائمة الحفظ ---
+  prof_head:'🌱 رحلةُ إحيائك',
+  prof_answer_all:'أجِب عن الأسئلة الثلاثة جميعًا.',
+  prof_sub:'أسئلةٌ قليلة لرحلةٍ تناسبك. التكاليفُ في الإسلام تختلف من شخصٍ لآخر.',
+  prof_start:'ابدأ ➤',
+  ez_sec_sure:'السُّوَر', ez_sec_dua:'أدعيةٌ يومية',
+  ez_nm_d_yemek_once:'قبل الطعام', ez_nm_d_yemek_sonra:'بعد الطعام', ez_nm_d_uyku:'قبل النوم',
+  ez_nm_d_uyanma:'عند الاستيقاظ', ez_nm_d_tuvalet:'عند دخول الخلاء',
+  pr_rug_has:'✓ عندك سجّادةٌ بالفعل', pr_rug_ground:'🧎 سجّادتُك على الأرض — خُذها أولًا', pr_rug_missing:'لا سجّادةَ لك',
   sc_ledger:'دفتر القضايا', sc_open:'افتح ▸', sc_total:' — المجموع ', sc_totcases:' قضية',
   sm_adalet:'عَدل — القاضي', sm_baris:'صُلح — أصلِح', sm_emanet:'أمانة — أدِّ',
   sl_baris:'صُلح', sl_adalet:'عَدل', sl_emanet:'أمانة',
@@ -1912,6 +2057,7 @@ ar:{
   ma_sohbet_banner:'💬 مجلسُ الإمام', ma_sit_toast:'🤲 جلستَ بسكينة وأنصتَّ — سكينةٌ ونور (+٣)',
 }};
 function hayirNm(h){ return tU('hy_'+h.id) || (h && h.nm) || ''; }   // hayır kalemi adı (dil)
+function needyNm(x){ const id=(typeof x==='string')?x:(x&&x.id)||''; return tU('needy_'+id.replace(/\d+$/,'')) || (x&&x.nm) || id; }   // muhtaç adı (dil)
 // EN İ18N — Hayır kalemi ref hadîsleri (Faz 3; TERCUME_SOZLUGU.md)
 const HAYIR_REF_EN={
   agac:'When a Muslim plants a tree and something is eaten from it, it is charity for him. (Bukhari, Hars 1)',
@@ -2073,7 +2219,7 @@ function checkStreak(){
   S.streakDay=d;
   const bonus=10+Math.min(60,S.streak*5);
   addNur(bonus); save(); refreshHUD();
-  setTimeout(()=>toast('🔥 İstikamet '+S.streak+' gün · +'+bonus+' nûr'), 400);
+  setTimeout(()=>toast(tF('pr_streak','🔥 İstikamet {d} gün · +{b} nûr',{d:S.streak,b:bonus})), 400);
 }
 // GÜN GEÇİŞİ: her gün/gece döngüsü tamamlanınca (gameTime 1→0 sarması) çağrılır.
 // Görevler tekrar açılır; fethedilen adalar (conquered) kalıcı, nûr birikir.
@@ -2084,10 +2230,10 @@ function onNewDay(){
   interactables.forEach(r=>{ if(!r.exam&&!r.gather&&!r.animal&&!r.npc&&!r.muahat&&!r.scenario&&!r.market&&!r.mosque&&!r.seccadePickup&&!r.station&&!r.modern&&!r.home) r.done=false; });
   applyIslandLock(); refreshHUD();
   weeklyJustice();   // haftalık: muhtaç ihmali → mutsuzluk → şehir olayları
-  toast('🌙 Yeni gün doğdu — '+dayName());
-  if(isFriday()) setTimeout(()=>{ banner('🕌 Bugün Cuma'); toast('Öğle vakti gelince Mescid\'e git, Cuma\'yı cemaatle kıl 🕌'); },1300);
-  if(isEyyamBiz() && orucMukellef()) setTimeout(()=>{ banner('🌕 Eyyâm-ı Bîz — Ayın '+lunarDay()+'. günü'); toast('Dolunay günleri (13-14-15) sünnet oruç: «Her aydan üç gün oruç, bütün seneyi oruçlu geçirmek gibidir.» (Buhârî) — 🌙 ile niyet et'); },1700);
-  else if(isFastingDay() && orucMukellef()) setTimeout(()=>{ banner('🌙 Bugün '+dayName()); toast('Sünnet oruç günü — gece/öğleden önce niyet et, Akşam iftar (🌙 düğmesi)'); },1300);
+  toast(tF('pr_newday','🌙 Yeni gün doğdu — {d}',{d:dayName()}));
+  if(isFriday()) setTimeout(()=>{ banner(tF('pr_fri_b','🕌 Bugün Cuma')); toast(tF('pr_fri_t','Öğle vakti gelince Mescid\'e git, Cuma\'yı cemaatle kıl 🕌')); },1300);
+  if(isEyyamBiz() && orucMukellef()) setTimeout(()=>{ banner(tF('pr_biz_b','🌕 Eyyâm-ı Bîz — Ayın {d}. günü',{d:lunarDay()})); toast(tF('pr_biz_t','Dolunay günleri (13-14-15) sünnet oruç: «Her aydan üç gün oruç, bütün seneyi oruçlu geçirmek gibidir.» (Buhârî) — 🌙 ile niyet et')); },1700);
+  else if(isFastingDay() && orucMukellef()) setTimeout(()=>{ banner(tF('pr_fastday_b','🌙 Bugün {d}',{d:dayName()})); toast(tF('pr_fastday_t','Sünnet oruç günü — gece/öğleden önce niyet et, Akşam iftar (🌙 düğmesi)')); },1300);
   updateFastBtn();
   if(typeof checkReminders==='function') checkReminders();   // 📅 takvim: bugüne uygun hatırlatmaları bildir
   if(S.hairShaved && isFriday()){ S.hairFridays=(S.hairFridays||0)+1;   // tıraştan sonra 3 Cuma → saç yeniden uzar
@@ -2198,11 +2344,11 @@ function onVakitChange(v, prevV){
   if(FARZ_VAKIT.includes(v[1])) sndEzan(); else sndVakit();  // farz vakti → ezan (derinden), diğerleri nazik ton
   if(FARZ_VAKIT.includes(v[1])){
     const cuma=(v[1]==='Öğle' && isFriday() && cumaActive());
-    setTimeout(()=>toast(cuma?'🕌 Cuma namazı henüz kılınmadı — Mescide git':'🧎 '+(NAMAZ_LABEL[v[1]]||v[1])+' namazı henüz kılınmadı'),1100);
+    setTimeout(()=>toast(cuma?tF('pr_jum_pending','🕌 Cuma namazı henüz kılınmadı — Mescide git'):tF('pr_pending','🧎 {n} namazı henüz kılınmadı',{n:namazLabel(v[1])})),1100);
   }
-  if(v[1]==='Öğle' && isFriday() && cumaActive()){ setTimeout(()=>{ banner('🕌 Bugün Cuma — Mescide Git'); toast('Cuma namazı vakti: Cami adasına geç, mescide gir, cemaatle kıl 🕌'); },1900); }
+  if(v[1]==='Öğle' && isFriday() && cumaActive()){ setTimeout(()=>{ banner(tF('pr_jum_b','🕌 Bugün Cuma — Mescide Git')); toast(tF('pr_jum_t','Cuma namazı vakti: Cami adasına geç, mescide gir, cemaatle kıl 🕌')); },1900); }
   // oruç: iftar hatırlatması (Akşam) + buton güncelle
-  if(v[1]==='Akşam' && S.fastNiyet===(S.dayNum||0) && S.fastDone!==(S.dayNum||0)) setTimeout(()=>toast('🌅 Akşam oldu — iftar vakti, orucunu aç (🌅)'),1300);
+  if(v[1]==='Akşam' && S.fastNiyet===(S.dayNum||0) && S.fastDone!==(S.dayNum||0)) setTimeout(()=>toast(tF('pr_iftar','🌅 Akşam oldu — iftar vakti, orucunu aç (🌅)')),1300);
   updateFastBtn();
 }
 /* ---- NAMAZ VAKTİ ÇIKIYOR UYARISI ---- */
@@ -2244,8 +2390,8 @@ function checkVakitWarning(){
   const cuma=(name==='Öğle' && isFriday() && cumaActive());
   const nm=NAMAZ_LABEL[name]||name;
   const hint=(S.hasSeccade && !cuma)?' (🧎 ile kıl)':'';
-  toast(cuma?'⏳ Cuma namazının vakti çıkmak üzere — camiye git!':'⏳ '+nm+' namazının vakti çıkmak üzere!'+hint);
-  banner(cuma?'⏳ Cuma vakti çıkıyor':'⏳ '+nm+' vakti çıkıyor');
+  toast(cuma?tF('pr_jum_soon','⏳ Cuma namazının vakti çıkmak üzere — camiye git!'):tF('pr_soon','⏳ {n} namazının vakti çıkmak üzere!',{n:nm})+hint);
+  banner(cuma?tF('pr_jum_soon_b','⏳ Cuma vakti çıkıyor'):tF('pr_soon_b','⏳ {n} vakti çıkıyor',{n:nm}));
   const el=document.getElementById('vakit'); if(el) el.classList.add('urgent');
   beep(880,0,0.16,'sine',0.075); beep(660,0.2,0.28,'sine',0.06);
 }
@@ -2987,13 +3133,13 @@ function updateAnimals(dt){
 }
 function doTend(rec){
   const def=rec.def;
-  if(!isUnlocked(def.islId)){ toast('🔒 Burası henüz açılmadı'); return; }
+  if(!isUnlocked(def.islId)){ toast(tF('gt_locked','🔒 Burası henüz açılmadı')); return; }
   if(!animalReady(def)){ const s=Math.max(1,Math.ceil((S.gather[def.id]-Date.now())/1000)); const m=def.produce==='yun'?'🐑 Yün yeniden uzuyor':def.produce==='sut'?'🥛 Süt birikiyor':'🐑 Dinleniyor'; toast(m+'… '+s+' sn'); return; }
   if(!def.produce){ playAction(0.9,'work'); S.gather[def.id]=Date.now()+(def.cd||8000);   // dekoratif tavuk/horoz: ürün yok (yumurta kümesten alınır)
     if(def.model==='rooster'){ playSnd&&playSnd('rooster',0.4,1.0); toast('🐓 Horoz ötüyor: Ü-ürü-üüü!'); }
-    else { toast('🐔 Tavuk gıdaklıyor: gıt gıt gıdak!'); }
+    else { toast(tF('gt_hen','🐔 Tavuk gıdaklıyor: gıt gıt gıdak!')); }
     return; }
-  if(invFull()){ toast('🎒 Dağarcık dolu ('+invCap()+') — sat/kullan ya da Atölye\'de çanta ör'); return; }
+  if(invFull()){ toast(tF('gt_bagfull','🎒 Dağarcık dolu ({n}) — sat/kullan ya da Atölye\'de çanta ör',{n:invCap()})); return; }
   // 🗡️ HIRSIZ bu adadaysa: hayvan ürününü kapar (%50, kargaşada %75)
   if(thiefActiveOn(def.islId) && Math.random()<(thief.chaosWarned?0.75:0.5)){
     S.gather[def.id]=Date.now()+def.cd; save(); sndStone();
@@ -3003,7 +3149,7 @@ function doTend(rec){
   const got=invAdd(def.produce, def.amount);
   S.gather[def.id]=Date.now()+def.cd;
   save(); refreshHUD(); sndChime();
-  const g=GOODS[def.produce]; toast('+'+got+' '+g.ic+' '+g.nm+(got<def.amount?' (çanta doldu)':' aldın'));
+  const g=GOODS[def.produce]; toast(tF(got<def.amount?'gt_got_full':'gt_got','+{n} {ic} {nm}'+(got<def.amount?' (çanta doldu)':' aldın'),{n:got,ic:g.ic,nm:goodName(def.produce)}));
   checkZekat();
 }
 
@@ -3084,34 +3230,34 @@ const SECCADE_FIYAT=8; // seccade satış (dirhem)
 let laidSeccadeRec=null, seccadeAnim=0;
 const SILK_SECCADE=4;   // dut kozalarından toplanan ipek → premium ipek seccade (tip 3, en yüksek huşû bonusu)
 function craftSilkSeccade(){
-  if((S.inv.ipek||0)<SILK_SECCADE){ toast('🧵 '+SILK_SECCADE+' ipek gerek ('+(S.inv.ipek||0)+' var) — dut ağaçlarındaki 🧵 kozalardan topla'); return; }
+  if((S.inv.ipek||0)<SILK_SECCADE){ toast(tF('pr_silk_need','🧵 {n} ipek gerek ({have} var) — dut ağaçlarındaki 🧵 kozalardan topla',{n:SILK_SECCADE,have:S.inv.ipek||0})); return; }
   S.inv.ipek-=SILK_SECCADE; if(S.inv.ipek<=0) delete S.inv.ipek;
   const abandoned=!!S.laidSeccade; if(abandoned){ S.laidSeccade=null; removeLaidSeccade(); }
   S.hasSeccade=true; S.seccadeType=3;   // ipek seccade = en konforlu (huşûlu, uzun namaz)
   playAction(2.0,'weave'); save(); refreshHUD(); if(typeof renderInv==='function') renderInv(); updateSeccadeBtn(); if(typeof updateWoolHint==='function') updateWoolHint(); sndFanfare();
-  banner('🧵 İpek seccade örüldü'); toast('Dut kozalarından çektiğin ipeği tezgâhta işledin — yumuşacık, huşûlu ipek seccade (🧵)');
+  banner(tF('pr_silk_b','🧵 İpek seccade örüldü')); toast(tF('pr_silk_t','Dut kozalarından çektiğin ipeği tezgâhta işledin — yumuşacık, huşûlu ipek seccade (🧵)'));
 }
 function craftSeccade(){
-  if(S.hasSeccade){ toast('✓ Zaten bir seccaden var'); return; }
+  if(S.hasSeccade){ toast(tF('pr_rug_has','✓ Zaten bir seccaden var')); return; }
   if((S.inv.yun||0)<SECCADE_YUN){ toast('🧵 '+SECCADE_YUN+' yün gerek ('+(S.inv.yun||0)+' var)'); return; }
   playAction(2.0,'weave');   // tezgâhta dokuma
   // Serili/unutulmuş bir seccade varsa onu GERİDE BIRAK, yenisini ör (yoksa oyuncu tıkanıyordu)
   const abandoned=!!S.laidSeccade; if(abandoned){ S.laidSeccade=null; removeLaidSeccade(); }
   S.inv.yun-=SECCADE_YUN; if(S.inv.yun<=0) delete S.inv.yun; S.hasSeccade=true; save(); refreshHUD(); renderInv(); sndFanfare();
-  banner('🧎 Seccade örüldü'); toast(abandoned?'Eski seccadeni geride bıraktın; yenisini ördün 🧎':'Artık her yerde namaz kılabilirsin (🧎)');
+  banner(tF('pr_rug_b','🧎 Seccade örüldü')); toast(abandoned?tF('pr_rug_again','Eski seccadeni geride bıraktın; yenisini ördün 🧎'):tF('pr_rug_new','Artık her yerde namaz kılabilirsin (🧎)'));
   updateSeccadeBtn(); updateWoolHint();
 }
 // ÇANTA (taşıma kapasitesi): 15 yün → Çanta 1 (150), 50 yün → Çanta 2 (200). Tek çanta; büyük çanta küçüğün yerine geçer.
 const BAG_YUN={1:15, 2:50};
 function craftBag(level){
-  if((S.bag||0)>=level){ toast('🎒 Zaten bu çanta (ya da daha büyüğü) sende var'); return; }
+  if((S.bag||0)>=level){ toast(tF('pr_bag_have','🎒 Zaten bu çanta (ya da daha büyüğü) sende var')); return; }
   const need=BAG_YUN[level]||15;
   if((S.inv.yun||0)<need){ toast('🎒 '+need+' yün gerek ('+(S.inv.yun||0)+' var)'); return; }
   playAction(2.0,'weave');   // tezgâhta çanta ör
   S.inv.yun-=need; if(S.inv.yun<=0) delete S.inv.yun; S.bag=level; save(); refreshHUD();
   if(document.getElementById('inv').classList.contains('show')) renderInv();
   sndFanfare(); banner('🎒 '+(level===2?'Büyük Çanta':'Çanta')+' örüldü');
-  setTimeout(()=>toast('Taşıma kapasiten '+invCap()+' item oldu.'),150);
+  setTimeout(()=>toast(tF('pr_bag_cap','Taşıma kapasiten {n} oldu.',{n:invCap()})),150);
 }
 // ÜRETİM ZİNCİRİ (Faz 3): buğday → un → ekmek. Ekmek FOOD → muhtaçları besler (kesb-i helâl + hayır).
 const UN_BUGDAY=3, EKMEK_UN=2, EKMEK_YIELD=2;   // 3 buğday→1 un; 2 un→2 ekmek
@@ -3129,21 +3275,21 @@ const COREK_UN=1, COREK_YUMURTA=2, COREK_YIELD=2;
 function craftCorek(){ if((S.inv.un||0)<COREK_UN || (S.inv.yumurta||0)<COREK_YUMURTA){ toast(tF('cw_bun_need','🥯 {a} {u} + {b} {y} gerek',{a:COREK_UN,u:goodName('un'),b:COREK_YUMURTA,y:goodName('yumurta')})); return; }
   playAction(1.8,'knead');   // hamuru yoğur / tandıra at
   S.inv.un-=COREK_UN; if(S.inv.un<=0) delete S.inv.un; S.inv.yumurta-=COREK_YUMURTA; if(S.inv.yumurta<=0) delete S.inv.yumurta;
-  invAdd('corek', COREK_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🥯 Çörek pişti');
+  invAdd('corek', COREK_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner(tF('cw_bun_b','🥯 Çörek pişti'));
   setTimeout(()=>toast(tF('cw_bun_t','Yumurtalı çörek (+{n}) — besleyici. Aç kalana ver ya da pazarda sat.',{n:COREK_YIELD})),1300); }
 // PEKMEZ — dut + bal kazanda kaynatılır → koyu pekmez (FOOD; işlenmiş, pazarda en değerli). Atölye'de Kazan istasyonu.
 const PEKMEZ_DUT=3, PEKMEZ_BAL=1, PEKMEZ_YIELD=2;
 function craftPekmez(){ if((S.inv.dut||0)<PEKMEZ_DUT || (S.inv.bal||0)<PEKMEZ_BAL){ toast(tF('cw_mol_need','🫙 {a} {d} + {b} {h} gerek',{a:PEKMEZ_DUT,d:goodName('dut'),b:PEKMEZ_BAL,h:goodName('bal')})); return; }
   playAction(2.0,'stir');   // kazanı kepçeyle karıştır
   S.inv.dut-=PEKMEZ_DUT; if(S.inv.dut<=0) delete S.inv.dut; S.inv.bal-=PEKMEZ_BAL; if(S.inv.bal<=0) delete S.inv.bal;
-  invAdd('pekmez', PEKMEZ_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🫙 Pekmez kaynadı');
+  invAdd('pekmez', PEKMEZ_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner(tF('cw_mol_b','🫙 Pekmez kaynadı'));
   setTimeout(()=>toast(tF('cw_mol_t','Dut ve balı kaynatıp pekmez yaptın (+{n}) — kışa azık, muhtaca kuvvet, pazarda değerli.',{n:PEKMEZ_YIELD})),1300); }
 // BALIK IZGARA — çiğ balık tandırda kızartılır (FOOD; çiğ balıktan değerli). Gölet→balık zincirini tamamlar.
 const IZGARA_BALIK=1, IZGARA_YIELD=1;
 function craftIzgara(){ if((S.inv.balik||0)<IZGARA_BALIK){ toast(tF('cw_need','🌾 {n} {item} gerek ({have} var)',{n:IZGARA_BALIK,item:goodName('balik'),have:S.inv.balik||0})); return; }
   playAction(1.8,'knead');   // tandır ateşinde balığı çevir
   S.inv.balik-=IZGARA_BALIK; if(S.inv.balik<=0) delete S.inv.balik;
-  invAdd('izgara', IZGARA_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🍢 Balık kızardı');
+  invAdd('izgara', IZGARA_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner(tF('cw_fish_b','🍢 Balık kızardı'));
   setTimeout(()=>toast(tF('cw_fish_t','Tandırda kızarmış balık (+{n}) — besleyici; aç kalana ikram et ya da pazarda sat.',{n:IZGARA_YIELD})),1300); }
 // SÜT ZİNCİRİ (Faz 7.09) — sağılan süt artık çıkmaz sokak değil: Atölye'de YAYIK istasyonu.
 // Gerçek yayıklama TEK işlemde iki ürün verir: yağ ayrışır (tereyağı) + geriye ayran (yayık ayranı) kalır.
@@ -3193,10 +3339,10 @@ function showQibla(silent){
   const g=ensureQiblaArrow();
   if(player) g.position.set(player.position.x,0.09,player.position.z);
   g.rotation.y=QIBLA_ANGLE+Math.PI; g.visible=true;   // kıble oku -z'yi (mescid/Kâbe yönü) gösterir
-  if(!silent){ banner('🧭 Kıble bu yönde');
+  if(!silent){ banner(tF('pr_qib_b','🧭 Kıble bu yönde'));
     // yöneliş/yönelmeyiş farkı: anlık yöne göre geri bildirim
-    if(facingQibla()) toast('✓ Yüzün kıbleye dönük — namaza durabilirsin. "Yüzünü Mescid-i Harâm tarafına çevir." (Bakara 144)');
-    else toast('🧭 Kıble ok yönünde. Namazda yüzünü oraya çevir — kıbleye dönmek namazın şartıdır (Bakara 144)');
+    if(facingQibla()) toast(tF('pr_qib_ok','✓ Yüzün kıbleye dönük — namaza durabilirsin. «Yüzünü Mescid-i Harâm tarafına çevir.» (Bakara 144)'));
+    else toast(tF('pr_qib_no','🧭 Kıble ok yönünde. Namazda yüzünü oraya çevir — kıbleye dönmek namazın şartıdır (Bakara 144)'));
   }
   if(qiblaHideTimer) clearTimeout(qiblaHideTimer);
   qiblaHideTimer=setTimeout(()=>{ if(qiblaArrow) qiblaArrow.visible=false; }, silent?2600:4200);
@@ -3214,32 +3360,32 @@ function pickupSeccade(){
   if(!S.laidSeccade){ return; }
   S.hasSeccade=true; S.laidSeccade=null; removeLaidSeccade();
   save(); updateSeccadeBtn(); updateWoolHint(); refreshHUD(); sndChime();
-  toast('🧎 Seccadeni aldın — yanında taşıyorsun');
+  toast(tF('pr_rug_take','🧎 Seccadeni aldın — yanında taşıyorsun'));
 }
 function sellSeccade(){
-  if(!S.hasSeccade){ toast(S.laidSeccade?'🧎 Seccaden yerde — önce al':'Seccaden yok'); return; }
+  if(!S.hasSeccade){ toast(S.laidSeccade?tF('pr_rug_ground','🧎 Seccaden yerde — önce al'):tF('pr_rug_missing','Seccaden yok')); return; }
   S.hasSeccade=false; S.dirhem=(S.dirhem||0)+SECCADE_FIYAT;
   save(); refreshHUD(); updateSeccadeBtn(); updateWoolHint(); renderMarket(); sndChime();
-  toast('💰 +'+SECCADE_FIYAT+' dirhem (seccade satıldı)');
+  toast(tF('pr_rug_sold','💰 +{n} dirhem (seccade satıldı)',{n:SECCADE_FIYAT}));
 }
 // kerahat (mekruh) vakitleri: güneş doğarken, tam tepede (istivâ), batarken
 function isKerahat(t){ return (t>=0.27 && t<0.32) || (t>=0.55 && t<0.585) || (t>=0.655 && t<0.68); }   // batış kerahati Akşam başında (0.68) BİTER → Akşam penceresi baştan sona kılınabilir (eskiden 0.705'e taşıp Akşam'ı yiyordu)
 function prayNamaz(){
   if(!S.hasSeccade){
-    if(S.laidSeccade){ toast('🧎 Seccaden yerde serili — yanına gidip al'); return; }
-    toast('🧵 Seccaden yok — Dağarcık\'tan yünle ör'); return;
+    if(S.laidSeccade){ toast(tF('pr_rug_laid','🧎 Seccaden yerde serili — yanına gidip al')); return; }
+    toast(tF('pr_rug_none','🧵 Seccaden yok — Dağarcık\'tan yünle ör')); return;
   }
   const vn=vakitOf(gameTime)[1];
   // Cuma günü öğle: seccadede/evde kılınmaz — SADECE camide (Mescid)
-  if(vn==='Öğle' && isFriday() && cumaActive()){ toast('🕌 Cuma günü öğle namazı sadece camide kılınır — Mescid\'e git'); return; }
+  if(vn==='Öğle' && isFriday() && cumaActive()){ toast(tF('pr_only_mosque','🕌 Cuma günü öğle namazı sadece camide kılınır — Mescid\'e git')); return; }
   // kerahat vakti: namaz mekruh
-  if(isKerahat(gameTime)){ toast('🕗 Kerahat vakti (güneş doğuş/tepe/batış) — namaz mekruh, biraz bekle'); return; }
+  if(isKerahat(gameTime)){ toast(tF('pr_kerahat','🕗 Kerahat vakti (güneş doğuş/tepe/batış) — namaz mekruh, biraz bekle')); return; }
   namazRekat=rekatCount(vn);   // vaktin rekat sayısı (Sabah 2, Öğle/İkindi/Yatsı 4, Akşam 3; nafile 2)
   featureNamazPhase();   // bu namazda bir evreyi öne çıkar (rotasyon): uygun kamera açısı + Elbânî kaynağı
   const _preY=player.rotation.y; const _nd=namazDur(namazRekat); laySeccade();
   playAction(_nd,'namaz'); player.rotation.y=_preY;   // KENDİ karakterimiz prosedürel kılar (GLB adam YOK); kıbleye dönüşü tick YUMUŞAK yapsın
   if(inModern && typeof formModernCongregation==='function'){ const _c=formModernCongregation(_nd); if(_c>0) setTimeout(()=>openCongregationChoice(), _nd*1000+400); }   // SOKAKTA CEMAAT: komşular saf tutar; namaz sonu seccade hediye/al
-  if(!S.qiblaLearned){ S.qiblaLearned=true; setTimeout(()=>toast('🧭 Kıbleye yöneldin — kıbleye dönmek namazın şartıdır (Bakara 144)'),700); }
+  if(!S.qiblaLearned){ S.qiblaLearned=true; setTimeout(()=>toast(tF('pr_qib_learn','🧭 Kıbleye yöneldin — kıbleye dönmek namazın şartıdır (Bakara 144)')),700); }
   const farz = FARZ_VAKIT.includes(vn) && !S.done['ev_namaz'];
   if(farz){
     S.done['ev_namaz']=true; addNur(10+seccadeBonus());   // seccade tipi konfor bonusu (huşû ↔ rahat namaz)
@@ -3248,11 +3394,11 @@ function prayNamaz(){
     save(); refreshHUD(); applyIslandLock();
     if(islandDone('ev')) checkStreak();
     sndChime();
-    setTimeout(()=>toast('🧎 '+(NAMAZ_LABEL[vn]||vn)+' namazı kılındı (+10 nûr) — seccadeni almayı unutma'),200);
+    setTimeout(()=>toast(tF('pr_done','🧎 {n} namazı kılındı (+10 nûr) — seccadeni almayı unutma',{n:namazLabel(vn)})),200);
   } else {
     // farz kılınmış ya da farz vakti değil → NÂFİLE namaz (her zaman kılınabilir, kerahat hariç)
     addNur(5+seccadeBonus()); save(); refreshHUD(); sndChime();
-    setTimeout(()=>toast('🧎 Nâfile namaz kıldın (+5 nûr) — Allah kabul etsin'),200);
+    setTimeout(()=>toast(tF('pr_nafile','🧎 Nâfile namaz kıldın (+5 nûr) — Allah kabul etsin')),200);
   }
 }
 /* ============ MESCİD İÇ MEKÂNI + CUMA/CEMAAT (girişte kamera zoom) ============ */
@@ -3284,7 +3430,7 @@ function mosqueFade(){ const f=document.getElementById('mosqueFade'); if(!f) ret
   f.style.transition='none'; f.style.opacity='1';
   requestAnimationFrame(()=>{ f.style.transition='opacity .55s ease'; f.style.opacity='0'; }); }
 function enterMosque(){
-  if(!isUnlocked('cami')){ toast('🔒 Mescid henüz açılmadı'); return; }
+  if(!isUnlocked('cami')){ toast(tF('pr_mosque_locked','🔒 Mescid henüz açılmadı')); return; }
   mosqueMode=true; if(mosqueGroup) mosqueGroup.visible=true;
   jVec.x=0; jVec.y=0; near=null;
   camera.position.copy(mosCamStart); camera.lookAt(mosCamLook);   // uçuş yok: doğrudan iç mekâna (tick dolly-in yapar)
@@ -3486,7 +3632,7 @@ function openHacGate(){
 }
 function enterHac(full){
   _hajjFull=!!full;
-  if(!full && !isUnlocked('sehir')){ toast('🔒 Önce Medine (Şehir) açılmalı — Umre için oradan yola çıkılır'); return; }
+  if(!full && !isUnlocked('sehir')){ toast(tF('hj_need_city','🔒 Önce Medine (Şehir) açılmalı — Umre için oradan yola çıkılır')); return; }
   if(hacMode||hacVortexT>0) return;   // zaten geçişte/Mekke'de → tekrar tetikleme
   // GİRDAP GEÇİŞİ: adada kamera ÖNCE Z (roll) SONRA Y (orbit) döner + karakter Kâbe'nin girdabına kapılıp
   // dönerek/çekilerek aşağı iner → geçiş Kâbe etrafında dönen umreci (360° orbit) ile son bulur.
@@ -4774,7 +4920,7 @@ function recordMosquePrayer(vn){
     const gIdx=d*5+FARZ_VAKIT.indexOf(vn);        // global vakit indeksi (ardışıklık ölçütü)
     S.mosqueConsec=(gIdx===S.mosqueConsecMark+1)?(S.mosqueConsec+1):1;   // bir önceki vakti takip ediyorsa +1, yoksa baştan
     S.mosqueConsecMark=gIdx;
-    if(S.mosqueConsec===5) setTimeout(()=>{ banner('🕌 İmam seni tanıdı'); toast('5 vakti üst üste cemaatle kıldın — İmam sana bir vazife vermek istiyor. Aşağıdan «İmam\'dan vazife al». 📜'); sndFanfare(); },500);
+    if(S.mosqueConsec===5) setTimeout(()=>{ banner(tF('mq_imam_b','🕌 İmam seni tanıdı')); toast(tF('mq_imam_t','5 vakti üst üste cemaatle kıldın — İmam sana bir vazife vermek istiyor. Aşağıdan «İmam\'dan vazife al». 📜')); sndFanfare(); },500);
   }
   if(S.mosqueVDay!==d){ S.mosqueVDay=d; S.mosqueVSet=[]; }
   if(!S.mosqueVSet.includes(vn)) S.mosqueVSet.push(vn);
@@ -4783,8 +4929,8 @@ function recordMosquePrayer(vn){
     S.mosqueStreak = (S.mosqueStreakDay===d-1) ? (S.mosqueStreak+1) : 1;
     S.mosqueStreakDay=d;
     if(S.mosqueStreak>=7 && !S.mosqueUnlocked){ S.mosqueUnlocked=true;
-      setTimeout(()=>{ banner('🕌 İmam ve cemaatle tanıştın'); toast('7 gün her vakti camide kıldın — artık imam ve cemaatle sohbet edip ilim alabilirsin.'); sndFanfare(); },400); }
-    else if(!S.mosqueUnlocked) setTimeout(()=>toast('🕌 Bugün 5 vakti de camide kıldın — imam sohbetine '+S.mosqueStreak+'/7 gün'),400);
+      setTimeout(()=>{ banner(tF('mq_meet_b','🕌 İmam ve cemaatle tanıştın')); toast(tF('mq_meet_t','7 gün her vakti camide kıldın — artık imam ve cemaatle sohbet edip ilim alabilirsin.')); sndFanfare(); },400); }
+    else if(!S.mosqueUnlocked) setTimeout(()=>toast(tF('mq_streak','🕌 Bugün 5 vakti de camide kıldın — imam sohbetine {n}/7 gün',{n:S.mosqueStreak})),400);
   }
 }
 // imam sohbeti: ilim/hikmet havuzu (açıldıktan sonra)
@@ -5030,20 +5176,20 @@ function updateFastBtn(){
   if(p==='none'||p==='done'||p==='missed'){ b.style.display='none'; b.classList.remove('ready'); return; }
   b.style.display='block';
   if(p==='niyet'){ b.innerHTML=emo('🌙'); b.title='Oruca niyet et'; b.classList.remove('ready'); }
-  else if(p==='fasting'){ b.innerHTML=emo('🤍'); b.title='Oruçlusun — iftar Akşam'; b.classList.remove('ready'); }
-  else if(p==='iftar'){ b.innerHTML=emo('🌅'); b.title='İftar et'; b.classList.add('ready'); }
+  else if(p==='fasting'){ b.innerHTML=emo('🤍'); b.title=tF('fs_title_fasting','Oruçlusun — iftar Akşam'); b.classList.remove('ready'); }
+  else if(p==='iftar'){ b.innerHTML=emo('🌅'); b.title=tF('fs_title_iftar','İftar et'); b.classList.add('ready'); }
 }
 function doFast(){
   const p=fastPhase(), d=S.dayNum||0;
-  if(p==='none'){ toast('🌙 Bugün sünnet oruç günü değil (Pazartesi/Perşembe)'); return; }
+  if(p==='none'){ toast(tF('fs_none','🌙 Bugün sünnet oruç günü değil (Pazartesi/Perşembe)')); return; }
   if(p==='niyet'){ S.fastNiyet=d; save(); updateFastBtn(); sndChime();
     banner('🌙 Oruca niyet ettin');
     setTimeout(()=>toast('Niyet ettin — Fecir\'de oruç başlar, Akşam iftar edersin. Rasûlullah ﷺ Pazartesi-Perşembe oruç tutar; "ameller o günlerde arz olunur, oruçlu olmayı severim." (Tirmizî)'),300); return; }
-  if(p==='fasting'){ toast('🤍 Oruçlusun — Akşam iftar edeceksin. "Oruç bir kalkandır." (Buhârî)'); return; }
+  if(p==='fasting'){ toast(tF('fs_fasting','🤍 Oruçlusun — Akşam iftar edeceksin. «Oruç bir kalkandır.» (Buhârî)')); return; }
   if(p==='iftar'){ S.fastDone=d; addNur(25); save(); refreshHUD(); updateFastBtn(); sndFanfare();
-    banner('🌅 İftar — orucun kabul olsun');
-    setTimeout(()=>toast('İftar ettin. "Oruçlunun iki sevinci: iftar ve Rabbine kavuşma." (Buhârî) — +25 nûr'),300); return; }
-  if(p==='missed'){ toast('🌙 Bu günün niyet vakti geçti — oruca öğleden önce niyet edilir'); return; }
+    banner(tF('fs_iftar_b','🌅 İftar — orucun kabul olsun'));
+    setTimeout(()=>toast(tF('fs_iftar_t','İftar ettin. «Oruçlunun iki sevinci: iftar ve Rabbine kavuşma.» (Buhârî) — +25 nûr')),300); return; }
+  if(p==='missed'){ toast(tF('fs_missed','🌙 Bu günün niyet vakti geçti — oruca öğleden önce niyet edilir')); return; }
 }
 
 /* ============ SU/YEMEK İHTİYACI (Faz 9) — nazik, cezalandırmayan (şükür + empati) ============ */
@@ -5059,11 +5205,11 @@ function updateNeeds(dt){
   S.thirst=Math.min(100, S.thirst + THIRST_RATE*dt*disc);
   S.hunger=Math.min(100, S.hunger + HUNGER_RATE*dt*disc);
   S.toilet=Math.min(100, (S.toilet||0) + TOILET_RATE*dt*disc);
-  if(S.thirst>70 && !thirstWarned && !fastingAbstain()){ thirstWarned=true; toast('💧 Susadın — kuyudan su çek, sonra 🥤 ile iç'); }
+  if(S.thirst>70 && !thirstWarned && !fastingAbstain()){ thirstWarned=true; toast(tF('nd_thirst','💧 Susadın — kuyudan su çek, sonra 🥤 ile iç')); }
   if(S.thirst<50) thirstWarned=false;
-  if(S.hunger>72 && !hungerWarned && !fastingAbstain()){ hungerWarned=true; toast('🍞 Karnın acıktı — hurma/ekmek topla, 🍽️ ile ye'); }
+  if(S.hunger>72 && !hungerWarned && !fastingAbstain()){ hungerWarned=true; toast(tF('nd_hunger','🍞 Karnın acıktı — hurma/ekmek topla, 🍽️ ile ye')); }
   if(S.hunger<50) hungerWarned=false;
-  if(S.toilet>70 && !toiletWarned){ toiletWarned=true; toast('🚻 Tuvalet ihtiyacın var — giderince abdestin bozulur, 🚿 ile abdest tazele'); }
+  if(S.toilet>70 && !toiletWarned){ toiletWarned=true; toast(tF('nd_toilet','🚻 Tuvalet ihtiyacın var — giderince abdestin bozulur, 🚿 ile abdest tazele')); }
   if(S.toilet<50) toiletWarned=false;
   needsAcc+=dt; if(needsAcc>=0.4){ needsAcc=0; updateNeedsHud(); }
 }
@@ -5088,29 +5234,29 @@ function updateNeedBtns(){
   if(pb){ const on=(S.toilet||0)>25; pb.style.display=on?'block':'none'; pb.classList.toggle('ready', on&&(S.toilet||0)>65); }
 }
 function drink(){
-  if(fastingAbstain()){ toast('🤍 Oruçlusun — iftara kadar sabret (Akşam)'); return; }
+  if(fastingAbstain()){ toast(tF('fs_abstain','🤍 Oruçlusun — iftara kadar sabret (Akşam)')); return; }
   if((S.inv.su||0)<=0){ toast('💧 Suyun yok — kuyudan (💧) su çek'); return; }
   S.inv.su--; if(S.inv.su<=0) delete S.inv.su;
   S.thirst=Math.max(0,S.thirst-55); addNur(1); save(); refreshHUD(); if(typeof renderInv==='function') renderInv(); sndChime();
   if(typeof playAction==='function') playAction(1.6,'drink');   // 💧 içme animasyonu (bardağı ağıza kaldır)
-  toast('💧 Su içtin — elhamdülillah (+1 nûr şükür)');
+  toast(tF('nd_drank','💧 Su içtin — elhamdülillah (+1 nûr şükür)'));
 }
 function eat(){
-  if(fastingAbstain()){ toast('🤍 Oruçlusun — iftara kadar sabret (Akşam)'); return; }
-  const k=foodItem(); if(!k){ toast('🍞 Yiyeceğin yok — hurma/dut/ekmek/süt topla'); return; }
+  if(fastingAbstain()){ toast(tF('fs_abstain','🤍 Oruçlusun — iftara kadar sabret (Akşam)')); return; }
+  const k=foodItem(); if(!k){ toast(tF('nd_nofood','🍞 Yiyeceğin yok — hurma/dut/ekmek/süt topla')); return; }
   S.inv[k]--; if(S.inv[k]<=0) delete S.inv[k];
   S.hunger=Math.max(0,S.hunger-50); addNur(1); save(); refreshHUD(); if(typeof renderInv==='function') renderInv(); sndChime();
   if(typeof playAction==='function') playAction(1.8,'eat');   // 🍞 yeme animasyonu (el ağıza, ısırık)
-  toast('🍞 '+GOODS[k].nm+' yedin — bismillah, elhamdülillah (+1 nûr şükür)');
+  toast(tF('nd_ate','🍞 {nm} yedin — bismillah, elhamdülillah (+1 nûr şükür)',{nm:goodName(k)}));
 }
 // TUVALET → ABDEST TAZELEME: ihtiyacı gider, abdest bozulur, detaylı abdest hareketlerini göster
 function refreshWudu(){
-  if((S.toilet||0)<=1){ toast('🚻 Şimdilik tuvalet ihtiyacın yok'); return; }
-  toast('🚻 Tuvalet âdâbı: girerken sol ayak+besmele, çıkarken sağ ayak+"gufrâneke". Abdestin bozuldu — tazele.');
+  if((S.toilet||0)<=1){ toast(tF('nd_no_toilet','🚻 Şimdilik tuvalet ihtiyacın yok')); return; }
+  toast(tF('nd_toilet_adab','🚻 Tuvalet âdâbı: girerken sol ayak+besmele, çıkarken sağ ayak+«gufrâneke». Abdestin bozuldu — tazele.'));
   openGuide({nm:'Abdest Tazele', ic:'💧', steps:ABDEST_STEPS}, ()=>{
     S.toilet=0; toiletWarned=false;
     addNur(2); save(); refreshHUD(); updateNeedsHud(); sndChime();
-    setTimeout(()=>{ banner('💧 Abdest tazelendi'); toast('Abdestini tazeledin — "Temizlik imanın yarısıdır." (Müslim) +2 nûr şükür'); },250);
+    setTimeout(()=>{ banner(tF('nd_wudu_b','💧 Abdest tazelendi')); toast(tF('nd_wudu_t','Abdestini tazeledin — «Temizlik imanın yarısıdır.» (Müslim) +2 nûr şükür')); },250);
   });
 }
 
@@ -5166,13 +5312,14 @@ function ezberAll(){ return EZBER.sureler.concat(EZBER.dualar); }
 function updateEzberBtn(){ const b=document.getElementById('ezberBtn'); if(b) b.style.display=isChild()?'block':'none'; }
 function openEzber(){ document.getElementById('ezber').classList.add('show'); ezItem=null; renderEzberList(); }
 function closeEzber(){ document.getElementById('ezber').classList.remove('show'); }
+function ezNm(x){ return (x && (tU('ez_nm_'+x.id) || x.ad)) || ''; }   // ezber kalemi adı (dil); sûre adları özel isim, çoğunlukla aynı kalır
 function renderEzberList(){
   const all=ezberAll(), done=all.filter(x=>S.memorized[x.id]).length;
   document.getElementById('ezberProg').textContent='✅ '+done+'/'+all.length;
-  const card=x=>'<button class="ezcard'+(S.memorized[x.id]?' done':'')+'" onclick="__ezOpen(\''+x.id+'\')">'+x.ic+' '+x.ad+(S.memorized[x.id]?' ✓':'')+'</button>';
+  const card=x=>'<button class="ezcard'+(S.memorized[x.id]?' done':'')+'" onclick="__ezOpen(\''+x.id+'\')">'+x.ic+' '+ezNm(x)+(S.memorized[x.id]?' ✓':'')+'</button>';
   document.getElementById('ezberBody').innerHTML=
-    '<div class="ezsec">Sûreler</div><div class="ezgrid">'+EZBER.sureler.map(card).join('')+'</div>'+
-    '<div class="ezsec">Günlük Dualar</div><div class="ezgrid">'+EZBER.dualar.map(card).join('')+'</div>';
+    '<div class="ezsec">'+tF('ez_sec_sure','Sûreler')+'</div><div class="ezgrid">'+EZBER.sureler.map(card).join('')+'</div>'+
+    '<div class="ezsec">'+tF('ez_sec_dua','Günlük Dualar')+'</div><div class="ezgrid">'+EZBER.dualar.map(card).join('')+'</div>';
 }
 let ezItem=null, ezIdx=0, ezTestPos=0, ezTestOrder=[];
 window.__ezOpen=function(id){ ezItem=ezberAll().find(x=>x.id===id); ezIdx=0; renderEzberStep(); };
@@ -5201,13 +5348,13 @@ function drawEzberTest(){
 window.__ezPick=function(i){
   if(i===ezTestPos){ ezTestPos++; beep(560+ezTestPos*40,0,0.09,'sine',0.05);
     if(ezTestPos>=ezItem.ayet.length){ ezberFinish(); return; } drawEzberTest(); }
-  else { toast('Sıra şaştı — baştan hatırla'); ezTestPos=0; drawEzberTest(); }
+  else { toast(tF('ez_wrong','Sıra şaştı — baştan hatırla')); ezTestPos=0; drawEzberTest(); }
 };
 function ezberFinish(){
   const first=!S.memorized[ezItem.id]; S.memorized[ezItem.id]=true; save();
   const gain=ezItem.ayet.length>1?12:6;
-  if(first){ addNur(gain); sndFanfare(); banner('📖 '+ezItem.ad+' ezberlendi'); setTimeout(()=>toast('Mâşâallah! Ezberledin. "Sizin en hayırlınız Kur\'ân\'ı öğrenen ve öğretendir." (Buhârî) — +'+gain+' nûr'),250); }
-  else { sndChime(); toast('📖 '+ezItem.ad+' tekrarladın — ne güzel, tekrar ezberi pekiştirir'); }
+  if(first){ addNur(gain); sndFanfare(); banner(tF('ez_done_b','📖 {ad} ezberlendi',{ad:ezItem.ad})); setTimeout(()=>toast(tF('ez_done_t','Mâşâallah! Ezberledin. «Sizin en hayırlınız Kur\'ân\'ı öğrenen ve öğretendir.» (Buhârî) — +{n} nûr',{n:gain})),250); }
+  else { sndChime(); toast(tF('ez_again','📖 {ad} tekrarladın — ne güzel, tekrar ezberi pekiştirir',{ad:ezItem.ad})); }
   refreshHUD(); __ezList();
 }
 // yün → seccade küçük ipucu (köşede)
@@ -5841,11 +5988,11 @@ function careAllNeedy(){ for(const n of NEEDY){ S.helpedWk[n.id]=true; S.mood[n.
 function weeklyJustice(){   // onNewDay'den — muhtaç ihmali değerlendirmesi (2 günde bir; 7 = bir oturumda 70 dk gerekirdi, hiç görünmüyordu)
   if((S.dayNum-(S.wkDay||0))<2) return;
   S.wkDay=S.dayNum; const neglected=[];
-  for(const n of NEEDY){ if(!S.helpedWk[n.id]){ S.mood[n.id]=Math.min(3,(S.mood[n.id]||0)+1); neglected.push(n.nm); } }
+  for(const n of NEEDY){ if(!S.helpedWk[n.id]){ S.mood[n.id]=Math.min(3,(S.mood[n.id]||0)+1); neglected.push(needyNm(n)); } }
   S.helpedWk={}; const total=moodTotal(); save(); updateAdaletHud();
-  if(neglected.length){ setTimeout(()=>banner('😟 Muhtaçlar gözetilmedi'),400);
-    setTimeout(()=>toast('Bu hafta '+neglected.join(', ')+' aç kaldı — huzursuzluk artıyor. Onları gözet, sadaka ver.'),900); }
-  else if(total>0){ setTimeout(()=>toast('🕊️ Muhtaçlar gözetildi — şehir yatışıyor.'),700); }
+  if(neglected.length){ setTimeout(()=>banner(tF('wj_b','😟 Muhtaçlar gözetilmedi')),400);
+    setTimeout(()=>toast(tF('wj_neglect','Bu hafta {who} aç kaldı — huzursuzluk artıyor. Onları gözet, sadaka ver.',{who:neglected.join(', ')})),900); }
+  else if(total>0){ setTimeout(()=>toast(tF('wj_ok','🕊️ Muhtaçlar gözetildi — şehir yatışıyor.')),700); }
   if(total>=5) setTimeout(()=>zulumEvent(total),1700);
 }
 function zulumEvent(total){   // yüksek mutsuzluk → yağma/eşkıya/saldırı → adaletsizlik
@@ -5910,7 +6057,7 @@ const REM_L={ tr:{hd:'📅 Hatırlatıcı · Takvim',sub:'İyi âdetlerini takvi
 function remL(){ const L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr'; return REM_L[L]||REM_L.tr; }
 function openReminders(){ audio(); renderReminders(); document.getElementById('remind').classList.add('show'); }
 function closeReminders(){ document.getElementById('remind').classList.remove('show'); }
-function addReminder(text, recur){ text=(text||'').trim(); if(!text) return; if(S.reminders.length>=12){ toast('📅 En fazla 12 hatırlatma'); return; }
+function addReminder(text, recur){ text=(text||'').trim(); if(!text) return; if(S.reminders.length>=12){ toast(tF('rm_max','📅 En fazla 12 hatırlatma')); return; }
   S.reminders.push({id:'r'+(S.remSeq=(S.remSeq||0)+1), text:text.slice(0,40), recur:recur||'daily', dow:(typeof dow==='function'?dow():0), last:-1}); save(); renderReminders(); if(typeof renderDailyGoal==='function') renderDailyGoal(); }
 function removeReminder(id){ S.reminders=S.reminders.filter(r=>r.id!==id); if(S.remDone) delete S.remDone[id]; save(); renderReminders(); if(typeof renderDailyGoal==='function') renderDailyGoal(); }
 function renderReminders(){ const M=remL(), L=(S.lang==='en'||S.lang==='ar')?S.lang:'tr';
@@ -7638,7 +7785,7 @@ function doScenario(rec){
   if(rec.islId && !isUnlocked(rec.islId)){ toast(tU('t_locked_place')||'🔒 Burası henüz açılmadı'); return; }
   // İMAM QUEST-GIVER yumuşak kapısı: barıştır/hükmet/emanet, imamdan vazife alınana dek kilitli (eski oyuncular grandfather ile açık)
   if(!S.imamMet && IMAM_SCEN.includes(rec.sid)){
-    toast('🔒 Önce İmam\'dan vazife al — Mescid\'e git, 5 vakti üst üste cemaatle kıl'+(S.mosqueConsec>0?' ('+Math.min(S.mosqueConsec,5)+'/5)':''));
+    toast(tF('mq_need_task','🔒 Önce İmam\'dan vazife al — Mescid\'e git, 5 vakti üst üste cemaatle kıl')+(S.mosqueConsec>0?' ('+Math.min(S.mosqueConsec,5)+'/5)':''));
     return; }
   // prereq kapısı: yalnız İLK KEZ (ada henüz fethedilmemiş VE senaryo hiç çözülmemiş) uygulanır.
   // Aksi hâlde günlük S.done sıfırlaması senaryoyu her gün yeniden kilitliyordu → tekrar barıştıramama/hükmedememe.
@@ -8264,7 +8411,7 @@ function interact(q){
   if(!S.done[q.id] && !questAvailable(q)){ const p=prereqOf(q); toast((tU('q_prereq')||'🔒 Önce: ')+(p?questNmT(p):(tU('q_nextstep')||'sıradaki adım'))); return; }
   // Cuma günü öğle: namaz evde kılınmaz — sadece camide
   if(q.id==='ev_namaz' && !S.done[q.id] && vakitOf(gameTime)[1]==='Öğle' && isFriday() && cumaActive()){
-    toast('🕌 Cuma günü öğle namazı evde değil, camide kılınır — Mescid\'e git'); return; }
+    toast(tF('pr_home_jum','🕌 Cuma günü öğle namazı evde değil, camide kılınır — Mescid\'e git')); return; }
   if(q.steps && !S.done[q.id] && !S.learned[q.id]){ openGuide(q); return; }  // ilk kez → adım adım öğret
   openSheet(q);
 }
@@ -8519,7 +8666,7 @@ document.getElementById('abdestBtn').onclick=refreshWudu;
 document.getElementById('ezberBtn').onclick=openEzber;
 document.getElementById('ezberClose').onclick=closeEzber;
 document.getElementById('ezber').addEventListener('click',e=>{ if(e.target.id==='ezber') closeEzber(); });
-document.getElementById('woolHint').onclick=()=>{ if((S.inv.yun||0)>=SECCADE_YUN && !S.hasSeccade) toast('🧵 Yün hazır — Atölye adasındaki tezgâha git (Hurma Bahçesi\'nin güneyi).'); };
+document.getElementById('woolHint').onclick=()=>{ if((S.inv.yun||0)>=SECCADE_YUN && !S.hasSeccade) toast(tF('pr_wool_ready','🧵 Yün hazır — Atölye adasındaki tezgâha git (Hurma Bahçesi\'nin güneyi).')); };
 document.getElementById('mktClose').onclick=closeMarket;
 document.getElementById('market').addEventListener('click',e=>{ if(e.target.id==='market') closeMarket(); });
 function doAct(){ if(!near) return;
@@ -8905,7 +9052,7 @@ function tick(){
       const rad=30+(13-30)*e, hgt=21+(10.5-21)*e;      // uzaktan/yüksekten → yakına/alçağa (zoom-in)
       camera.position.set(cx+Math.cos(ang)*rad, hgt, cz+Math.sin(ang)*rad);
       camera.lookAt(cx, 5+(1.2-5)*e, cz-1);            // hep Kâbe'ye bak; yaklaştıkça alçal
-      if(hacIntroT<=0){ hacIntroT=0; document.getElementById('hac').classList.add('show'); banner('🕋 Mîkāta vardın — Umre\'ye niyet'); }
+      if(hacIntroT<=0){ hacIntroT=0; document.getElementById('hac').classList.add('show'); banner(tF('hj_mikat','🕋 Mîkāta vardın — Umre\'ye niyet')); }
     } else {
       let cp=hacCamPos, cl=hacCamLook; const ph=hacState.phase;   // evreye göre kamera preseti
       if(ph==='say'){ cp=hacSayCamPos; cl=hacSayCamLook; }                 // sa'y AYRI Mes'â'da
@@ -9367,7 +9514,7 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     // KISAYOL: 7 gün × 5 vakit camide serisini TAMAMLANMIŞ say → İmam sohbetini aç (gerçek kutlamayla)
     unlockSohbet:()=>{ S.mosqueStreak=7; S.mosqueStreakDay=S.dayNum; S.mosqueVDay=S.dayNum; S.mosqueVSet=FARZ_VAKIT.slice(); S.mosqueFullDay=S.dayNum;
       const first=!S.mosqueUnlocked; S.mosqueUnlocked=true; save();
-      if(first){ banner('🕌 İmam ve cemaatle tanıştın'); setTimeout(()=>toast('7 gün her vakti camide kıldın — artık imam ve cemaatle sohbet edip ilim alabilirsin.'),300); sndFanfare(); }
+      if(first){ banner(tF('mq_meet_b','🕌 İmam ve cemaatle tanıştın')); setTimeout(()=>toast(tF('mq_meet_t','7 gün her vakti camide kıldın — artık imam ve cemaatle sohbet edip ilim alabilirsin.')),300); sndFanfare(); }
       if(mosqueMode && typeof renderMosque==='function') renderMosque();
       return {unlocked:true, hint:'Mescide gir → «💬 İmam ve cemaatle sohbet et (ilim +5)» butonu açık. Her sohbet: sahih bir imam sözü + 5 nûr (vakte göre döner).'}; },
     obstacles:()=>OBSTACLES.length, blocked:(x,z)=>blocked(x,z),
