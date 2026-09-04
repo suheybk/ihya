@@ -1462,6 +1462,7 @@ const UI_STR={ en:{
   good_hurma:'Dates', good_dut:'Mulberries', good_sut:'Milk', good_yun:'Wool', good_ekmek:'Bread',
   good_su:'Water', good_bal:'Honey', good_bugday:'Wheat', good_un:'Flour', good_yumurta:'Eggs',
   good_corek:'Buns', good_pekmez:'Molasses', good_balik:'Fish', good_izgara:'Grilled Fish',
+  good_ipek:'Silk', good_ayran:'Buttermilk', good_peynir:'Cheese', good_tereyagi:'Butter',
   gv_su:'💧 Draw water', gv_bal:'🍯 Take honey', gv_yumurta:'🥚 Collect eggs', gv_bugday:'🌾 Reap wheat', gv_balik:'🎣 Fish',
   rg_su:'💧 The well is refilling', rg_bugday:'🌾 The wheat is ripening', rg_yumurta:'🥚 The hens are laying',
   rg_bal:'🍯 The bees are making honey', rg_hurma:'🌴 The dates are ripening', rg_dut:'🍇 The mulberries are ripening',
@@ -1527,7 +1528,7 @@ const UI_STR={ en:{
   iv_carry:'Carrying', iv_nobag:' · no satchel', iv_full:'FULL',
   iv_baghint:'To carry more, go to the loom on the Workshop isle (weave with wool).',
   iv_empty:'You haven\'t gathered anything yet. Gather from the trees and animals on the isles 🌴🐑',
-  iv_prod_head:'Crafting: on the Workshop isle', iv_prod_body:'Cross the bridge south of the Date Grove to the Workshop: 🌾 mill (flour), 🍞 oven (bread), 🧶 loom (prayer rug).',
+  iv_prod_head:'Crafting: on the Workshop isle', iv_prod_body:'Cross the bridge south of the Date Grove to the Workshop: 🌾 mill (flour), 🍞 oven (bread), 🧶 loom (prayer rug), 🫙 cauldron (molasses), 🧈 churn (butter·cheese).',
   iv_zekat_head:'🕌 <b>Zakat</b> — goods that reach the nisab (tithe 1/10). Sheep nisab: 40 head.',
   iv_zekat_suf:' zakat',
   // --- Faz 2b-2: Hayır Çeşmesi kalemleri (adlar; ref'ler Faz 3) ---
@@ -1684,6 +1685,7 @@ ar:{
   good_hurma:'تمر', good_dut:'توت', good_sut:'حليب', good_yun:'صوف', good_ekmek:'خبز',
   good_su:'ماء', good_bal:'عسل', good_bugday:'قمح', good_un:'دقيق', good_yumurta:'بيض',
   good_corek:'أقراص', good_pekmez:'دِبس', good_balik:'سمك', good_izgara:'سمك مشوي',
+  good_ipek:'حرير', good_ayran:'لبن مخيض', good_peynir:'جبن', good_tereyagi:'زبدة',
   gv_su:'💧 استقِ الماء', gv_bal:'🍯 خُذ العسل', gv_yumurta:'🥚 اجمع البيض', gv_bugday:'🌾 احصُد القمح', gv_balik:'🎣 اصطَد',
   rg_su:'💧 البئر تمتلئ', rg_bugday:'🌾 القمح يَنضج', rg_yumurta:'🥚 الدجاج يبيض',
   rg_bal:'🍯 النحل يصنع العسل', rg_hurma:'🌴 التمر يَنضج', rg_dut:'🍇 التوت يَنضج',
@@ -1759,7 +1761,7 @@ ar:{
   iv_carry:'الحمل', iv_nobag:' · لا جَعبة', iv_full:'ممتلئة',
   iv_baghint:'لحمل المزيد، اذهب إلى النَّول في جزيرة الورشة (انسِج بالصوف).',
   iv_empty:'لم تجمع شيئًا بعد. اجمع من الأشجار والحيوانات في الجزر 🌴🐑',
-  iv_prod_head:'التصنيع: في جزيرة الورشة', iv_prod_body:'اعبُر الجسر جنوب بستان التمر إلى الورشة: 🌾 الرحى (دقيق)، 🍞 التنّور (خبز)، 🧶 النَّول (سجّادة).',
+  iv_prod_head:'التصنيع: في جزيرة الورشة', iv_prod_body:'اعبُر الجسر جنوب بستان التمر إلى الورشة: 🌾 الرحى (دقيق)، 🍞 التنّور (خبز)، 🧶 النَّول (سجّادة)، 🫙 القِدر (دِبس)، 🧈 المِمخضة (زبدة·جبن).',
   iv_zekat_head:'🕌 <b>الزكاة</b> — الأموال التي بلغت النِّصاب (العُشر 1/10). نِصاب الغنم: 40 رأسًا.', iv_zekat_suf:' زكاة',
   mk_empty:'لا شيء لديك للبيع. اجمع وارعَ في الجزر، ثم أحضِرها إلى هنا 🌴🐑',
   mk_seccade:'سجّادة الصلاة', mk_seccade_ref:'بِع سجّادتك التي بيدك', mk_sell:'بِع ', mk_unit:'سعر الوحدة: ',
@@ -2356,7 +2358,7 @@ function applyIslandLock(){
 }
 
 /* ============ HASAT / TOPLAMA (Faz 1) — kesb-i helâl ============ */
-const GOODS={ hurma:{ic:'🌴',nm:'Hurma'}, dut:{ic:'🫐',nm:'Dut'}, sut:{ic:'🥛',nm:'Süt'}, yun:{ic:'🧶',nm:'Yün'}, ekmek:{ic:'🍞',nm:'Ekmek'}, su:{ic:'💧',nm:'Su'}, bal:{ic:'🍯',nm:'Bal'}, bugday:{ic:'🌾',nm:'Buğday'}, un:{ic:'🥣',nm:'Un'}, yumurta:{ic:'🥚',nm:'Yumurta'}, corek:{ic:'🥯',nm:'Çörek'}, pekmez:{ic:'🫙',nm:'Pekmez'}, balik:{ic:'🐟',nm:'Balık'}, izgara:{ic:'🍢',nm:'Kızarmış Balık'}, ipek:{ic:'🧵',nm:'İpek'} };
+const GOODS={ hurma:{ic:'🌴',nm:'Hurma'}, dut:{ic:'🫐',nm:'Dut'}, sut:{ic:'🥛',nm:'Süt'}, yun:{ic:'🧶',nm:'Yün'}, ekmek:{ic:'🍞',nm:'Ekmek'}, su:{ic:'💧',nm:'Su'}, bal:{ic:'🍯',nm:'Bal'}, bugday:{ic:'🌾',nm:'Buğday'}, un:{ic:'🥣',nm:'Un'}, yumurta:{ic:'🥚',nm:'Yumurta'}, corek:{ic:'🥯',nm:'Çörek'}, pekmez:{ic:'🫙',nm:'Pekmez'}, balik:{ic:'🐟',nm:'Balık'}, izgara:{ic:'🍢',nm:'Kızarmış Balık'}, ipek:{ic:'🧵',nm:'İpek'}, ayran:{ic:'🥤',nm:'Ayran'}, peynir:{ic:'🧀',nm:'Peynir'}, tereyagi:{ic:'🧈',nm:'Tereyağı'} };
 // Hurma Bahçesi'nde toplanabilir ağaçlar (tekrarlanır: topla → hasat hali → cooldown → yeniden dolar)
 // Tüm adalara EŞİT dağıt: her adada 1 hurma + 1 dut ağacı (kenarlarda, görev hattından uzak)
 // Gather node'ları ada'nın 4 KÖŞESİNE dağıt (ada-yarıçapı-farkında): merkez görev hattından (z≈±2.6)
@@ -2958,6 +2960,21 @@ function craftIzgara(){ if((S.inv.balik||0)<IZGARA_BALIK){ toast('🐟 '+IZGARA_
   S.inv.balik-=IZGARA_BALIK; if(S.inv.balik<=0) delete S.inv.balik;
   invAdd('izgara', IZGARA_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🍢 Balık kızardı');
   setTimeout(()=>toast('Tandırda kızarmış balık (+'+IZGARA_YIELD+') — besleyici; aç kalana ikram et ya da pazarda sat.'),1300); }
+// SÜT ZİNCİRİ (Faz 7.09) — sağılan süt artık çıkmaz sokak değil: Atölye'de YAYIK istasyonu.
+// Gerçek yayıklama TEK işlemde iki ürün verir: yağ ayrışır (tereyağı) + geriye ayran (yayık ayranı) kalır.
+const YAYIK_SUT=3, YAYIK_YAG=1, YAYIK_AYRAN=2;
+function craftYayik(){ if((S.inv.sut||0)<YAYIK_SUT){ toast('🧈 '+YAYIK_SUT+' süt gerek ('+(S.inv.sut||0)+' var)'); return; }
+  playAction(2.0,'stir');   // yayığı çalkala
+  S.inv.sut-=YAYIK_SUT; if(S.inv.sut<=0) delete S.inv.sut;
+  invAdd('tereyagi', YAYIK_YAG); invAdd('ayran', YAYIK_AYRAN); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🧈 Yayık çalkalandı');
+  setTimeout(()=>toast('Süt yayıkta ayrıldı (+'+YAYIK_YAG+' tereyağı, +'+YAYIK_AYRAN+' ayran) — sağdığın süt artık boşa gitmiyor.'),1300); }
+// PEYNİR — süt mayalanır, süzülür (FOOD; pazarda sütten değerli, uzun ömürlü azık)
+const PEYNIR_SUT=4, PEYNIR_YIELD=2;
+function craftPeynir(){ if((S.inv.sut||0)<PEYNIR_SUT){ toast('🧀 '+PEYNIR_SUT+' süt gerek ('+(S.inv.sut||0)+' var)'); return; }
+  playAction(1.8,'knead');   // sütü mayala, telemeyi süz
+  S.inv.sut-=PEYNIR_SUT; if(S.inv.sut<=0) delete S.inv.sut;
+  invAdd('peynir', PEYNIR_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🧀 Peynir mayalandı');
+  setTimeout(()=>toast('Sütü mayalayıp peynir yaptın (+'+PEYNIR_YIELD+') — bozulmayan azık, muhtaca kuvvet, pazarda değerli.'),1300); }
 // yerde serili seccade = toplanabilir düğüm; almazsan orada kalır
 function placeLaidSeccade(x,z,ry,animate){
   removeLaidSeccade();
@@ -5212,7 +5229,7 @@ function applyProfile(){ if(isChild()){ S.hasSeccade=true; } save(); updateSecca
 
 /* ============ MEDİNE PAZARI (Faz 3) — kesb-i helâli dirhem'e çevir ============ */
 const MARKET_POS={ islId:'sehir', pos:[67,0,-4] };
-const PRICES={ hurma:2, dut:2, sut:3, yun:4, ekmek:3, su:1, bal:6, bugday:2, yumurta:3, corek:5, pekmez:8, balik:5, izgara:8 };   // bal = en değerli hasat; un craft-ara ürün (satılmaz); çörek = katma değerli; pekmez = işlenmiş (dut+bal, en değerli); balık = değerli yiyecek; ızgara = tandırda kızarmış (balıktan değerli)
+const PRICES={ hurma:2, dut:2, sut:3, yun:4, ekmek:3, su:1, bal:6, bugday:2, yumurta:3, corek:5, pekmez:8, balik:5, izgara:8, ayran:2, peynir:7, tereyagi:10 };   // bal = en değerli hasat; un craft-ara ürün (satılmaz); çörek = katma değerli; pekmez = işlenmiş (dut+bal, en değerli); balık = değerli yiyecek; ızgara = tandırda kızarmış (balıktan değerli)
 let marketRec=null, marketDecor=[], marketMerchant=null;
 function buildMarket(){
   marketDecor=[];
@@ -5260,7 +5277,7 @@ function renderMarket(){
 }
 
 /* ============ TEKRARLANAN HAYIR — NPC'ler (Faz 4): aynî sadaka ============ */
-const FOOD=['hurma','dut','ekmek','sut','yumurta','corek','pekmez','balik','izgara'];   // yiyecek kategorisi (muhtaçlara verilebilir)
+const FOOD=['hurma','dut','ekmek','sut','yumurta','corek','pekmez','balik','izgara','ayran','peynir','tereyagi'];   // yiyecek kategorisi (muhtaçlara verilebilir)
 function foodCount(){ return FOOD.reduce((s,k)=>s+(S.inv[k]||0),0); }
 function takeFood(n){ let need=n; for(const k of FOOD){ while(need>0 && (S.inv[k]||0)>0){ S.inv[k]--; if(S.inv[k]<=0) delete S.inv[k]; need--; } } return n-need; }
 const NPC_DEFS=[
@@ -6217,7 +6234,7 @@ function renderInv(){
   } else { w.innerHTML='<div class="invempty">'+(tU('iv_empty')||'Henüz bir şey toplamadın. Adalardaki ağaçlardan/hayvanlardan topla 🌴🐑')+'</div>'; }
   // --- üretim ATÖLYE adasına taşındı (değirmen/tandır/tezgâh) ---
   { const d=document.createElement('div'); d.style.cssText='margin:4px 2px 8px;padding:8px 11px;background:#0000000f;border-radius:11px;font:700 12px system-ui;line-height:1.5';
-    d.innerHTML=emo('🔨')+' <b>'+(tU('iv_prod_head')||'Üretim: Atölye adasında')+'</b><br><span style="opacity:.82">'+emo(tU('iv_prod_body')||'Hurma Bahçesi\'nin güneyindeki köprüden Atölye\'ye geç: 🌾 değirmen (un), 🍞 tandır (ekmek), 🧶 tezgâh (seccade).')+'</span>';
+    d.innerHTML=emo('🔨')+' <b>'+(tU('iv_prod_head')||'Üretim: Atölye adasında')+'</b><br><span style="opacity:.82">'+emo(tU('iv_prod_body')||'Hurma Bahçesi\'nin güneyindeki köprüden Atölye\'ye geç: 🌾 değirmen (un), 🍞 tandır (ekmek), 🧶 tezgâh (seccade), 🫙 kazan (pekmez), 🧈 yayık (tereyağı·peynir).')+'</span>';
     w.appendChild(d); }
   // --- zekât ver (nisaba ulaşan mallar) — çocuk mükellef değil ---
   const zk=zekatMukellef()?Object.keys(ZEKAT).filter(k=>(S.inv[k]||0)>=ZEKAT[k].nisab):[];
@@ -6512,11 +6529,25 @@ function buildCauldron(g){   // kazan: taş ocak + ateş + kara kazan + koyu pek
   const lad=stAdd(new THREE.CylinderGeometry(0.03,0.03,0.7,8), wood, 0.3,0.95,0.15, g); lad.rotation.z=0.5;   // kepçe sapı
   stAdd(new THREE.SphereGeometry(0.1,10,8,0,Math.PI*2,0,Math.PI*0.6), pot, 0.52,0.72,0.26, g);                // kepçe kâsesi
 }
+function buildChurn(g){   // yayık: sehpa + ahşap yayık fıçısı + çemberler + tokmak/piston + süt kovası + peynir kalıbı
+  const wood=stMat(0x8a5a2a,0.9), wood2=stMat(0x6d4520,0.9), hoop=stMat(0x6b6f74,0.6), milk=stMat(0xf3efe4,0.35);
+  for(const a of [0,2.094,4.189]) stAdd(new THREE.BoxGeometry(0.09,0.42,0.09), wood2, Math.cos(a)*0.26,0.21,Math.sin(a)*0.26, g);   // üç ayaklı sehpa
+  stAdd(new THREE.CylinderGeometry(0.33,0.29,0.76,16), wood, 0,0.8,0, g);                                    // yayık fıçısı
+  for(const y of [0.55,1.05]) stAdd(new THREE.TorusGeometry(0.325,0.03,7,18), hoop, 0,y,0, g).rotation.x=Math.PI/2;   // demir çemberler
+  stAdd(new THREE.CylinderGeometry(0.34,0.34,0.05,16), wood2, 0,1.2,0, g);                                   // kapak
+  stAdd(new THREE.CylinderGeometry(0.035,0.035,0.8,8), wood2, 0,1.58,0, g);                                  // tokmak sapı
+  stAdd(new THREE.BoxGeometry(0.3,0.06,0.07), wood, 0,1.96,0, g);                                            // tokmak tutamağı
+  stAdd(new THREE.CylinderGeometry(0.17,0.15,0.24,14), hoop, 0.62,0.12,0.3, g);                              // süt kovası
+  stAdd(new THREE.CylinderGeometry(0.145,0.145,0.03,14), milk, 0.62,0.25,0.3, g);                            // kovadaki süt yüzeyi
+  stAdd(new THREE.BoxGeometry(0.34,0.06,0.34), wood2, -0.6,0.05,0.28, g);                                    // peynir tahtası
+  stAdd(new THREE.CylinderGeometry(0.15,0.15,0.16,14), milk, -0.6,0.16,0.28, g);                             // süzülen peynir kalıbı
+}
 const ATOLYE_STATIONS=[
   {key:'mill', tpl:'mill', build:buildMill, pos:[13.4,-13.6], ry:0.35,  nm:'Değirmen', ic:'🌾', craft:'un',      sBtn:'🌾 Buğday öğüt',  sTitle:'Değirmen — buğday öğüt (un yap)'},
   {key:'oven', tpl:'oven', build:buildOven, pos:[16.6,-15.7], ry:0.0,   nm:'Tandır',   ic:'🍞', craft:'ekmek',   sBtn:'🍞 Ekmek pişir', sTitle:'Tandır — ekmek pişir'},
   {key:'loom', tpl:'loom', build:buildLoom, pos:[19.6,-13.6], ry:-0.35, nm:'Tezgâh',   ic:'🧶', craft:'seccade', sBtn:'🧶 Yünü işle',   sTitle:'Tezgâh — yünü işle (seccade · çanta)'},
   {key:'cauldron', tpl:'cauldron', build:buildCauldron, pos:[19.6,-15.9], ry:-0.6, nm:'Kazan', ic:'🫙', craft:'pekmez', sBtn:'🫙 Pekmez kaynat', sTitle:'Kazan — dut+bal → pekmez'},
+  {key:'churn', tpl:'churn', build:buildChurn, pos:[16.6,-13.4], ry:0.18, nm:'Yayık', ic:'🧈', craft:'sut', sBtn:'🧈 Sütü işle', sTitle:'Yayık — süt → tereyağı·ayran·peynir'},
 ];
 function buildAtolye(){
   const isl=WORLD.islands.find(i=>i.id==='atolye'); if(!isl) return;
@@ -6555,6 +6586,9 @@ function doStation(rec){
   } else if(rec.craft==='pekmez'){
     const dut=S.inv.dut||0, bal=S.inv.bal||0, pek=S.inv.pekmez||0;
     openDialog({ic:'🫙',title:'Kazan', start:'s0', steps:{ s0:{who:'Pekmez kaynat', txt:'Dut ve balı kazanda ağır ateşte kaynat, koyu pekmez yap; kışa azık, muhtaca kuvvet.\n\n<b>'+PEKMEZ_DUT+' dut + '+PEKMEZ_BAL+' bal → '+PEKMEZ_YIELD+' pekmez</b>\n\nElinde: '+dut+' dut · '+bal+' bal · '+pek+' pekmez.', ref:'<b>Âyet:</b> «Yiyin, için; fakat israf etmeyin.» (A\'râf 7/31)', opts:[ {l:'🫙 Pekmez kaynat', act:()=>craftPekmez()}, {l:'Kapat'} ]} }});
+  } else if(rec.craft==='sut'){
+    const sut=S.inv.sut||0, ay=S.inv.ayran||0, ty=S.inv.tereyagi||0, pn=S.inv.peynir||0;
+    openDialog({ic:'🧈',title:'Yayık', start:'s0', steps:{ s0:{who:'Sütü işle', txt:'Sağdığın sütü öylece bırakma: yayıkta çalkala, yağı ayrılsın — geriye ayran kalır. Ya da mayalayıp peynir yap; bozulmadan durur, muhtaca azık olur.\n\n<b>'+YAYIK_SUT+' süt → '+YAYIK_YAG+' tereyağı + '+YAYIK_AYRAN+' ayran</b>\n<b>'+PEYNIR_SUT+' süt → '+PEYNIR_YIELD+' peynir</b>\n\nElinde: '+sut+' süt · '+ay+' ayran · '+ty+' tereyağı · '+pn+' peynir.', ref:'<b>Âyet:</b> «Şüphesiz hayvanlarda da sizin için bir ibret vardır… size, içenlerin boğazından kolayca geçen hâlis bir süt içiriyoruz.» (Nahl 16/66)', opts:[ {l:'🧈 Yayığı çalkala (tereyağı + ayran)', act:()=>craftYayik()}, {l:'🧀 Sütü mayala (peynir)', act:()=>craftPeynir()}, {l:'Kapat'} ]} }});
   }
 }
 
@@ -8181,7 +8215,7 @@ document.getElementById('hayirClose').onclick=closeHayir;
 const TUT_STEPS=[
   {ic:'🕹️',t:'Hareket',b:'Alt-soldaki yuvarlağı sürükle ya da <b>WASD</b> ile Medine\'de gez. Bir şeyin yanına gidince <b>sağ-alttaki buton</b> onunla etkileşir.'},
   {ic:'🌴',t:'Çalış (kesb-i helâl)',b:'Ağaçtan <b>meyve topla</b>, hayvandan <b>süt/yün al</b>, kuyudan <b>su çek</b>, tarladan <b>buğday biç</b>, gölette <b>balık tut</b>. Boş olanın üstünde <b>bekleme süresi</b> görünür.'},
-  {ic:'🔨',t:'Üret',b:'Hurma Bahçesi\'nin güneyindeki <b>Atölye</b> adasında değirmen·tandır·tezgâh·kazan ile un·ekmek·çörek·seccade·çanta·pekmez yap.'},
+  {ic:'🔨',t:'Üret',b:'Hurma Bahçesi\'nin güneyindeki <b>Atölye</b> adasında değirmen·tandır·tezgâh·kazan·yayık ile un·ekmek·çörek·seccade·çanta·pekmez·peynir·tereyağı yap.'},
   {ic:'🛒',t:'Pazar',b:'Topladığın/ürettiğin malları <b>Medine Pazarı</b>\'nda (Şehir adası) <b>dirheme</b> sat.'},
   {ic:'🤲',t:'Hayır & Sadaka',b:'Muhtaçlara (yetim·komşu·yolcu·dilenci) <b>yiyecek ver</b>; dirhemini <b>🤲 Hayır</b> ile sadakaya dönüştür → <b>nûr</b> kazan.'},
   {ic:'🕌',t:'İbadet',b:'Vakti gelince <b>🧎 namazını kıl</b>. Cuma günü <b>Mescid</b>\'e git, cemaatle kıl. <b>5 vakti üst üste</b> camide cemaatle kılınca <b>imam sana vazife açar</b> (barıştır·hükmet·emanet).'},
@@ -8190,7 +8224,7 @@ const TUT_STEPS=[
 const TUT_EN=[
   {ic:'🕹️',t:'Move',b:'Drag the circle at the bottom-left or use <b>WASD</b> to roam Medina. Step next to something and the <b>button at the bottom-right</b> interacts with it.'},
   {ic:'🌴',t:'Work (honest earning)',b:'<b>Pick fruit</b> from trees, take <b>milk/wool</b> from animals, <b>draw water</b> from the well, <b>reap wheat</b>, <b>catch fish</b> at the pond. A <b>cooldown</b> shows over an emptied one.'},
-  {ic:'🔨',t:'Craft',b:'On the <b>Workshop</b> isle south of the Date Grove, use the mill·oven·loom·cauldron to make flour·bread·buns·prayer rug·satchel·molasses.'},
+  {ic:'🔨',t:'Craft',b:'On the <b>Workshop</b> isle south of the Date Grove, use the mill·oven·loom·cauldron·churn to make flour·bread·buns·prayer rug·satchel·molasses·cheese·butter.'},
   {ic:'🛒',t:'Market',b:'Sell what you gather or craft at the <b>Medina Market</b> (City isle) for <b>dirhams</b>.'},
   {ic:'🤲',t:'Good & Charity',b:'<b>Give food</b> to those in need (orphan·neighbor·traveler·beggar); turn dirhams into charity via <b>🤲 Good</b> → earn <b>nûr</b>.'},
   {ic:'🕌',t:'Worship',b:'When the time comes, <b>🧎 pray</b>. On <b>Friday</b> go to the <b>Mosque</b> and pray in congregation. Pray <b>five prayers in a row</b> in congregation and <b>the imam opens duties</b> for you (reconcile·judge·trust).'},
@@ -8200,7 +8234,7 @@ const TUT_EN=[
 const TUT_AR=[
   {ic:'🕹️',t:'التحرّك',b:'اسحب الدائرة أسفل اليسار أو استخدم <b>WASD</b> للتجوّل في المدينة. اقترِب من شيءٍ فيتفاعل معه <b>الزرُّ أسفل اليمين</b>.'},
   {ic:'🌴',t:'اعمل (الكسب الحلال)',b:'<b>اقطِف الثمر</b> من الأشجار، وخُذ <b>الحليب/الصوف</b> من الحيوانات، و<b>اسحب الماء</b> من البئر، و<b>احصُد القمح</b>، و<b>اصطَد السمك</b> في البركة. يظهر <b>وقتُ الانتظار</b> فوق ما فرغ.'},
-  {ic:'🔨',t:'اصنع',b:'في جزيرة <b>الورشة</b> جنوبَ بستان التمر، استخدم الرحى·التنّور·النَّول·القِدر لصنع الدقيق·الخبز·الأقراص·السجّادة·الجَعبة·الدِّبس.'},
+  {ic:'🔨',t:'اصنع',b:'في جزيرة <b>الورشة</b> جنوبَ بستان التمر، استخدم الرحى·التنّور·النَّول·القِدر·المِمخضة لصنع الدقيق·الخبز·الأقراص·السجّادة·الجَعبة·الدِّبس·الجبن·الزبدة.'},
   {ic:'🛒',t:'السوق',b:'بِع ما جمعتَه أو صنعتَه في <b>سوق المدينة</b> (جزيرة المدينة) مقابل <b>الدراهم</b>.'},
   {ic:'🤲',t:'الخير والصدقة',b:'<b>أطعِم المحتاجين</b> (يتيم·جار·مسافر·سائل)؛ وحوّل دراهمك إلى صدقة عبر <b>🤲 الخير</b> → تكسب <b>النور</b>.'},
   {ic:'🕌',t:'العبادة',b:'إذا دخل الوقت <b>🧎 صلِّ</b>. ويوم <b>الجمعة</b> اذهب إلى <b>المسجد</b> وصلِّ جماعةً. وإذا صلّيتَ <b>خمسةَ أوقاتٍ متتاليةً</b> جماعةً <b>فتح لك الإمامُ وظائف</b> (إصلاح·قضاء·أمانة).'},
