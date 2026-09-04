@@ -157,6 +157,9 @@
   #vazife.hudmin.pend::after{content:'';position:absolute;top:2px;right:2px;width:7px;height:7px;border-radius:50%;background:#f0a63e;box-shadow:0 0 0 2px var(--panel);animation:fastpulse 1.6s ease-in-out infinite}
   /* Senaryo Defteri ilerleme çubuğu */
   .pbar{height:6px;background:#0000001f;border-radius:4px;margin-top:6px;overflow:hidden}
+  .wkbars{display:flex;align-items:flex-end;gap:3px;height:28px;margin:7px 0 5px}
+  .wkbars i{flex:1;min-height:3px;border-radius:2px 2px 0 0;background:linear-gradient(180deg,#8fce58,#4f8f36);opacity:.55}
+  .wkbars i.today{opacity:1;background:linear-gradient(180deg,#b6e77c,#5aa63a)}
   .pfill{height:100%;background:linear-gradient(90deg,#8fce58,#5aa63a);border-radius:4px;transition:width .4s}
   .ezsec{font-weight:800;font-size:13px;color:var(--muted);margin:10px 2px 6px}
   .ezgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -1499,6 +1502,8 @@ const UI_STR={ en:{
   sm_adalet:'Justice — Judge', sm_baris:'Peace — Reconcile', sm_emanet:'Trust — Deliver',
   sl_baris:'Peace', sl_adalet:'Justice', sl_emanet:'Trust',
   sc_notitle:'No title yet', sc_next:' · next: ', sc_top:' · <b>highest title!</b>',
+  wk_title:'This Week', wk_pray:'prayers', wk_hayir:'charity', wk_ikram:'kindnesses', wk_case:'duties',
+  wk_empty:'Nothing recorded this week yet — begin today with one small good deed.',
   sc_cases:' cases', sc_case1:' case',
   sc_ledger:'Case Ledger', sc_open:'open ▸', sc_total:' — total ', sc_totcases:' cases',
   // --- Faz 2b: statik panel kabuğu (data-i18n) ---
@@ -1666,6 +1671,7 @@ const UI_STR={ en:{
 },
 // ===== AR — Arapça (Faz 1: kabuk + dünya-içi etkileşim). Dinî içerik (QUEST/QBANK/diyalog) sonraki AR fazlarında; şimdilik TR'ye düşer. =====
 ar:{
+  nur_suffix:' نور',   // AR'da eksikti: gunun hedefi/hirsiz/hafta metinleri Latin 'nur' yaziyordu
   rank_0:'النِّيّة', rank_1:'طالِب', rank_2:'أهل الاجتهاد', rank_3:'سالِك الإحياء', rank_4:'جُنديّ الإحياء', rank_5:'أستاذ الإحياء',
   rank_6:'مُرشِد الإحياء', rank_7:'مُعلِّم الإحياء', rank_8:'أهل النور', rank_9:'شيخ الإحياء',
   dg_head:'هدف اليوم', dg_done:'🎯 تمّ هدف اليوم', dg_pray:'صلوات جماعة', dg_zikir:'أذكار', dg_hayir:'صدقة جارية', dg_sell:'كسب في السوق (درهم)', dg_case:'احلُل قضيّة', dg_ikram:'أطعِم محتاجًا', dg_exam:'اجتَز امتحانًا',
@@ -1773,6 +1779,8 @@ ar:{
   mk_seccade:'سجّادة الصلاة', mk_seccade_ref:'بِع سجّادتك التي بيدك', mk_sell:'بِع ', mk_unit:'سعر الوحدة: ',
   mk_sell1:'بِع 1', mk_all:'الكل (', mk_lock:'🔒 المدينة لم تُفتَح بعد', mk_earn_a:'💰 +', mk_earn_b:' درهم (',
   sc_notitle:'لا لقب بعد', sc_next:' · التالي: ', sc_top:' · <b>أعلى لقب!</b>', sc_cases:' قضية',
+  wk_title:'هذا الأسبوع', wk_pray:'صلوات', wk_hayir:'صدقات', wk_ikram:'إكرام', wk_case:'مهمّات',
+  wk_empty:'لا شيء مسجّل هذا الأسبوع — ابدأ اليوم بمعروفٍ صغير.',
   sc_ledger:'دفتر القضايا', sc_open:'افتح ▸', sc_total:' — المجموع ', sc_totcases:' قضية',
   sm_adalet:'عَدل — القاضي', sm_baris:'صُلح — أصلِح', sm_emanet:'أمانة — أدِّ',
   sl_baris:'صُلح', sl_adalet:'عَدل', sl_emanet:'أمانة',
@@ -1889,7 +1897,57 @@ const RANKS=[[0,'Niyet'],[60,'Tâlib'],[180,'Gayret Ehli'],[360,'İhyâ Yolcusu'
 function rankIndex(n){ let i=0; for(let k=0;k<RANKS.length;k++){ if(n>=RANKS[k][0]) i=k; } return i; }
 function rankName(n){ const i=rankIndex(n); return tU('rank_'+i)||RANKS[i][1]; }
 function addNur(n){ const b=rankIndex(S.nur); S.nur+=n; const a=rankIndex(S.nur);
+  try{ weekBump('nur', n); }catch(e){}   // 📊 Bu Hafta: nûr günlüğe yazılır (tek merkez)
   if(a>b) setTimeout(()=>{ banner((tU('rank_up')||'🌟 Yeni rütbe: ')+rankName(S.nur)); sndFanfare(); }, 550); }
+/* ---- 📈 ÖLÇÜM (Faz 7.12) — GA4 zaten kuruluydu ama HİÇ özel olay göndermiyordu.
+   Rapordaki dört soruyu cevaplayan asgari küme. Kişisel veri YOK, yalnız sayaç:
+     ihya_first_frame  → açılış kaç ms sürdü (90 saniye kuralı ölçülebilsin)
+     ihya_first_action → oyuncu ilk anlamlı etkileşimi kaç ms'de yaptı
+     ihya_day_return   → kaçıncı oyun günü + kurulumdan bu yana kaç gün (D1/D7/D30)
+     ihya_week_active  → son 7 günün kaçında oynanmış (haftalık aktif gün)
+   gtag yoksa/engelliyse sessizce hiçbir şey yapmaz. */
+function track(name, params){ try{ if(typeof gtag==='function') gtag('event', name, params||{}); }catch(e){} }
+let _firstActionSent=false;
+function trackFirstAction(){ if(_firstActionSent) return; _firstActionSent=true;
+  try{ track('ihya_first_action', {ms: Math.round(performance.now())}); }catch(e){} }
+function trackBoot(){
+  try{
+    track('ihya_first_frame', {ms: Math.round(performance.now())});
+    if(!S.installAt){ S.installAt=Date.now(); save(); }
+    const gunler=Math.floor((Date.now()-S.installAt)/86400000);
+    track('ihya_day_return', {day: S.dayNum||0, days_since_install: gunler});
+    const aktif=S.week?Object.keys(S.week).length:0;
+    track('ihya_week_active', {days: aktif});
+  }catch(e){}
+}
+/* ---- 📊 BU HAFTA (Faz 7.12) — "bu hafta ne yaptım" özeti [[vision-ihya-2026]] ----
+   Araştırma bulgusu: oyunda ilerleme VAR (zincirler, unvanlar, imtihanlar) ama emeğin
+   görünür bir özeti yoktu — öz-belirlenim kuramındaki YETERLİK ihtiyacı boşta kalıyordu.
+   Veri zaten akıyor: her dgBump olayı (namaz/hayır/ikram/vazife…) ve her addNur. Tek
+   yaptığımız güne yazıp SON 7 GÜNÜ saklamak. Kayıt küçük kalır (7 satır), buluta da gider. */
+const WEEK_KEYS=[{k:'pray',ic:'🕌',nm:'namaz'},{k:'hayir',ic:'🤲',nm:'hayır'},{k:'ikram',ic:'🤝',nm:'ikram'},{k:'case',ic:'⚖️',nm:'vazife'}];
+function weekBump(k,amount){ if(!k) return; const n=+amount||0; if(n<=0) return;
+  const d=S.dayNum||0; S.week=S.week||{};
+  const row=(S.week[d]=S.week[d]||{}); row[k]=(row[k]||0)+n;
+  const days=Object.keys(S.week).map(Number).sort((a,b)=>a-b);
+  while(days.length>7) delete S.week[days.shift()];   // yalnız son 7 gün dursun
+}
+function weekStats(){ const d=S.dayNum||0, out={days:[], tot:{}};
+  for(let i=6;i>=0;i--){ const dd=d-i, row=(S.week&&S.week[dd])||{};
+    out.days.push({d:dd, row, today:dd===d});
+    for(const k in row) out.tot[k]=(out.tot[k]||0)+row[k]; }
+  return out; }
+function weekCard(){
+  const st=weekStats(); let max=1; st.days.forEach(x=>{ if((x.row.nur||0)>max) max=x.row.nur; });
+  const bars=st.days.map(x=>'<i class="'+(x.today?'today':'')+'" style="height:'+Math.max(4,Math.round((x.row.nur||0)/max*100))+'%"></i>').join('');
+  const chips=WEEK_KEYS.filter(w=>st.tot[w.k]).map(w=>emo(w.ic)+' <b>'+st.tot[w.k]+'</b> '+(tU('wk_'+w.k)||w.nm)).join('  ·  ');
+  const card=document.createElement('div'); card.className='hcard';
+  card.innerHTML='<div class="hic">'+emo('📊')+'</div>'+
+    '<div class="hbody"><div class="hnm">'+(tU('wk_title')||'Bu Hafta')+' <span class="hcnt">✦ '+(st.tot.nur||0)+(tU('nur_suffix')||' nûr')+'</span></div>'+
+    '<div class="wkbars">'+bars+'</div>'+
+    '<div class="href">'+(chips||(tU('wk_empty')||'Bu hafta henüz kayıt yok — bugün küçük bir iyilikle başla.'))+'</div></div>';
+  return card;
+}
 /* ---- GÜNÜN HEDEFİ (Faz 6.17): her gün rotasyonlu tek hedef → tamamlanınca bonus nûr (günlük "arzu" katmanı) ---- */
 const DAILY_GOALS=[
   {id:'pray',  ic:'🕌', n:3,  evt:'pray',  bonus:25},   // cemaatle 3 farz namaz
@@ -1915,6 +1973,7 @@ function dgToday(){ const P=isLevel2()?MODERN_GOALS:DAILY_GOALS; return P[(S.day
 function dgLabel(g){ return tU('dg_'+g.id) || ({pray:'Cemaatle namaz',zikir:'Zikir çek',hayir:'Sadaka-i câriye',sell:'Pazarda kazanç (dirhem)',case:'Bir mesele çöz',ikram:'Muhtaca ikram et',exam:'İmtihanı geç',m_pray:'Vaktinde namaz kıl',m_market:'Markette helâl alışveriş',m_work:'İşinde/okulunda dürüst ol',m_emanet:'Emaneti sahibine ver',m_greet:'Komşuna selâm ver',m_sadaka:'Muhtaca gizli sadaka ver',m_komsu:'Komşu hakkını gözet'}[g.id]); }
 function dgBump(evt, amount){
   if(typeof onboardHit==='function') onboardHit(evt);   // 🗺️ İlk Hafta: eşleşen onboarding adımını işaretle (selâm/namaz/sadaka)
+  try{ weekBump(evt, amount||1); }catch(e){}   // 📊 Bu Hafta: günün hedefi tamamlansa da saymaya devam et
   if(!S.dg) S.dg={prog:0,done:false};
   const g=dgToday(); if(g.evt!==evt || S.dg.done) return;
   S.dg.prog=(S.dg.prog||0)+(amount||1);
@@ -6227,6 +6286,7 @@ function renderMap(){
 function renderScen(){
   document.getElementById('scenXP').textContent=scenXP();
   const w=document.getElementById('scenList'); w.innerHTML='';
+  w.appendChild(weekCard());   // 📊 önce "Bu Hafta" özeti, sonra unvan kartları
   for(const k of ['adalet','baris','emanet']){
     const st=scenOf(k), n=st.n, cur=scenTitle(k), nx=scenNext(k), m=SCEN_META[k];
     const prev=cur?cur.n:0, pct=nx?Math.max(4,Math.round((n-prev)/(nx.n-prev)*100)):100;
@@ -7950,12 +8010,17 @@ const sndBuf={}; let sndReady=false, sndLoading=false, sndCount=0;
 // yerleştikten sonra BOŞTA (idle) çekilir. Erken çağrılırsa ensureSnd anında indirir; hiç
 // inemezse sndEzan eski TTS/ton yoluna düşer (regresyon yok).
 const SND_LAZY={ezan:1};
+// SES SURUMU (cache-bust): dosya adlari ayni kaldigi icin SW/tarayici ONBELLEGI eski BUYUK
+// mp3'leri inatla servis ediyordu (projenin bilinen dersi: MODELV ?v deseni). s1 = Faz 7.10
+// mono/kisaltilmis surumler → donen kullanici da kucuk dosyalari ALIR.
+const SNDV='s1';
+function sndUrl(k){ return SND_URL[k]+'?v='+SNDV; }
 const sndPend={};   // key → Promise: aynı dosya iki kez indirilmesin
 function decodeSnd(k){ if(sndBuf[k]) return Promise.resolve(true);
   if(sndPend[k]) return sndPend[k];
   if(!audio()) return Promise.resolve(false);
   const ac=AC;
-  return sndPend[k]=fetch(SND_URL[k]).then(r=>r.ok?r.arrayBuffer():Promise.reject())
+  return sndPend[k]=fetch(sndUrl(k)).then(r=>r.ok?r.arrayBuffer():Promise.reject())
     .then(b=>new Promise((res,rej)=>ac.decodeAudioData(b,res,rej)))
     .then(buf=>{ sndBuf[k]=buf; return true; }).catch(()=>false);
 }
@@ -8368,6 +8433,7 @@ document.getElementById('woolHint').onclick=()=>{ if((S.inv.yun||0)>=SECCADE_YUN
 document.getElementById('mktClose').onclick=closeMarket;
 document.getElementById('market').addEventListener('click',e=>{ if(e.target.id==='market') closeMarket(); });
 function doAct(){ if(!near) return;
+  trackFirstAction();   // 📈 ilk etkileşime kadar geçen süre (yalnız bir kez)
   if(near.thief){ strikeThief(); return; }   // ⚔️ hırsıza vur (her Space/dokunuş = bir vuruş)
   if(near.seccadePickup){ pickupSeccade(); return; }
   if(near.mosque){ enterMosque(); return; }
@@ -9065,6 +9131,7 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
   try{ fbBootSync(); }catch(e){}   // 🔥 Firebase: e-posta-bağlantısı dönüşü + eski kayıtlıları bir kez senkron/e-posta (config boşsa no-op; boot'u ASLA bloklamaz)
   if(!S.introDone){ startIntro(); }   // ilk açılış: dil seçimi + sinematik uyanış (HUD gizli)
   else if(S.startInModern && S.modernUnlocked){ setTimeout(()=>{ if(!inModern && typeof enterModern==='function') enterModern(); }, 500); }   // SEVİYE 2: Hac sonrası oyun modern şehirde başlar (🕌 ile Medine'ye dönülebilir)
+  trackBoot();   // 📈 açılış süresi + dönüş günü + haftalık aktif gün
   { const _ld=document.getElementById('load');   // yükleme ekranı ARTIK dil-seçme/oyun üstüne YUMUŞAKÇA söner (ani kesme yok)
     if(_ld){ if(loadBar) loadBar.style.width='100%'; requestAnimationFrame(()=>_ld.classList.add('fade')); setTimeout(()=>{ _ld.style.display='none'; }, 900); } }
   // yeni gün artık gün/gece döngüsü tamamlanınca (updateDayNight → onNewDay) olur
