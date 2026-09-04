@@ -547,7 +547,7 @@
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.07</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.15</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -9200,7 +9200,10 @@ function tick(){
   }
   // sıradaki yapılabilir görev parıldasın (yol gösterir)
   const glow=0.28+0.22*Math.sin(clock.elapsedTime*3);
-  for(const r of interactables){ if(r.gather||r.animal||r.market||r.npc||r.muahat||r.scenario||r.mosque||r.seccadePickup||r.station||r.modern||r.home) continue; const on=!r.done && questAvailable(r.q);
+  // NOT (Faz 7.15): r.thief MUTLAKA atlanmali — hirsiz bu listeye girince kara pelerinine
+  // altin sarisi emissive basiliyor, simsiyah silueti parlayan soluk bir kutleye donusuyor ve
+  // zeminde GORUNMEZ hale geliyordu (kullanici: 'hirsiz bana saldiriyor ama onu goremiyorum').
+  for(const r of interactables){ if(r.gather||r.animal||r.market||r.npc||r.muahat||r.scenario||r.mosque||r.seccadePickup||r.station||r.modern||r.home||r.thief) continue; const on=!r.done && questAvailable(r.q);
     for(const x of r.meshes){ if(x.m.material.emissive){ x.m.material.emissive.setHex(on?0xffcf55:0x000000); x.m.material.emissiveIntensity=on?glow:0; } } }
   if(particles.length) updateParticles(dt);
   if(examNodes.length) animateExamNodes(dt, clock.elapsedTime);
