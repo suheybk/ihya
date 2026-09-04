@@ -1504,6 +1504,36 @@ const UI_STR={ en:{
   sc_notitle:'No title yet', sc_next:' · next: ', sc_top:' · <b>highest title!</b>',
   wk_title:'This Week', wk_pray:'prayers', wk_hayir:'charity', wk_ikram:'kindnesses', wk_case:'duties',
   wk_empty:'Nothing recorded this week yet — begin today with one small good deed.',
+  // --- Faz 7.13: Atölye / üretim sahnesi ---
+  cw_locked:'🔒 The Workshop is not open yet', cw_close:'Close',
+  cw_need:'🌾 {n} {item} needed (you have {have})',
+  cw_mill_t:'Mill', cw_mill_who:'Grind wheat', cw_mill_do:'🌾 Grind wheat (make flour)',
+  cw_mill_txt:'Turn the millstone and grind the wheat into flour.\n\n<b>{n} wheat → 1 flour</b>\nYou have: {bug} wheat · {un} flour.',
+  cw_mill_ref:'<b>Hadith:</b> «No one eats anything better than what he earns with his own hand.» (Bukhari)',
+  cw_un_done:'🥣 The millstone turned — you made flour from wheat (+1 flour)',
+  cw_oven_t:'Oven', cw_oven_who:'Bakehouse', cw_oven_bread:'🍞 Bake bread', cw_oven_bun:'🥯 Bake buns (with egg)', cw_oven_fish:'🍢 Grill fish',
+  cw_oven_txt:'Bake in the oven; give the warm bread, bun or fish to someone hungry.\n<b>{u} flour → {e} bread</b>\n<b>{cu} flour + {cy} eggs → {c} buns</b> (with egg, nourishing)\n<b>{fb} fish → {f} grilled fish</b>\n\nYou have: {un} flour · {yum} eggs · {blk} fish · {ek} bread.',
+  cw_oven_ref:'<b>Hadith:</b> «The best of people are those most beneficial to people.» (Bayhaqi)',
+  cw_bread_b:'🍞 The bread is baked',
+  cw_bread_t:'Bread from the oven (+{n}). Give it to someone hungry or to an orphan — «the best of people are those most beneficial to people».',
+  cw_bun_need:'🥯 {a} {u} + {b} {y} needed', cw_bun_t:'Egg buns (+{n}) — nourishing. Feed someone hungry or sell them at the market.',
+  cw_fish_t:'Grilled fish from the oven (+{n}) — nourishing; offer it to someone hungry or sell it at the market.',
+  cw_loom_t:'Loom', cw_loom_who:'Loom', cw_loom_rug:'🧵 Weave a prayer rug', cw_loom_rug2:'🧵 Weave a new prayer rug',
+  cw_loom_silk:'🧵 Weave a silk prayer rug', cw_loom_bag:'🎒 Weave a satchel', cw_loom_bag2:'🎒 Weave a large satchel',
+  cw_loom_txt:'Work the wool at the loom:\n<b>{sy} wool → prayer rug</b> (pray anywhere)\n<b>{b1} wool → satchel</b> (carries 150) · <b>{b2} wool → large satchel</b> (carries 200)\n\nYou have: {yun} wool · Your satchel: {bag} ({cap} capacity)',
+  cw_loom_ref:'<b>Verse:</b> «Establish the prayer.» (al-Baqara 2/43)',
+  cw_cau_t:'Cauldron', cw_cau_who:'Boil molasses', cw_cau_do:'🫙 Boil molasses',
+  cw_cau_txt:'Simmer mulberries and honey in the cauldron into thick molasses; provision for winter, strength for the needy.\n\n<b>{d} mulberries + {b} honey → {y} molasses</b>\n\nYou have: {dut} mulberries · {bal} honey · {pek} molasses.',
+  cw_cau_ref:'<b>Verse:</b> «Eat and drink, but be not excessive.» (al-A\'raf 7/31)',
+  cw_mol_need:'🫙 {a} {d} + {b} {h} needed',
+  cw_mol_t:'You boiled mulberries and honey into molasses (+{n}) — provision for winter, strength for the needy, valuable at the market.',
+  cw_churn_t:'Churn', cw_churn_who:'Work the milk', cw_churn_do1:'🧈 Churn it (butter + buttermilk)', cw_churn_do2:'🧀 Curdle the milk (cheese)',
+  cw_churn_txt:'Do not let the milk you drew go to waste: churn it until the butter separates — what remains is buttermilk. Or curdle it into cheese; it keeps, and feeds the needy.\n\n<b>{ys} milk → {yy} butter + {ya} buttermilk</b>\n<b>{ps} milk → {py} cheese</b>\n\nYou have: {sut} milk · {ay} buttermilk · {ty} butter · {pn} cheese.',
+  cw_churn_ref:'<b>Verse:</b> «And indeed, for you in grazing livestock is a lesson… We give you pure milk, pleasant to those who drink.» (an-Nahl 16/66)',
+  cw_churn_b:'🧈 The churn has turned',
+  cw_churn_done:'The milk separated in the churn (+{y} {yn}, +{a} {an}) — the milk you draw no longer goes to waste.',
+  cw_cheese_b:'🧀 The cheese has set',
+  cw_cheese_done:'You curdled the milk into cheese (+{n}) — provision that keeps, strength for the needy, valuable at the market.',
   sc_cases:' cases', sc_case1:' case',
   sc_ledger:'Case Ledger', sc_open:'open ▸', sc_total:' — total ', sc_totcases:' cases',
   // --- Faz 2b: statik panel kabuğu (data-i18n) ---
@@ -1781,6 +1811,36 @@ ar:{
   sc_notitle:'لا لقب بعد', sc_next:' · التالي: ', sc_top:' · <b>أعلى لقب!</b>', sc_cases:' قضية',
   wk_title:'هذا الأسبوع', wk_pray:'صلوات', wk_hayir:'صدقات', wk_ikram:'إكرام', wk_case:'مهمّات',
   wk_empty:'لا شيء مسجّل هذا الأسبوع — ابدأ اليوم بمعروفٍ صغير.',
+  // --- Faz 7.13: الورشة / التصنيع ---
+  cw_locked:'🔒 لم تُفتَح الورشة بعد', cw_close:'إغلاق',
+  cw_need:'🌾 تحتاج {n} {item} (لديك {have})',
+  cw_mill_t:'الرحى', cw_mill_who:'اطحن القمح', cw_mill_do:'🌾 اطحن القمح (اصنع دقيقًا)',
+  cw_mill_txt:'أدِر حجر الرحى واطحن القمح دقيقًا.\n\n<b>{n} قمح → دقيقٌ واحد</b>\nلديك: {bug} قمح · {un} دقيق.',
+  cw_mill_ref:'<b>حديث:</b> «ما أكل أحدٌ طعامًا قطُّ خيرًا من أن يأكل من عمل يده.» (البخاري)',
+  cw_un_done:'🥣 دارت الرحى — صار القمحُ دقيقًا (+١ دقيق)',
+  cw_oven_t:'التنّور', cw_oven_who:'المخبز', cw_oven_bread:'🍞 اخبِز خبزًا', cw_oven_bun:'🥯 اخبِز أقراصًا (بالبيض)', cw_oven_fish:'🍢 اشوِ السمك',
+  cw_oven_txt:'اخبِز في التنّور؛ وأعطِ الخبزَ أو القرصَ أو السمكَ الساخن لجائع.\n<b>{u} دقيق → {e} خبز</b>\n<b>{cu} دقيق + {cy} بيض → {c} أقراص</b> (بالبيض، مغذّية)\n<b>{fb} سمك → {f} سمك مشوي</b>\n\nلديك: {un} دقيق · {yum} بيض · {blk} سمك · {ek} خبز.',
+  cw_oven_ref:'<b>حديث:</b> «خيرُ الناسِ أنفعُهم للناس.» (البيهقي)',
+  cw_bread_b:'🍞 نَضِجَ الخبز',
+  cw_bread_t:'خبزٌ من التنّور (+{n}). أعطِه جائعًا أو يتيمًا — «خيرُ الناسِ أنفعُهم للناس».',
+  cw_bun_need:'🥯 تحتاج {a} {u} + {b} {y}', cw_bun_t:'أقراصٌ بالبيض (+{n}) — مغذّية. أطعِم بها جائعًا أو بِعها في السوق.',
+  cw_fish_t:'سمكٌ مشويٌّ من التنّور (+{n}) — مغذٍّ؛ أكرِم به جائعًا أو بِعه في السوق.',
+  cw_loom_t:'النَّول', cw_loom_who:'النَّول', cw_loom_rug:'🧵 انسِج سجّادة', cw_loom_rug2:'🧵 انسِج سجّادةً جديدة',
+  cw_loom_silk:'🧵 انسِج سجّادةَ حرير', cw_loom_bag:'🎒 انسِج جَعبة', cw_loom_bag2:'🎒 انسِج جَعبةً كبيرة',
+  cw_loom_txt:'اشتغِل بالصوف على النَّول:\n<b>{sy} صوف → سجّادة</b> (صلِّ في أي مكان)\n<b>{b1} صوف → جَعبة</b> (تحمل ١٥٠) · <b>{b2} صوف → جَعبة كبيرة</b> (تحمل ٢٠٠)\n\nلديك: {yun} صوف · جَعبتك: {bag} (سعة {cap})',
+  cw_loom_ref:'<b>آية:</b> «وأقيموا الصلاة.» (البقرة ٢/٤٣)',
+  cw_cau_t:'القِدر', cw_cau_who:'اغلِ الدِّبس', cw_cau_do:'🫙 اغلِ الدِّبس',
+  cw_cau_txt:'اغلِ التوتَ والعسلَ في القِدر على نارٍ هادئة حتى يصيرَ دِبسًا ثخينًا؛ زادٌ للشتاء وقوةٌ للمحتاج.\n\n<b>{d} توت + {b} عسل → {y} دِبس</b>\n\nلديك: {dut} توت · {bal} عسل · {pek} دِبس.',
+  cw_cau_ref:'<b>آية:</b> «وكلوا واشربوا ولا تُسرِفوا.» (الأعراف ٧/٣١)',
+  cw_mol_need:'🫙 تحتاج {a} {d} + {b} {h}',
+  cw_mol_t:'أغليتَ التوتَ والعسلَ دِبسًا (+{n}) — زادٌ للشتاء، وقوةٌ للمحتاج، وثمينٌ في السوق.',
+  cw_churn_t:'المِمخضة', cw_churn_who:'اعمَل باللبن', cw_churn_do1:'🧈 امخَضها (زبدة + لبن مخيض)', cw_churn_do2:'🧀 أنضِج الحليب (جبن)',
+  cw_churn_txt:'لا تدَعِ الحليبَ الذي حلبتَه يضيع: امخَضه حتى تنفصلَ الزبدة — ويبقى اللبنُ المخيض. أو أنضِجه جُبنًا؛ يبقى ولا يفسد، ويكون زادًا للمحتاج.\n\n<b>{ys} حليب → {yy} زبدة + {ya} لبن مخيض</b>\n<b>{ps} حليب → {py} جبن</b>\n\nلديك: {sut} حليب · {ay} لبن مخيض · {ty} زبدة · {pn} جبن.',
+  cw_churn_ref:'<b>آية:</b> «وإنَّ لكم في الأنعام لَعِبرة… نُسقيكم مما في بطونه… لبنًا خالصًا سائغًا للشاربين.» (النحل ١٦/٦٦)',
+  cw_churn_b:'🧈 تمَّ المَخض',
+  cw_churn_done:'انفصل اللبنُ في المِمخضة (+{y} {yn}، +{a} {an}) — لم يعد الحليبُ الذي تحلبه يضيع.',
+  cw_cheese_b:'🧀 تخثَّر الجبن',
+  cw_cheese_done:'أنضجتَ الحليبَ جُبنًا (+{n}) — زادٌ يبقى، وقوةٌ للمحتاج، وثمينٌ في السوق.',
   sc_ledger:'دفتر القضايا', sc_open:'افتح ▸', sc_total:' — المجموع ', sc_totcases:' قضية',
   sm_adalet:'عَدل — القاضي', sm_baris:'صُلح — أصلِح', sm_emanet:'أمانة — أدِّ',
   sl_baris:'صُلح', sl_adalet:'عَدل', sl_emanet:'أمانة',
@@ -1886,6 +1946,9 @@ function scenTName(t){ if(!t) return t; if(S.lang==='en'&&SCEN_T_EN[t]) return S
 function scenMetaNm(k){ return tU('sm_'+k) || (typeof SCEN_META!=='undefined' && SCEN_META[k] && SCEN_META[k].nm) || k; }
 function scenLabelNm(k){ return tU('sl_'+k) || (typeof SCEN_LABEL!=='undefined' && SCEN_LABEL[k]) || k; }
 function tU(k){ const L=S.lang; return (L && L!=='tr' && UI_STR[L] && UI_STR[L][k]!=null) ? UI_STR[L][k] : null; }   // çok-dilli: en/ar/… → değer, tr → null (çağrı yerinde ||TR)
+// tF (Faz 7.13): yer-tutuculu çeviri. Türkçe metin YEDEK, {n}/{have} gibi alanlar sonradan
+// doldurulur → EN/AR'da kelime sırası serbest kalır (parça parça birleştirme sorunu biter).
+function tF(k, tr, v){ let out=tU(k)||tr; if(v) for(const p in v) out=out.split('{'+p+'}').join(v[p]); return out; }
 function vakitName(vn){ return tU('vk_'+vn) || vn; }   // vakit adı (dil)
 function goodName(item){ return tU('good_'+item) || (GOODS[item]&&GOODS[item].nm) || item; }   // item adı (dil)
 function namazLabel(vn){ return tU('nml_'+vn) || (typeof NAMAZ_LABEL!=='undefined' && NAMAZ_LABEL[vn]) || vn; }   // namaz adı (dil)
@@ -3052,51 +3115,51 @@ function craftBag(level){
 }
 // ÜRETİM ZİNCİRİ (Faz 3): buğday → un → ekmek. Ekmek FOOD → muhtaçları besler (kesb-i helâl + hayır).
 const UN_BUGDAY=3, EKMEK_UN=2, EKMEK_YIELD=2;   // 3 buğday→1 un; 2 un→2 ekmek
-function craftUn(){ if((S.inv.bugday||0)<UN_BUGDAY){ toast('🌾 '+UN_BUGDAY+' buğday gerek ('+(S.inv.bugday||0)+' var)'); return; }
+function craftUn(){ if((S.inv.bugday||0)<UN_BUGDAY){ toast(tF('cw_need','🌾 {n} {item} gerek ({have} var)',{n:UN_BUGDAY,item:goodName('bugday'),have:S.inv.bugday||0})); return; }
   playAction(1.7,'grind');   // değirmen taşını çevir
   S.inv.bugday-=UN_BUGDAY; if(S.inv.bugday<=0) delete S.inv.bugday; S.inv.un=(S.inv.un||0)+1;
-  save(); refreshHUD(); renderInv(); sndChime(); toast('🥣 Değirmen döndü — buğdayı un ettin (+1 un)'); }
+  save(); refreshHUD(); renderInv(); sndChime(); toast(tF('cw_un_done','🥣 Değirmen döndü — buğdayı un ettin (+1 un)')); }
 function craftEkmek(){ if((S.inv.un||0)<EKMEK_UN){ toast('🥣 '+EKMEK_UN+' un gerek ('+(S.inv.un||0)+' var)'); return; }
   playAction(1.8,'knead');   // hamuru yoğur / tandıra at
   S.inv.un-=EKMEK_UN; if(S.inv.un<=0) delete S.inv.un; S.inv.ekmek=(S.inv.ekmek||0)+EKMEK_YIELD;
-  save(); refreshHUD(); renderInv(); sndFanfare(); banner('🍞 Ekmek pişti');
-  setTimeout(()=>toast('Tandırda ekmek (+'+EKMEK_YIELD+'). Bir aç kalana / yetime ver — "İnsanların hayırlısı insanlara faydalı olandır."'),1300); }
+  save(); refreshHUD(); renderInv(); sndFanfare(); banner(tF('cw_bread_b','🍞 Ekmek pişti'));
+  setTimeout(()=>toast(tF('cw_bread_t','Tandırda ekmek (+{n}). Bir aç kalana / yetime ver — «İnsanların hayırlısı insanlara faydalı olandır.»',{n:EKMEK_YIELD})),1300); }
 // ÇÖREK — yumurtalı, katma değerli: 1 un + 2 yumurta → 2 çörek (FOOD; pazarda ekmekten değerli)
 const COREK_UN=1, COREK_YUMURTA=2, COREK_YIELD=2;
-function craftCorek(){ if((S.inv.un||0)<COREK_UN || (S.inv.yumurta||0)<COREK_YUMURTA){ toast('🥯 '+COREK_UN+' un + '+COREK_YUMURTA+' yumurta gerek'); return; }
+function craftCorek(){ if((S.inv.un||0)<COREK_UN || (S.inv.yumurta||0)<COREK_YUMURTA){ toast(tF('cw_bun_need','🥯 {a} {u} + {b} {y} gerek',{a:COREK_UN,u:goodName('un'),b:COREK_YUMURTA,y:goodName('yumurta')})); return; }
   playAction(1.8,'knead');   // hamuru yoğur / tandıra at
   S.inv.un-=COREK_UN; if(S.inv.un<=0) delete S.inv.un; S.inv.yumurta-=COREK_YUMURTA; if(S.inv.yumurta<=0) delete S.inv.yumurta;
   invAdd('corek', COREK_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🥯 Çörek pişti');
-  setTimeout(()=>toast('Yumurtalı çörek (+'+COREK_YIELD+') — besleyici. Aç kalana ver ya da pazarda sat.'),1300); }
+  setTimeout(()=>toast(tF('cw_bun_t','Yumurtalı çörek (+{n}) — besleyici. Aç kalana ver ya da pazarda sat.',{n:COREK_YIELD})),1300); }
 // PEKMEZ — dut + bal kazanda kaynatılır → koyu pekmez (FOOD; işlenmiş, pazarda en değerli). Atölye'de Kazan istasyonu.
 const PEKMEZ_DUT=3, PEKMEZ_BAL=1, PEKMEZ_YIELD=2;
-function craftPekmez(){ if((S.inv.dut||0)<PEKMEZ_DUT || (S.inv.bal||0)<PEKMEZ_BAL){ toast('🫙 '+PEKMEZ_DUT+' dut + '+PEKMEZ_BAL+' bal gerek'); return; }
+function craftPekmez(){ if((S.inv.dut||0)<PEKMEZ_DUT || (S.inv.bal||0)<PEKMEZ_BAL){ toast(tF('cw_mol_need','🫙 {a} {d} + {b} {h} gerek',{a:PEKMEZ_DUT,d:goodName('dut'),b:PEKMEZ_BAL,h:goodName('bal')})); return; }
   playAction(2.0,'stir');   // kazanı kepçeyle karıştır
   S.inv.dut-=PEKMEZ_DUT; if(S.inv.dut<=0) delete S.inv.dut; S.inv.bal-=PEKMEZ_BAL; if(S.inv.bal<=0) delete S.inv.bal;
   invAdd('pekmez', PEKMEZ_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🫙 Pekmez kaynadı');
-  setTimeout(()=>toast('Dut ve balı kaynatıp pekmez yaptın (+'+PEKMEZ_YIELD+') — kışa azık, muhtaca kuvvet, pazarda değerli.'),1300); }
+  setTimeout(()=>toast(tF('cw_mol_t','Dut ve balı kaynatıp pekmez yaptın (+{n}) — kışa azık, muhtaca kuvvet, pazarda değerli.',{n:PEKMEZ_YIELD})),1300); }
 // BALIK IZGARA — çiğ balık tandırda kızartılır (FOOD; çiğ balıktan değerli). Gölet→balık zincirini tamamlar.
 const IZGARA_BALIK=1, IZGARA_YIELD=1;
-function craftIzgara(){ if((S.inv.balik||0)<IZGARA_BALIK){ toast('🐟 '+IZGARA_BALIK+' balık gerek ('+(S.inv.balik||0)+' var)'); return; }
+function craftIzgara(){ if((S.inv.balik||0)<IZGARA_BALIK){ toast(tF('cw_need','🌾 {n} {item} gerek ({have} var)',{n:IZGARA_BALIK,item:goodName('balik'),have:S.inv.balik||0})); return; }
   playAction(1.8,'knead');   // tandır ateşinde balığı çevir
   S.inv.balik-=IZGARA_BALIK; if(S.inv.balik<=0) delete S.inv.balik;
   invAdd('izgara', IZGARA_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🍢 Balık kızardı');
-  setTimeout(()=>toast('Tandırda kızarmış balık (+'+IZGARA_YIELD+') — besleyici; aç kalana ikram et ya da pazarda sat.'),1300); }
+  setTimeout(()=>toast(tF('cw_fish_t','Tandırda kızarmış balık (+{n}) — besleyici; aç kalana ikram et ya da pazarda sat.',{n:IZGARA_YIELD})),1300); }
 // SÜT ZİNCİRİ (Faz 7.09) — sağılan süt artık çıkmaz sokak değil: Atölye'de YAYIK istasyonu.
 // Gerçek yayıklama TEK işlemde iki ürün verir: yağ ayrışır (tereyağı) + geriye ayran (yayık ayranı) kalır.
 const YAYIK_SUT=3, YAYIK_YAG=1, YAYIK_AYRAN=2;
-function craftYayik(){ if((S.inv.sut||0)<YAYIK_SUT){ toast('🧈 '+YAYIK_SUT+' süt gerek ('+(S.inv.sut||0)+' var)'); return; }
+function craftYayik(){ if((S.inv.sut||0)<YAYIK_SUT){ toast(tF('cw_need','🌾 {n} {item} gerek ({have} var)',{n:YAYIK_SUT,item:goodName('sut'),have:S.inv.sut||0})); return; }
   playAction(2.0,'stir');   // yayığı çalkala
   S.inv.sut-=YAYIK_SUT; if(S.inv.sut<=0) delete S.inv.sut;
-  invAdd('tereyagi', YAYIK_YAG); invAdd('ayran', YAYIK_AYRAN); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🧈 Yayık çalkalandı');
-  setTimeout(()=>toast('Süt yayıkta ayrıldı (+'+YAYIK_YAG+' tereyağı, +'+YAYIK_AYRAN+' ayran) — sağdığın süt artık boşa gitmiyor.'),1300); }
+  invAdd('tereyagi', YAYIK_YAG); invAdd('ayran', YAYIK_AYRAN); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner(tF('cw_churn_b','🧈 Yayık çalkalandı'));
+  setTimeout(()=>toast(tF('cw_churn_done','Süt yayıkta ayrıldı (+{y} {yn}, +{a} {an}) — sağdığın süt artık boşa gitmiyor.',{y:YAYIK_YAG,yn:goodName('tereyagi'),a:YAYIK_AYRAN,an:goodName('ayran')})),1300); }
 // PEYNİR — süt mayalanır, süzülür (FOOD; pazarda sütten değerli, uzun ömürlü azık)
 const PEYNIR_SUT=4, PEYNIR_YIELD=2;
-function craftPeynir(){ if((S.inv.sut||0)<PEYNIR_SUT){ toast('🧀 '+PEYNIR_SUT+' süt gerek ('+(S.inv.sut||0)+' var)'); return; }
+function craftPeynir(){ if((S.inv.sut||0)<PEYNIR_SUT){ toast(tF('cw_need','🌾 {n} {item} gerek ({have} var)',{n:PEYNIR_SUT,item:goodName('sut'),have:S.inv.sut||0})); return; }
   playAction(1.8,'knead');   // sütü mayala, telemeyi süz
   S.inv.sut-=PEYNIR_SUT; if(S.inv.sut<=0) delete S.inv.sut;
-  invAdd('peynir', PEYNIR_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner('🧀 Peynir mayalandı');
-  setTimeout(()=>toast('Sütü mayalayıp peynir yaptın (+'+PEYNIR_YIELD+') — bozulmayan azık, muhtaca kuvvet, pazarda değerli.'),1300); }
+  invAdd('peynir', PEYNIR_YIELD); save(); refreshHUD(); if(document.getElementById('inv').classList.contains('show'))renderInv(); sndFanfare(); banner(tF('cw_cheese_b','🧀 Peynir mayalandı'));
+  setTimeout(()=>toast(tF('cw_cheese_done','Sütü mayalayıp peynir yaptın (+{n}) — bozulmayan azık, muhtaca kuvvet, pazarda değerli.',{n:PEYNIR_YIELD})),1300); }
 // yerde serili seccade = toplanabilir düğüm; almazsan orada kalır
 function placeLaidSeccade(x,z,ry,animate){
   removeLaidSeccade();
@@ -6691,27 +6754,54 @@ function buildAtolye(){
   sign.traverse(o=>{ if(o.isMesh) isl.deco.push(...wrapMesh(o)); });
 }
 function doStation(rec){
-  if(!isUnlocked('atolye')){ toast('🔒 Atölye henüz açılmadı'); return; }
+  if(!isUnlocked('atolye')){ toast(tF('cw_locked','🔒 Atölye henüz açılmadı')); return; }
   const bug=S.inv.bugday||0, un=S.inv.un||0, yun=S.inv.yun||0, ek=S.inv.ekmek||0;
+  const CLOSE=tF('cw_close','Kapat');
   if(rec.craft==='un'){
-    openDialog({ic:'🌾',title:'Değirmen', start:'s0', steps:{ s0:{who:'Buğday öğüt', txt:'Değirmen taşını çevir, buğdayı una öğüt.\n\n<b>'+UN_BUGDAY+' buğday → 1 un</b>\nElinde: '+bug+' buğday · '+un+' un.', ref:'<b>Hadis:</b> «Kişinin yediği en helâl şey, kendi elinin emeğidir.» (Buhârî)', opts:[ {l:'🌾 Buğday öğüt (un yap)', act:()=>craftUn()}, {l:'Kapat'} ]} }});
+    openDialog({ic:'🌾',title:tF('cw_mill_t','Değirmen'), start:'s0', steps:{ s0:{
+      who:tF('cw_mill_who','Buğday öğüt'),
+      txt:tF('cw_mill_txt','Değirmen taşını çevir, buğdayı una öğüt.\n\n<b>{n} buğday → 1 un</b>\nElinde: {bug} buğday · {un} un.',{n:UN_BUGDAY,bug:bug,un:un}),
+      ref:tF('cw_mill_ref','<b>Hadis:</b> «Kişinin yediği en helâl şey, kendi elinin emeğidir.» (Buhârî)'),
+      opts:[ {l:tF('cw_mill_do','🌾 Buğday öğüt (un yap)'), act:()=>craftUn()}, {l:CLOSE} ]} }});
   } else if(rec.craft==='ekmek'){
     const yum=S.inv.yumurta||0, blk=S.inv.balik||0;
-    openDialog({ic:'🍞',title:'Tandır', start:'s0', steps:{ s0:{who:'Fırın', txt:'Tandırda pişir; sıcak ekmeği/çöreği/balığı aç kalana ver.\n<b>'+EKMEK_UN+' un → '+EKMEK_YIELD+' ekmek</b>\n<b>'+COREK_UN+' un + '+COREK_YUMURTA+' yumurta → '+COREK_YIELD+' çörek</b> (yumurtalı, besleyici)\n<b>'+IZGARA_BALIK+' balık → '+IZGARA_YIELD+' kızarmış balık</b>\n\nElinde: '+un+' un · '+yum+' yumurta · '+blk+' balık · '+ek+' ekmek.', ref:'<b>Hadis:</b> «İnsanların en hayırlısı, insanlara faydalı olandır.» (Beyhakî)', opts:[ {l:'🍞 Ekmek pişir', act:()=>craftEkmek()}, {l:'🥯 Çörek pişir (yumurtalı)', act:()=>craftCorek()}, {l:'🍢 Balık kızart', act:()=>craftIzgara()}, {l:'Kapat'} ]} }});
+    openDialog({ic:'🍞',title:tF('cw_oven_t','Tandır'), start:'s0', steps:{ s0:{
+      who:tF('cw_oven_who','Fırın'),
+      txt:tF('cw_oven_txt','Tandırda pişir; sıcak ekmeği/çöreği/balığı aç kalana ver.\n<b>{u} un → {e} ekmek</b>\n<b>{cu} un + {cy} yumurta → {c} çörek</b> (yumurtalı, besleyici)\n<b>{fb} balık → {f} kızarmış balık</b>\n\nElinde: {un} un · {yum} yumurta · {blk} balık · {ek} ekmek.',
+        {u:EKMEK_UN,e:EKMEK_YIELD,cu:COREK_UN,cy:COREK_YUMURTA,c:COREK_YIELD,fb:IZGARA_BALIK,f:IZGARA_YIELD,un:un,yum:yum,blk:blk,ek:ek}),
+      ref:tF('cw_oven_ref','<b>Hadis:</b> «İnsanların en hayırlısı, insanlara faydalı olandır.» (Beyhakî)'),
+      opts:[ {l:tF('cw_oven_bread','🍞 Ekmek pişir'), act:()=>craftEkmek()},
+             {l:tF('cw_oven_bun','🥯 Çörek pişir (yumurtalı)'), act:()=>craftCorek()},
+             {l:tF('cw_oven_fish','🍢 Balık kızart'), act:()=>craftIzgara()}, {l:CLOSE} ]} }});
   } else if(rec.craft==='seccade'){
     const opts=[];
-    opts.push({l:(S.hasSeccade?'🧵 Yeni seccade ör':'🧵 Seccade ör')+' ('+yun+'/'+SECCADE_YUN+' yün)', act:()=>craftSeccade()});
-    opts.push({l:'🧵 İpekten seccade ör ('+(S.inv.ipek||0)+'/'+SILK_SECCADE+' ipek)', act:()=>craftSilkSeccade()});   // dut kozalarından ipek → premium ipek seccade
-    if((S.bag||0)<1) opts.push({l:'🎒 Çanta ör ('+yun+'/'+BAG_YUN[1]+' yün → 150 kapasite)', act:()=>craftBag(1)});
-    if((S.bag||0)<2) opts.push({l:'🎒 Büyük çanta ör ('+yun+'/'+BAG_YUN[2]+' yün → 200 kapasite)', act:()=>craftBag(2)});
-    opts.push({l:'Kapat'});
-    openDialog({ic:'🧵',title:'Tezgâh', start:'s0', steps:{ s0:{who:'Tezgâh', txt:'Yünü tezgâhta işle:\n<b>'+SECCADE_YUN+' yün → seccade</b> (her yerde namaz)\n<b>'+BAG_YUN[1]+' yün → çanta</b> (150 taşı) · <b>'+BAG_YUN[2]+' yün → büyük çanta</b> (200 taşı)\n\nElinde: '+yun+' yün · Çantan: '+bagName()+' ('+invCap()+' kapasite)', ref:'<b>Âyet:</b> «Namazı dosdoğru kılın.» (Bakara 2/43)', opts} }});
+    opts.push({l:(S.hasSeccade?tF('cw_loom_rug2','🧵 Yeni seccade ör'):tF('cw_loom_rug','🧵 Seccade ör'))+' ('+yun+'/'+SECCADE_YUN+' '+goodName('yun')+')', act:()=>craftSeccade()});
+    opts.push({l:tF('cw_loom_silk','🧵 İpekten seccade ör')+' ('+(S.inv.ipek||0)+'/'+SILK_SECCADE+' '+goodName('ipek')+')', act:()=>craftSilkSeccade()});
+    if((S.bag||0)<1) opts.push({l:tF('cw_loom_bag','🎒 Çanta ör')+' ('+yun+'/'+BAG_YUN[1]+' '+goodName('yun')+' → 150)', act:()=>craftBag(1)});
+    if((S.bag||0)<2) opts.push({l:tF('cw_loom_bag2','🎒 Büyük çanta ör')+' ('+yun+'/'+BAG_YUN[2]+' '+goodName('yun')+' → 200)', act:()=>craftBag(2)});
+    opts.push({l:CLOSE});
+    openDialog({ic:'🧵',title:tF('cw_loom_t','Tezgâh'), start:'s0', steps:{ s0:{
+      who:tF('cw_loom_who','Tezgâh'),
+      txt:tF('cw_loom_txt','Yünü tezgâhta işle:\n<b>{sy} yün → seccade</b> (her yerde namaz)\n<b>{b1} yün → çanta</b> (150 taşı) · <b>{b2} yün → büyük çanta</b> (200 taşı)\n\nElinde: {yun} yün · Çantan: {bag} ({cap} kapasite)',
+        {sy:SECCADE_YUN,b1:BAG_YUN[1],b2:BAG_YUN[2],yun:yun,bag:bagName(),cap:invCap()}),
+      ref:tF('cw_loom_ref','<b>Âyet:</b> «Namazı dosdoğru kılın.» (Bakara 2/43)'), opts} }});
   } else if(rec.craft==='pekmez'){
     const dut=S.inv.dut||0, bal=S.inv.bal||0, pek=S.inv.pekmez||0;
-    openDialog({ic:'🫙',title:'Kazan', start:'s0', steps:{ s0:{who:'Pekmez kaynat', txt:'Dut ve balı kazanda ağır ateşte kaynat, koyu pekmez yap; kışa azık, muhtaca kuvvet.\n\n<b>'+PEKMEZ_DUT+' dut + '+PEKMEZ_BAL+' bal → '+PEKMEZ_YIELD+' pekmez</b>\n\nElinde: '+dut+' dut · '+bal+' bal · '+pek+' pekmez.', ref:'<b>Âyet:</b> «Yiyin, için; fakat israf etmeyin.» (A\'râf 7/31)', opts:[ {l:'🫙 Pekmez kaynat', act:()=>craftPekmez()}, {l:'Kapat'} ]} }});
+    openDialog({ic:'🫙',title:tF('cw_cau_t','Kazan'), start:'s0', steps:{ s0:{
+      who:tF('cw_cau_who','Pekmez kaynat'),
+      txt:tF('cw_cau_txt','Dut ve balı kazanda ağır ateşte kaynat, koyu pekmez yap; kışa azık, muhtaca kuvvet.\n\n<b>{d} dut + {b} bal → {y} pekmez</b>\n\nElinde: {dut} dut · {bal} bal · {pek} pekmez.',
+        {d:PEKMEZ_DUT,b:PEKMEZ_BAL,y:PEKMEZ_YIELD,dut:dut,bal:bal,pek:pek}),
+      ref:tF('cw_cau_ref','<b>Âyet:</b> «Yiyin, için; fakat israf etmeyin.» (A\'râf 7/31)'),
+      opts:[ {l:tF('cw_cau_do','🫙 Pekmez kaynat'), act:()=>craftPekmez()}, {l:CLOSE} ]} }});
   } else if(rec.craft==='sut'){
     const sut=S.inv.sut||0, ay=S.inv.ayran||0, ty=S.inv.tereyagi||0, pn=S.inv.peynir||0;
-    openDialog({ic:'🧈',title:'Yayık', start:'s0', steps:{ s0:{who:'Sütü işle', txt:'Sağdığın sütü öylece bırakma: yayıkta çalkala, yağı ayrılsın — geriye ayran kalır. Ya da mayalayıp peynir yap; bozulmadan durur, muhtaca azık olur.\n\n<b>'+YAYIK_SUT+' süt → '+YAYIK_YAG+' tereyağı + '+YAYIK_AYRAN+' ayran</b>\n<b>'+PEYNIR_SUT+' süt → '+PEYNIR_YIELD+' peynir</b>\n\nElinde: '+sut+' süt · '+ay+' ayran · '+ty+' tereyağı · '+pn+' peynir.', ref:'<b>Âyet:</b> «Şüphesiz hayvanlarda da sizin için bir ibret vardır… size, içenlerin boğazından kolayca geçen hâlis bir süt içiriyoruz.» (Nahl 16/66)', opts:[ {l:'🧈 Yayığı çalkala (tereyağı + ayran)', act:()=>craftYayik()}, {l:'🧀 Sütü mayala (peynir)', act:()=>craftPeynir()}, {l:'Kapat'} ]} }});
+    openDialog({ic:'🧈',title:tF('cw_churn_t','Yayık'), start:'s0', steps:{ s0:{
+      who:tF('cw_churn_who','Sütü işle'),
+      txt:tF('cw_churn_txt','Sağdığın sütü öylece bırakma: yayıkta çalkala, yağı ayrılsın — geriye ayran kalır. Ya da mayalayıp peynir yap; bozulmadan durur, muhtaca azık olur.\n\n<b>{ys} süt → {yy} tereyağı + {ya} ayran</b>\n<b>{ps} süt → {py} peynir</b>\n\nElinde: {sut} süt · {ay} ayran · {ty} tereyağı · {pn} peynir.',
+        {ys:YAYIK_SUT,yy:YAYIK_YAG,ya:YAYIK_AYRAN,ps:PEYNIR_SUT,py:PEYNIR_YIELD,sut:sut,ay:ay,ty:ty,pn:pn}),
+      ref:tF('cw_churn_ref','<b>Âyet:</b> «Şüphesiz hayvanlarda da sizin için bir ibret vardır… size, içenlerin boğazından kolayca geçen hâlis bir süt içiriyoruz.» (Nahl 16/66)'),
+      opts:[ {l:tF('cw_churn_do1','🧈 Yayığı çalkala (tereyağı + ayran)'), act:()=>craftYayik()},
+             {l:tF('cw_churn_do2','🧀 Sütü mayala (peynir)'), act:()=>craftPeynir()}, {l:CLOSE} ]} }});
   }
 }
 
@@ -9054,6 +9144,39 @@ function applyLang(){ const L=(S.lang&&I18N[S.lang])?S.lang:'tr';
       el2.textContent=(isFriday()?(tU('day_friday')||'🕌 Cuma'):dayName())+' · '+icon+' '+vakitName(v[1]); } }catch(e){}
   if(typeof refreshHUD==='function'){ try{ refreshHUD(); }catch(e){} }   // rütbe/adalet/ada/vazife dil ile güncellensin
   try{ if(document.getElementById('tut').style.display==='flex') renderTut(); }catch(e){}
+  rerenderOpenPanels();
+}
+/* AÇIK PANELLERİ YENİDEN ÇİZ (Faz 7.13) — panel KABUĞU data-i18n ile çevriliyordu ama panel
+   İÇERİĞİ JS ile üretiliyor: dil değişince içerik eski dilde kalıyor, ekran karışık görünüyordu
+   (başlık Türkçe, kartlar Arapça). Açık olan her panelin kendi render'ı yeniden çağrılır.
+   typeof kontrolü tanımsız isimde bile patlamaz; her çağrı ayrı try içinde (biri hata verirse
+   diğerleri yine çizilsin). */
+function rerenderOpenPanels(){
+  const PANELS=[
+    ['scen',    typeof renderScen==='function'?renderScen:null],
+    ['inv',     typeof renderInv==='function'?renderInv:null],
+    ['hayir',   typeof renderHayir==='function'?renderHayir:null],
+    ['map',     typeof renderMap==='function'?renderMap:null],
+    ['market',  typeof renderMarket==='function'?renderMarket:null],
+    ['mosque',  typeof renderMosque==='function'?renderMosque:null],
+    ['hac',     typeof renderHac==='function'?renderHac:null],
+    ['hacReg',  typeof renderHacReg==='function'?renderHacReg:null],
+    ['ihyadef', typeof renderIhyaDef==='function'?renderIhyaDef:null],
+    ['onboard', typeof renderOnboard==='function'?renderOnboard:null],
+    ['profile', typeof renderProfile==='function'?renderProfile:null],
+    ['settings',typeof renderSettings==='function'?renderSettings:null],
+    ['remind',  typeof renderReminders==='function'?renderReminders:null],
+    ['ezber',   typeof renderEzberList==='function'?renderEzberList:null],
+    ['cuma',    typeof renderCuma==='function'?renderCuma:null],
+    ['newbirth',typeof renderNewBirth==='function'?renderNewBirth:null],
+  ];
+  for(const [id,fn] of PANELS){
+    if(!fn) continue;
+    try{ const el=document.getElementById(id);
+      if(el && el.classList.contains('show')) fn();
+    }catch(e){}
+  }
+  try{ if(typeof renderDailyGoal==='function') renderDailyGoal(); }catch(e){}   // HUD'daki günün hedefi de dile uysun
 }
 let introMode=false, introT=0, introLit=false, cineStart=0;
 function startIntro(){
