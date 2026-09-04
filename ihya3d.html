@@ -1593,6 +1593,9 @@ const UI_STR={ en:{
   hac_namaz_wait:'🧎 Praying…', hac_namaz_btn2:'🧎 Pray two rak\'ahs at Maqam Ibrahim (+6 nur)',
   thief_nm:'Thief', thief_btn:'Fight back', thief_spawn_a:'A thief!', thief_spawn_b:'the produce is being stolen!', thief_spawn_toast:'⚔️ Go to the thief and fight back (Space) — protecting your property is your right.', thief_hit:'You struck!', thief_flee:'The thief fled! Goods recovered', thief_stole:'The thief snatched this produce and ran! Stop him', thief_chaos:'unrest is growing! Stop the thief', thief_hadis:'«Whoever is killed defending his property is a martyr.» (Bukhari, Mazalim 33; Muslim, Iman 226) — protecting your property and labor is your right.',
   thief_counter:'The thief struck back — close in and strike again!',
+  thief_stalk:'The thief has spotted you — he is coming for you! Draw your sword (Space).',
+  thief_snatch:'The thief snatched from your satchel:', thief_snatch2:'beat him to get it back!',
+  thief_back:'What he snatched from your satchel is returned:',
   ab_exam_again:'📝 Retake the exam', ex_again_s:' — knowledge refreshed (+5 nur)', ex_again_done:'✓ Done (+5 nur)', ex_again_b:'Knowledge refreshed — +5 nur',
   fb_mail_sent:'A sign-in link was sent to your email', fb_email_confirm:'Enter your email to verify the sign-in link:', fb_signed_in:'Signed in: ',
   fb_cloud_first:'Your save is now backed up to the cloud — safe even if you change devices', fb_cloud_title:'Cloud Save Found', fb_cloud_txt:'This account has a more advanced save:', fb_cloud_day:'Day', fb_cloud_q:'Load the CLOUD save instead of the one on this device?', fb_cloud_yes:'☁️ Load cloud save', fb_cloud_no:'📱 Continue with this device\'s save',
@@ -1737,6 +1740,9 @@ ar:{
   hac_namaz_wait:'🧎 تُصلّي…', hac_namaz_btn2:'🧎 صلِّ ركعتين عند مقام إبراهيم (+٦ نور)',
   thief_nm:'لصّ', thief_btn:'تصدَّ له', thief_spawn_a:'لصّ!', thief_spawn_b:'تُسرَق المحاصيل!', thief_spawn_toast:'⚔️ اذهب إلى اللصّ وتصدَّ له — الدفاعُ عن مالك حقٌّ لك.', thief_hit:'أصبتَه!', thief_flee:'هرب اللصّ! استُعيدت الأموال', thief_stole:'خطف اللصُّ هذا المحصولَ وهرب! أوقِفه', thief_chaos:'الفوضى تتزايد! أوقِفِ اللصّ', thief_hadis:'«من قُتل دون ماله فهو شهيد.» (البخاري، المظالم ٣٣؛ مسلم، الإيمان ٢٢٦) — حمايةُ مالِك وكدِّك حقٌّ لك.',
   thief_counter:'ردَّ اللصُّ الضربة — اقترِب واضرِب من جديد!',
+  thief_stalk:'رآكَ اللّصُّ — إنّه قادمٌ إليك! اسلُل سيفك.',
+  thief_snatch:'خطفَ اللّصُّ من جَعبتك:', thief_snatch2:'اهزِمه لتستردّه!',
+  thief_back:'عادَ ما خطفَه من جَعبتك:',
   ab_exam_again:'📝 أعِدِ الامتحان', ex_again_s:' — تجدَّدت معرفتُك (+٥ نور)', ex_again_done:'✓ تمّ (+٥ نور)', ex_again_b:'تجدَّدت معرفتُك — +٥ نور',
   fb_mail_sent:'أُرسل رابطُ الدخول إلى بريدك', fb_email_confirm:'اكتب بريدك للتحقق من رابط الدخول:', fb_signed_in:'تمّ الدخول: ',
   fb_cloud_first:'حُفظ تقدُّمك في السحابة — آمنٌ حتى لو غيّرتَ جهازك', fb_cloud_title:'وُجد حفظٌ سحابيّ', fb_cloud_txt:'لهذا الحساب حفظٌ أكثرُ تقدّمًا:', fb_cloud_day:'اليوم', fb_cloud_q:'أيُحمَّل الحفظُ السحابيُّ بدلَ حفظِ هذا الجهاز؟', fb_cloud_yes:'☁️ حمِّلِ الحفظَ السحابيّ', fb_cloud_no:'📱 تابِع بحفظِ هذا الجهاز',
@@ -2540,6 +2546,22 @@ function updateCooldownSprites(){ const now=Date.now();
    Sahih çerçeve: «Malı uğrunda öldürülen şehittir» (Buhârî, Mezâlim 33; Müslim, Îmân 226). */
 let thief=null, swordMesh=null, _thiefAcc=0, slashSide=1;
 const THIEF_HP=4, THIEF_CD=3*60*1000, THIEF_CHAOS_T=120;   // can · tekrar-gelme (3dk — sık) · kargaşa eşiği (sn)
+// Faz 7.11 — AVCILIK + ÇALMA
+const THIEF_STALK_R=13;      // bu mesafeden yakında oyuncuyu SEZER ve üstüne yürür
+const THIEF_STALK_SPD=3.0;   // takip hızı — oyuncunun 8.5'inin ~%35'i: tehdit eder ama KAÇILABİLİR (ceza sarmalı yok)
+const THIEF_STEAL_P=0.5;     // her hamlede çantadan kapma olasılığı
+const THIEF_STEAL_MAX=4;     // bir hırsız en fazla bu kadar ürün kapar (kayıp sınırlı)
+// Ada KARE (inSq) — eski kod kutupsal (cos/sin) nokta seçiyordu ve YÜRÜNEBİLİRLİK bakmıyordu:
+// hırsız ağacın/binanın içinde ya da uzak bir adada belirip ulaşılmaz kalabiliyordu. Artık kare
+// içinde, walkable() onaylı nokta aranır; bulunamazsa ada merkezine düşülür.
+function thiefSpot(is, frac){
+  const half=Math.max(1,(is.r||7)-1.6)*(frac||1);
+  for(let i=0;i<24;i++){
+    const x=is.c[0]+(Math.random()*2-1)*half, z=is.c[1]+(Math.random()*2-1)*half;
+    if(typeof walkable==='function' ? walkable(x,z) : !blocked(x,z)) return [x,z];
+  }
+  return [is.c[0], is.c[1]];
+}
 const SWORD_HAND=[-0.19,0.42,0.14];   // kılıcın oyuncu-local konumu (sağ el hizası — olta ROD_HAND ile aynı)
 function buildSword(){ const g=new THREE.Group();
   const steel=new THREE.MeshStandardMaterial({color:0xdfe4ea,roughness:0.35,metalness:0.55});
@@ -2585,15 +2607,20 @@ function spawnThief(forceIsl){   // forceIsl: debug/test — kapıları atlayıp
     if(hacMode || inModern || inHome || inBld || mosqueMode || introMode || warpBlock) return;
     if(Date.now() < (S.thiefCd||0)) return;
     const cand=thiefIslands(); if(cand.length<2) return;   // en az 2 fethedilmiş üretim adası (erken oyunda hırsız yok)
-    is=cand[Math.floor(Math.random()*cand.length)];
+    // YAKINLIK KURALI (Faz 7.11): eskiden RASTGELE bir adada belirirdi → oyuncu Hâne'deyken Medine'de
+    // doğar, uzaktan yalnız can çubuğu görünür ("haritanın dışında, saldıramıyorum"). Artık oyuncunun
+    // BULUNDUĞU adada; orada değilse EN YAKIN uygun adada belirir → her zaman bulunur ve dövüşülür.
+    const px=player?player.position.x:0, pz=player?player.position.z:0;
+    is=cand.find(i=>Math.abs(px-i.c[0])<i.r && Math.abs(pz-i.c[1])<i.r);
+    if(!is) return;   // oyuncu uygun bir uretim adasinda DEGIL → simdi belirme, 4sn sonra tekrar bak
+                      // (hirsiz uretimi calar; oyuncunun oldugu yerde belirmesi hem mantikli hem ulasilabilir)
   }
   const p=buildThiefModel();   // SIFIRDAN korkutucu model (kara pelerin+kızıl gözler+hançer) — sevimli değil
   p.g.scale.setScalar(1.05); p.g.rotation.order='YXZ';   // oyuncudan uzun (~2.3) → tehditkâr
-  const a=Math.random()*6.283, r=(is.r||7)*0.45;
-  const x=is.c[0]+Math.cos(a)*r, z=is.c[1]+Math.sin(a)*r;
+  const sp0=thiefSpot(is,0.7), x=sp0[0], z=sp0[1];   // yürünebilir nokta (ağaç/bina içinde belirmez)
   p.g.position.set(x,0,z); scene.add(p.g);
   const hpBar=thiefHpBar(); hpBar.position.set(x,2.62,z); scene.add(hpBar);
-  thief={ g:p.g, meshes:p.meshes, hpBar, islId:is.id, hp:THIEF_HP, t:0, tx:x, tz:z, wait:0, dying:0, chaosWarned:false, flash:0, reach:2.8, atkT:1.4, ctT:0, lunge:0,
+  thief={ g:p.g, meshes:p.meshes, hpBar, islId:is.id, hp:THIEF_HP, t:0, tx:x, tz:z, wait:0, dying:0, chaosWarned:false, flash:0, reach:2.8, atkT:1.4, ctT:0, lunge:0, loot:null, stolen:0,
     q:{id:'thief', nm:(tU('thief_nm')||'Hırsız'), ic:'⚔️', pos:[x,0,z]}, thief:true };
   interactables.push(thief);
   banner('🗡️ '+(tU('thief_spawn_a')||'Hırsız!')+' '+islandName(is)+' — '+(tU('thief_spawn_b')||'ürünler çalınıyor!'));
@@ -2615,14 +2642,30 @@ function updateThief(dt){
   // HAMLE animasyonu: karşı saldırıda öne atılıp doğrulur (gövde eğilir)
   if(thief.lunge>0){ thief.lunge-=dt; const lk=Math.sin(Math.max(0,1-thief.lunge/0.3)*Math.PI); g.rotation.x=0.1+lk*0.45; }
   else g.rotation.x=0.1;
+  const isl=WORLD.islands.find(i=>i.id===thief.islId);
   const dx=thief.tx-g.position.x, dz=thief.tz-g.position.z, d=Math.hypot(dx,dz);
-  if(near===thief && player){                                                   // DÖVÜŞ: yüzleş + periyodik KARŞILIK (iki taraflı)
+  const pd=player?Math.hypot(player.position.x-g.position.x, player.position.z-g.position.z):999;
+  // adasından ÇIKMAZ: takip ederken bile kendi karesinde kalır (köprüye/başka adaya sarkmaz)
+  const okMove=(nx,nz)=>(!isl || (Math.abs(nx-isl.c[0])<isl.r-0.6 && Math.abs(nz-isl.c[1])<isl.r-0.6))
+                        && (typeof walkable!=='function' || walkable(nx,nz));
+  const step=(ux,uz,sp)=>{ const nx=g.position.x+ux*sp, nz=g.position.z+uz*sp;
+    if(okMove(nx,nz)){ g.position.x=nx; g.position.z=nz; }
+    else if(okMove(nx,g.position.z)) g.position.x=nx;          // engele sürtünerek kay (takılıp kalmasın)
+    else if(okMove(g.position.x,nz)) g.position.z=nz;
+    else { thief.wait=0; }                                      // tıkandı → yeni hedef seç
+    g.rotation.y=Math.atan2(ux,uz); g.position.y=Math.abs(Math.sin(clock.elapsedTime*7))*0.02; };
+  if(player && pd<=thief.reach){                                                // DÖVÜŞ: yüzleş + periyodik HAMLE (iki taraflı)
     g.rotation.y=Math.atan2(player.position.x-g.position.x, player.position.z-g.position.z);
     thief.atkT-=dt; if(thief.atkT<=0){ thief.atkT=1.5+Math.random()*0.9; thiefCounter(); }
   }
-  else if(d>0.25){ const sp=1.05*dt; g.position.x+=dx/d*sp; g.position.z+=dz/d*sp; g.rotation.y=Math.atan2(dx,dz); g.position.y=Math.abs(Math.sin(clock.elapsedTime*7))*0.02; }   // sinsi yürüyüş
-  else { thief.wait-=dt; if(thief.wait<=0){ const is=WORLD.islands.find(i=>i.id===thief.islId); const a2=Math.random()*6.283, r2=Math.random()*Math.max(1,(is.r||7)-2.2);
-      thief.tx=is.c[0]+Math.cos(a2)*r2; thief.tz=is.c[1]+Math.sin(a2)*r2; thief.wait=1.2+Math.random()*2.2; } }
+  else if(player && pd<THIEF_STALK_R){                                          // AVLANMA: seni sezdi, üstüne yürüyor
+    step((player.position.x-g.position.x)/pd, (player.position.z-g.position.z)/pd, THIEF_STALK_SPD*dt);
+    thief.tx=g.position.x; thief.tz=g.position.z;   // takipten çıkınca taze hedef seçsin
+    if(!thief.stalkWarned){ thief.stalkWarned=true; toast('🗡️ '+(tU('thief_stalk')||'Hırsız seni fark etti — üstüne geliyor! Kılıcını çek (Space).')); }
+  }
+  else if(d>0.25){ step(dx/d, dz/d, 1.05*dt); }                                 // sinsi dolaşma
+  else { thief.wait-=dt; if(thief.wait<=0){ const sp2=thiefSpot(isl||{c:[0,0],r:7});
+      thief.tx=sp2[0]; thief.tz=sp2[1]; thief.wait=1.2+Math.random()*2.2; } }
   thief.q.pos[0]=g.position.x; thief.q.pos[2]=g.position.z;
   thief.hpBar.position.set(g.position.x, 2.62, g.position.z);
 }
@@ -2633,7 +2676,24 @@ function thiefCounter(){ if(!player||!thief) return;
   const nx=player.position.x+dx/d*0.6, nz=player.position.z+dz/d*0.6;
   if(typeof walkable!=='function' || walkable(nx,nz)){ player.position.x=nx; player.position.z=nz; }   // güvenli geri itme (suya düşürme yok)
   playAction(0.35,'hitback');   // oyuncu: kollar önde savunma + geri yaslanma
-  if(thief.ctT<=0){ thief.ctT=4; toast('🗡️ '+(tU('thief_counter')||'Hırsız karşılık verdi — tekrar yaklaş ve vur!')); }
+  if(Math.random()<THIEF_STEAL_P) thiefSnatch();
+  else if(thief.ctT<=0){ thief.ctT=4; toast('🗡️ '+(tU('thief_counter')||'Hırsız karşılık verdi — tekrar yaklaş ve vur!')); }
+}
+// ÇALMA (Faz 7.11): hırsızın derdi CANIMIZ değil MALIMIZ. Oyunda oyuncu canı/ölümü YOK (sakin tasarım
+// bozulmasın) → saldırısı çantadan ürün kapmakla ölçülür. Kaptığı her şey thief.loot'ta durur ve hırsız
+// yenilince TAMAMI geri gelir: direnmenin karşılığı var, kaçmanın bedeli. Yalnız GOODS'a dokunur —
+// seccade/emanet/dirhem güvende; en fazla THIEF_STEAL_MAX adet (kayıp sınırlı, ceza sarmalı yok).
+function thiefSnatch(){ if(!thief) return;
+  const keys=Object.keys(S.inv||{}).filter(k=>GOODS[k] && S.inv[k]>0);
+  if(!keys.length || (thief.stolen||0)>=THIEF_STEAL_MAX){
+    if(thief.ctT<=0){ thief.ctT=4; toast('🗡️ '+(tU('thief_counter')||'Hırsız karşılık verdi — tekrar yaklaş ve vur!')); }
+    return; }
+  const k=keys[Math.floor(Math.random()*keys.length)];
+  S.inv[k]--; if(S.inv[k]<=0) delete S.inv[k];
+  thief.loot=thief.loot||{}; thief.loot[k]=(thief.loot[k]||0)+1; thief.stolen=(thief.stolen||0)+1;
+  save(); refreshHUD();
+  const invEl=document.getElementById('inv'); if(invEl&&invEl.classList.contains('show')) renderInv();
+  toast('🗡️ '+(tU('thief_snatch')||'Hırsız çantandan kaptı:')+' 1 '+((GOODS[k]||{}).ic||'')+' '+goodName(k)+' — '+(tU('thief_snatch2')||'yen de geri al!'));
 }
 function sndSwipe(){ audio(); beep(340,0,0.08,'sawtooth',0.07); beep(210,0.04,0.1,'triangle',0.05); }   // hançer savruluşu (boğuk)
 function strikeThief(){
@@ -2653,8 +2713,11 @@ function defeatThief(){
   thief.dying=0.6; S.thiefCd=Date.now()+THIEF_CD;
   const rec=gatherNodes.find(r=>r.def.islId===thief.islId && GOODS[r.def.item]);   // çalınan mallar geri: adanın ürününden 2
   const item=rec?rec.def.item:'hurma'; invAdd(item,2); addNur(10);
+  let back=0, backIc='';   // ÇANTADAN kaptıklarının TAMAMI geri (direnenin kaybı olmaz)
+  if(thief.loot){ for(const k in thief.loot){ invAdd(k, thief.loot[k]); back+=thief.loot[k]; if(!backIc) backIc=(GOODS[k]||{}).ic||''; } }
   save(); refreshHUD(); sndFanfare();
   banner('🛡️ '+(tU('thief_flee')||'Hırsız kaçtı! Mallar kurtarıldı')+' — +2 '+((GOODS[item]||{}).ic||'')+' · +10'+(tU('nur_suffix')||' nûr'));
+  if(back) setTimeout(()=>toast('🎒 '+(tU('thief_back')||'Çantandan kaptıkları geri geldi:')+' '+back+' '+backIc),1500);
   setTimeout(()=>toast(tU('thief_hadis')||'«Malı uğrunda öldürülen şehittir.» (Buhârî, Mezâlim 33; Müslim, Îmân 226) — malını ve emeğini korumak hakkındır.'),900);
 }
 function removeThief(){ if(!thief) return;
@@ -7814,6 +7877,11 @@ function sndEzan(full){ audio(); if(muted) return;
     playSnd('ezan', 0.42, 1, full?0:14);   // ses kısıldı (kullanıcı: çok yüksekti)
     return;
   }
+  // tembel yükleme: kayıt henüz inmediyse şimdi indir ve iner inmez çal (normalde idle'da çoktan inmiş olur)
+  ensureSnd('ezan').then(ok=>{ if(muted) return;
+    if(ok && sndBuf.ezan) playSnd('ezan', 0.42, 1, full?0:14); else ezanFallback(); });
+}
+function ezanFallback(){   // kayıt yok/inemedi → Arapça TTS, o da yoksa saygılı Hicaz tonu
   if('speechSynthesis' in window){
     if(ezanVoice===undefined) pickEzanVoice();
     if(ezanVoice){
@@ -7877,12 +7945,27 @@ const SND_URL={
   ezan:'sounds/ezan.mp3',   // GERÇEK ezan kaydı (kullanıcı ekleyecek; TAM ezan olsun — normalde sadece başı çalınır, Cuma camide tamamı). Dosya yoksa sessizce TTS/tona düşer.
 };
 const sndBuf={}; let sndReady=false, sndLoading=false, sndCount=0;
-function loadSamples(){ if(sndLoading||!audio())return; sndLoading=true;
-  const ac=AC, keys=Object.keys(SND_URL);
-  keys.forEach(k=>fetch(SND_URL[k]).then(r=>r.ok?r.arrayBuffer():Promise.reject())
+// TEMBEL YÜKLEME (Faz 7.10): açılışta yalnız küçük + hemen gereken örnekler iner.
+// ezan.mp3 ses yükünün en büyük tek parçası (~1,9 MB) ve ilk dakikada gerekmiyor → oyun
+// yerleştikten sonra BOŞTA (idle) çekilir. Erken çağrılırsa ensureSnd anında indirir; hiç
+// inemezse sndEzan eski TTS/ton yoluna düşer (regresyon yok).
+const SND_LAZY={ezan:1};
+const sndPend={};   // key → Promise: aynı dosya iki kez indirilmesin
+function decodeSnd(k){ if(sndBuf[k]) return Promise.resolve(true);
+  if(sndPend[k]) return sndPend[k];
+  if(!audio()) return Promise.resolve(false);
+  const ac=AC;
+  return sndPend[k]=fetch(SND_URL[k]).then(r=>r.ok?r.arrayBuffer():Promise.reject())
     .then(b=>new Promise((res,rej)=>ac.decodeAudioData(b,res,rej)))
-    .then(buf=>{ sndBuf[k]=buf; }).catch(()=>{})
+    .then(buf=>{ sndBuf[k]=buf; return true; }).catch(()=>false);
+}
+function ensureSnd(k){ return decodeSnd(k); }   // tek örneği gerektiğinde yükle
+function loadSamples(){ if(sndLoading||!audio())return; sndLoading=true;
+  const keys=Object.keys(SND_URL).filter(k=>!SND_LAZY[k]);
+  keys.forEach(k=>decodeSnd(k)
     .then(()=>{ if(++sndCount>=keys.length){ if(Object.keys(sndBuf).length){ sndReady=true; startBeds(); } } }));
+  const idle=(fn)=>window.requestIdleCallback?requestIdleCallback(fn,{timeout:20000}):setTimeout(fn,12000);
+  idle(()=>{ for(const k in SND_LAZY) ensureSnd(k); });   // ağır örnekler: oyun yerleşince arka planda
 }
 // tek atış örnek (yakınlık ses seviyesi + hafif perde varyasyonu → tekdüze olmasın)
 function playSnd(key,gain,rate,dur){ const buf=sndBuf[key]; if(!buf||!AC||muted)return;
@@ -8961,7 +9044,15 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
   // placeholder kutu döndürür). Böylece cache-bust/yavaş bağlantıda oyun her hâlükârda açılır (self-healing).
   const loadSafe=(m)=>Promise.race([ load(m).catch(e=>{ console.warn('model load fail',m,e); }),
     new Promise(r=>setTimeout(()=>{ console.warn('model timeout, skip',m); r(); },15000)) ]);
-  for(const m of MODELS){ await loadSafe(m); loadBar.style.width=(++n/MODELS.length*100)+'%'; }
+  // PARALEL ÖBEK YÜKLEME (Faz 7.10): eskiden 40 model TEK TEK (await) inerdi → mobil bağlantıda
+  // her model için ayrı bir gidiş-dönüş gecikmesi, toplamda saniyeler. Artık 6'şarlı öbekler hâlinde
+  // paralel iner (aynı modeller, aynı timeout, aynı sıra) → açılış belirgin kısalır. Tarayıcı zaten
+  // eşzamanlı istek sayısını kendisi sınırlar; 6 güvenli bir üst sınır.
+  const PARA=6;
+  for(let i=0;i<MODELS.length;i+=PARA){
+    const chunk=MODELS.slice(i,i+PARA);
+    await Promise.all(chunk.map(m=>loadSafe(m).then(()=>{ loadBar.style.width=(++n/MODELS.length*100)+'%'; })));
+  }
   setVakitQuests(vakitOf(gameTime)[1]);   // vakte göre ev ibadetlerini kur
   migrateConquered();               // eski kayıt: tamamlanmış adaları kalıcı fethe işle
   // istikamet: son tamamlanan gün ne bu gün ne dün ise (dayNum) zincir kırılmış → sıfırla
