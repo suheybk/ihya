@@ -556,7 +556,7 @@ addEventListener('appinstalled', function(){ window.__ihyaPwa.installed = true; 
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.17</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.18</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1620,6 +1620,7 @@ const UI_STR={ en:{
   pw_other:'Browser menu ⋮ → «Install app» / «Add to home screen».',
   pw_ok_b:'📲 Ihya is in your pocket', pw_ok_t:'Added to your home screen — one tap, and it opens even offline (+10 nur).',
   pw_btn:'Read the signpost',
+  adab_drink:'🧎 You drank sitting down — «None of you should drink standing.» (Muslim)', adab_eat:'🧎 You ate sitting down — the Prophet ﷺ ate seated, saying «I am but a servant». (Bukhari · Muslim)',
   pr_entered:'🕌 {n} has begun', pr_hint_rug:'(pray with 🧎)', nd_wudu_guide:'Renew Your Wudu',
   // --- Faz 7.17: EN'de eksik kalan anahtarlar ---
   ab_silk:'Take silk', bld_enter:'You stepped inside',
@@ -2021,6 +2022,7 @@ ar:{
   pw_other:'قائمة المتصفّح ⋮ ← «تثبيت التطبيق» / «أضِف إلى الشاشة الرئيسة».',
   pw_ok_b:'📲 إحياءُ في جيبك', pw_ok_t:'أُضيف إلى شاشتك الرئيسة — لمسةٌ واحدة، ويُفتَح ولو بلا إنترنت (+١٠ نور).',
   pw_btn:'اقرأ اللوحة',
+  adab_drink:'🧎 شربتَ جالسًا — «لا يشربنَّ أحدٌ منكم قائمًا.» (مسلم)', adab_eat:'🧎 أكلتَ جالسًا — كان النبي ﷺ يأكل جالسًا ويقول: «إنما أنا عبد.» (البخاري · مسلم)',
   pr_entered:'🕌 دخل وقتُ {n}', pr_hint_rug:'(صلِّ بـ 🧎)', nd_wudu_guide:'جدِّد وضوءك',
   // --- Faz 7.17: AR'da eksik kalan anahtarlar ---
   ab_silk:'خُذ الحرير', bld_enter:'دخلتَ',
@@ -4347,13 +4349,13 @@ function spawnCityEvent(){ if(cityEvent||!modernGroup) return; if(S.cityCd && Da
   const idx=(S.cityIdx||0)%CITY_EVENTS.length; S.cityIdx=(idx+1)%CITY_EVENTS.length;
   const ev=CITY_EVENTS[idx]; const sp=CITY_SPOTS[idx%CITY_SPOTS.length];
   const ox=MODERN_ORIGIN[0], oz=MODERN_ORIGIN[2], x=ox+sp[0], z=oz+sp[1];
-  const g=new THREE.Group(); let meshes=[];
+  const g=new THREE.Group(); let meshes=[]; let npcG=null; const bags=[];
   if(ev.people){ let it; try{ it=instance('neighbor'); }catch(e){ try{ it=instance('traveler'); }catch(e2){ it=null; } }
-    if(it){ if(typeof tintNpc==='function') tintNpc(it.g, ev.tint||'neighbor'); it.g.position.set(0,0,0); it.g.rotation.y=Math.PI*0.15; it.g.scale.setScalar(ev.sc||1.75); g.add(it.g); meshes=it.meshes; }
+    if(it){ if(typeof tintNpc==='function') tintNpc(it.g, ev.tint||'neighbor'); it.g.position.set(0,0,0); it.g.rotation.y=Math.PI*0.15; it.g.scale.setScalar(ev.sc||1.75); g.add(it.g); meshes=it.meshes; npcG=it.g; }
     if(ev.crowd>1){ for(let k=1;k<ev.crowd;k++){ let e2=null; try{ e2=instance('neighbor'); }catch(_){ e2=null; }   // 🗣️ gıybet meclisi: çevresinde birkaç kişi
       if(e2){ if(typeof tintNpc==='function') tintNpc(e2.g, k%2?'traveler':'merchant'); const a=1.2+k*1.9;
         e2.g.position.set(Math.cos(a)*1.15,0,Math.sin(a)*1.15); e2.g.rotation.y=a+Math.PI; e2.g.scale.setScalar(ev.sc||1.75); g.add(e2.g); } } }
-    if(ev.id==='poset'){ for(const dx of [-0.5,0.5]){ const bag=mkBox(0.34,0.42,0.26,0xcdbb8e,dx,0.24,0.55); g.add(bag); } }   // poşetler
+    if(ev.id==='poset'){ for(const dx of [-0.5,0.5]){ const bag=mkBox(0.34,0.42,0.26,0xcdbb8e,dx,0.24,0.55); g.add(bag); bags.push(bag); } }   // poşetler
     else if(ev.id==='gormeyen'){ const cane=mkBox(0.05,0.05,1.15,0xf4f4f2,0.4,0.5,0.42); cane.rotation.x=0.55; g.add(cane);   // beyaz baston
       const tip=mkBox(0.07,0.07,0.14,0xc0392b,0.4,0.06,0.92); g.add(tip); }
     else if(ev.id==='arac'){ g.add(mkBox(1.95,0.6,0.98,0x8c3b34,1.75,0.45,0.15));  g.add(mkBox(1.05,0.42,0.9,0x2f3a44,1.68,0.9,0.15));   // bozuk araç (gövde+kabin)
@@ -4366,7 +4368,46 @@ function spawnCityEvent(){ if(cityEvent||!modernGroup) return; if(S.cityCd && Da
   g.position.set(x,0,z); modernGroup.add(g);
   const spr=(typeof emojiSprite==='function')?emojiSprite(ev.ic,0.8):null; if(spr){ spr.position.set(0,ev.people?2.6:1.1,0); g.add(spr); }
   const rec={ modern:'city', cityId:ev.id, q:{id:'m_city_'+ev.id, pos:[x,0,z], nm:'', ic:ev.ic}, g:new THREE.Object3D(), meshes:[], reach:3.0 };
-  rec.g.position.set(x,0,z); interactables.push(rec); cityEvent={ g, rec, ev };
+  rec.g.position.set(x,0,z); interactables.push(rec); cityEvent={ g, rec, ev, npcG, bags, t:0, thankT:0 };
+}
+/* 🎒 POŞETLİ TEYZE (Faz 7.18) — kullanıcı "teyzeye animasyon ekle" dedi.
+   ZORLANMA: yükün altında hafif öne eğilir, ağırlık bir o yana bir bu yana verilir, poşetler sallanır,
+   arada doğrulup nefeslenir. YARDIM SONRASI: poşetler ELİNDEN GİDER (sen aldın), sırtı doğrulur ve
+   eller duâya kalkar (🤲). Diğer olaylarda da hafif bir "hayat" salınımı olur (heykel gibi durmasınlar). */
+function updateCityEvent(dt){
+  const ce=cityEvent; if(!ce) return; ce.t+=dt;
+  const t=ce.t, poset=(ce.ev.id==='poset');
+  if(ce.thankT>0){                                   // ── ŞÜKRAN: doğrul + duâya kalk
+    ce.thankT-=dt; const k=Math.min(1,(1.6-ce.thankT)/0.55);
+    if(ce.npcG){ ce.npcG.rotation.x = 0.22*(1-k) - 0.06*k;      // eğik sırt → dik
+                 ce.npcG.position.y = Math.sin(k*Math.PI)*0.06; }  // hafif rahatlama
+    if(ce.thankT<=0) despawnCityEvent();
+    return;
+  }
+  if(poset && ce.npcG){                              // ── ZORLANMA
+    const breathe=(t%7)>5.6;                                     // ~7 sn'de bir doğrulup nefeslenir
+    const lean=breathe?0.05:0.22+Math.sin(t*1.6)*0.03;           // yük altında öne eğik
+    ce.npcG.rotation.x += (lean-ce.npcG.rotation.x)*Math.min(1,dt*4);
+    ce.npcG.rotation.z = Math.sin(t*0.9)*0.05;                   // ağırlığı bir o yana bir bu yana ver
+    ce.npcG.position.y = Math.abs(Math.sin(t*0.9))*0.015;
+    for(let i=0;i<ce.bags.length;i++){                            // poşetler adım/salınımla sallanır
+      const b=ce.bags[i]; b.rotation.x=Math.sin(t*1.8+i*Math.PI)*0.10; b.rotation.z=Math.sin(t*0.9)*0.06; }
+  } else if(ce.npcG){                                 // diğer olaylar: çok hafif nefes/duruş salınımı
+    ce.npcG.position.y = Math.abs(Math.sin(t*1.1))*0.012;
+    ce.npcG.rotation.z = Math.sin(t*0.7)*0.02;
+  }
+}
+function cityThank(){                                 // yardım edildi: poşetler sana geçer, teyze doğrulup duâ eder
+  const ce=cityEvent; if(!ce) return false;
+  if(ce.ev.id!=='poset' || !ce.npcG){ despawnCityEvent(); return false; }
+  for(const b of ce.bags){ if(b.parent) b.parent.remove(b); } ce.bags.length=0;   // poşetleri SEN aldın
+  ce.thankT=1.6;
+  // EMNİYET: sekme arka plandaysa/kare hızı düşükse rAF sayacı ilerlemez → NPC takılı kalmasın diye
+  // duvar saatiyle de kaldır (hangisi önce biterse).
+  setTimeout(()=>{ if(cityEvent===ce && ce.thankT>0) despawnCityEvent(); }, 2600);
+  const spr=(typeof emojiSprite==='function')?emojiSprite('🤲',0.7):null;
+  if(spr){ spr.position.set(0,2.9,0); ce.g.add(spr); }
+  return true;                                        // despawn'ı animasyon bitirince yapacağız
 }
 function despawnCityEvent(){ if(!cityEvent) return; if(modernGroup) modernGroup.remove(cityEvent.g);
   const i=interactables.indexOf(cityEvent.rec); if(i>=0) interactables.splice(i,1); if(near===cityEvent.rec) near=null; cityEvent=null; }
@@ -4376,7 +4417,9 @@ function openCityEvent(rec){ const ce=cityEvent; if(!ce||ce.rec!==rec) return; c
         if(typeof facePlayer==='function' && ce.g) facePlayer(ce.g.position); if(typeof playAction==='function') playAction(1.5, ev.anim);
         banner(ev.ic+' +'+ev.nur+(tU('nur_suffix')||' nûr')); setTimeout(()=>toast(ev.ic+' '+M.done),450);
         if(typeof onboardMark==='function') onboardMark('yardim');   // 🗺️ İlk Hafta: şehirde yardım adımı
-        S.cityCd=Date.now()+CITY_CD; save(); despawnCityEvent(); if(typeof closeDialog==='function') closeDialog(); } },
+        S.cityCd=Date.now()+CITY_CD; save();
+        if(!cityThank()) despawnCityEvent();   // 🎒 poşet: teşekkür animasyonu oynasın, sonunda kendi kaldırır
+        if(typeof closeDialog==='function') closeDialog(); } },
     { l:M.skip, act:()=>{ S.cityCd=Date.now()+Math.round(CITY_CD*0.6); save(); toast(ev.ic+' '+M.skipd); despawnCityEvent(); if(typeof closeDialog==='function') closeDialog(); } }
   ] } }});
 }
@@ -5371,16 +5414,25 @@ function drink(){
   if((S.inv.su||0)<=0){ toast('💧 Suyun yok — kuyudan (💧) su çek'); return; }
   S.inv.su--; if(S.inv.su<=0) delete S.inv.su;
   S.thirst=Math.max(0,S.thirst-55); addNur(1); save(); refreshHUD(); if(typeof renderInv==='function') renderInv(); sndChime();
-  if(typeof playAction==='function') playAction(1.6,'drink');   // 💧 içme animasyonu (bardağı ağıza kaldır)
+  if(typeof playAction==='function') playAction(2.4,'drink');   // 💧 otur → bardağı ağıza kaldır → indir (âdâb okunsun diye uzatıldı)
   toast(tF('nd_drank','💧 Su içtin — elhamdülillah (+1 nûr şükür)'));
+  adabNudge('drink');
+}
+// ÂDÂB NOTU: oturarak içme/yeme ilk kez yapılınca BİR KEZ hatırlatılır (tekrar edip bıktırmaz).
+function adabNudge(kind){
+  S.adab=S.adab||{}; if(S.adab[kind]) return; S.adab[kind]=1; save();
+  setTimeout(()=>toast(kind==='drink'
+    ? tF('adab_drink','🧎 Oturarak içtin — «Sizden biri ayakta içmesin.» (Müslim)')
+    : tF('adab_eat','🧎 Oturarak yedin — Peygamber ﷺ oturarak yer, «ben ancak bir kulum» buyururdu. (Buhârî · Müslim)')), 1500);
 }
 function eat(){
   if(fastingAbstain()){ toast(tF('fs_abstain','🤍 Oruçlusun — iftara kadar sabret (Akşam)')); return; }
   const k=foodItem(); if(!k){ toast(tF('nd_nofood','🍞 Yiyeceğin yok — hurma/dut/ekmek/süt topla')); return; }
   S.inv[k]--; if(S.inv[k]<=0) delete S.inv[k];
   S.hunger=Math.max(0,S.hunger-50); addNur(1); save(); refreshHUD(); if(typeof renderInv==='function') renderInv(); sndChime();
-  if(typeof playAction==='function') playAction(1.8,'eat');   // 🍞 yeme animasyonu (el ağıza, ısırık)
+  if(typeof playAction==='function') playAction(2.6,'eat');   // 🍞 otur → el ağıza, ısırık (âdâb okunsun diye uzatıldı)
   toast(tF('nd_ate','🍞 {nm} yedin — bismillah, elhamdülillah (+1 nûr şükür)',{nm:goodName(k)}));
+  adabNudge('eat');
 }
 // TUVALET → ABDEST TAZELEME: ihtiyacı gider, abdest bozulur, detaylı abdest hareketlerini göster
 function refreshWudu(){
@@ -9013,8 +9065,11 @@ function tick(){
   const nowS = performance.now()/1000;
   if(moving) lastActT = nowS;
   const canSit = player && !moving && actionT<=0 && !mosqueMode && !hacMode && !introMode;
-  const sitTarget = (canSit && (nowS-lastActT)>10) ? 1 : 0;
-  sitAmount += (sitTarget - sitAmount) * Math.min(1, dt*3.2);
+  // SÜNNET ÂDÂBI (Faz 7.18): su içerken ve yemek yerken OTURULUR — «Sizden biri ayakta içmesin.» (Müslim).
+  // İçme/yeme aksiyonu boyunca oturuş ZORLANIR (10 sn AFK beklemesine bakılmaz), bitince kendiliğinden kalkar.
+  const adabSit = !!(player && actionT>0 && (actionKind==='drink'||actionKind==='eat') && !mosqueMode && !hacMode && !introMode);
+  const sitTarget = (adabSit || (canSit && (nowS-lastActT)>10)) ? 1 : 0;
+  sitAmount += (sitTarget - sitAmount) * Math.min(1, dt*(adabSit?7.5:3.2));   // âdâb oturuşu daha çabuk çöker (aksiyon kısa)
   // GİRDAP POZU: Kâbe'nin girdabına kapılmış — kollar havada çırpınır (kurtulmaya çalışır), ayaklar aşağı çekilir,
   // gövde giderek hızlanarak döner ve küçülerek aşağı iner. (diğer poz blokları girdapta atlanır)
   if(hacVortexT>0 && PP && PP.legL && PP.armL){
@@ -9158,6 +9213,7 @@ function tick(){
     // gövde eğimi: namaz/ikram sırasında pozdan; bitince ayakta dik. OTURURKEN gövde DİK dursun
     // (öne eğik komik görünüyordu → hafif geriye/dik ~ -0.04, bağdaş kuran biri gibi doğal)
     if(!(actionT>0 && (actionKind==='namaz'||actionKind==='give'||actionKind==='hug'||actionKind==='draw'||actionKind==='run'||actionKind==='lift'||actionKind==='stretch'||actionKind==='eat'||actionKind==='drink'))) player.rotation.x += (sitAmount*-0.04 - player.rotation.x)*0.2;
+    // NOT: eat/drink burada hariç — gövde eğimini kendi aksiyon blokları sürüyor; oturuşu BACAKLAR + kalça yüksekliği veriyor.
   }
   // EMANET taşırken SOL kol dirsekten kıvrık (keseyi GÖĞÜS hizasında tutar) — dururken/yürürken/harekette HEP (son yazan → salınımı ezer)
   if(hacVortexT<=0 && S.carryPouch && PP && PP.armL){ swingLeg(PP.armL, -1.18); }   // -1.45→-1.18: el göğse iner, kese elin üstünde kalmaz
@@ -9352,6 +9408,7 @@ function tick(){
   if(bees.length) updateBees(dt, clock.elapsedTime);
   if(animals.length) updateAnimals(dt);
   updateThief(dt);   // 🗡️ hırsız: belirme koşulu + dolaşma + kargaşa + kaçış animasyonu
+  if(cityEvent) updateCityEvent(dt);   // 🎒 şehir olayı: teyzenin zorlanması / şükran animasyonu
   cdAcc+=dt; if(cdAcc>=0.4){ cdAcc=0; updateCooldownSprites(); if(typeof renderVazife==='function') renderVazife(); }   // bekleme geri-sayım rozetleri + imam vazife takibi (~0.4 sn'de bir)
   groundAnimals();   // güvenlik ağı: her kare tüm hayvan klonlarını ada+tabana sıkıştır (orphan/uçan dahil)
   // ---- TEŞHİS (Faz 11.9 geçici): görünür hayvanın GERÇEK render pozisyonu (dünya bbox) anormal mi? Ekranda göster ----
@@ -9650,6 +9707,10 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     cityEvent:()=>cityEvent?{id:cityEvent.ev.id, pos:[Math.round(cityEvent.rec.g.position.x),Math.round(cityEvent.rec.g.position.z)]}:null,
     spawnCity:(id)=>{ if(cityEvent) despawnCityEvent(); S.cityCd=0; if(id){ const i=CITY_EVENTS.findIndex(e=>e.id===id); if(i>=0) S.cityIdx=i; } spawnCityEvent(); return cityEvent?cityEvent.ev.id:null; },
     cityList:()=>CITY_EVENTS.map(e=>e.id),
+    cityState:()=>cityEvent?{id:cityEvent.ev.id, t:+cityEvent.t.toFixed(2), thankT:+cityEvent.thankT.toFixed(2),
+      bags:cityEvent.bags.length, npc:!!cityEvent.npcG,
+      npcRotX:cityEvent.npcG?+cityEvent.npcG.rotation.x.toFixed(3):null,
+      npcRotZ:cityEvent.npcG?+cityEvent.npcG.rotation.z.toFixed(3):null}:null,   // 🎒 teyze animasyonu gözlemi
     cityOpen:()=>{ if(cityEvent) openCityEvent(cityEvent.rec); return cityEvent?cityEvent.ev.id:null; },
     cityLabel:()=>cityEvent?modernBldNm(cityEvent.rec):null,
     mosqueState:()=>({mode:mosqueMode, cumaDone:S.cumaDone, sat:S.mosqueSat, interiorNodes:mosqueGroup?mosqueGroup.children.length:0}),
