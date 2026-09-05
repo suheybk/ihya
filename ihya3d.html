@@ -412,6 +412,12 @@ addEventListener('appinstalled', function(){ window.__ihyaPwa.installed = true; 
   .introLangBtn{ font-size:19px; font-weight:700; padding:15px 18px; border-radius:15px; border:1.5px solid #2f8f6355;
     background:rgba(255,255,255,.06); color:#eaf3ec; cursor:pointer; transition:transform .12s, background .12s, border-color .12s }
   .introLangBtn:hover,.introLangBtn:focus{ background:rgba(143,206,88,.16); border-color:#8fce58; transform:translateY(-2px); outline:none }
+  .introCharBtns{ display:flex; gap:16px; flex-wrap:wrap; justify-content:center }
+  .introCharBtn{ display:flex; flex-direction:column; align-items:center; gap:9px; width:min(150px,38vw); padding:14px 10px 12px;
+    border-radius:18px; border:1.5px solid #2f8f6355; background:rgba(255,255,255,.06); color:#eaf3ec; cursor:pointer;
+    transition:transform .12s, background .12s, border-color .12s; font:800 16px system-ui,sans-serif }
+  .introCharBtn:hover,.introCharBtn:focus{ background:rgba(143,206,88,.16); border-color:#8fce58; transform:translateY(-3px); outline:none }
+  .introCharBtn svg{ width:100%; height:auto; display:block }
   .introCtrl{ display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:6px; opacity:.9 }
   .introKeys{ display:grid; grid-template-columns:repeat(3,40px); grid-template-rows:40px 40px; gap:6px; justify-content:center }
   .introKeys span{ display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; border-radius:9px;
@@ -452,6 +458,42 @@ addEventListener('appinstalled', function(){ window.__ihyaPwa.installed = true; 
       <div class="introSpace"><span class="introSpaceKey" id="introSpaceKey">Boşluk</span></div>
       <div class="introCtrlTxt" id="introActTxt">Etkinliğe geçmek / etkileşim için <b>Boşluk</b> (mobilde 🔘 düğme)</div>
     </div>
+  </div>
+  <div id="introChar" class="introScreen" style="display:none">
+    <div class="introTitle" style="font-size:clamp(30px,8vw,52px)">İhya</div>
+    <div class="introSub" id="introCharPick" data-i18n="ch_pick">Kendini seç</div>
+    <div class="introCharBtns">
+      <button class="introCharBtn" data-gender="erkek">
+        <svg viewBox="0 0 100 130" aria-hidden="true">
+          <ellipse cx="50" cy="120" rx="30" ry="7" fill="#0000002e"/>
+          <rect x="34" y="70" width="12" height="34" rx="5" fill="#b9c6cf"/><rect x="54" y="70" width="12" height="34" rx="5" fill="#b9c6cf"/>
+          <rect x="30" y="100" width="18" height="9" rx="4" fill="#4a4038"/><rect x="52" y="100" width="18" height="9" rx="4" fill="#4a4038"/>
+          <path d="M30 44h40v34a6 6 0 0 1-6 6H36a6 6 0 0 1-6-6z" fill="#9fb6c4"/>
+          <rect x="20" y="46" width="11" height="28" rx="5" fill="#9fb6c4"/><rect x="69" y="46" width="11" height="28" rx="5" fill="#9fb6c4"/>
+          <circle cx="50" cy="28" r="20" fill="#d9a878"/>
+          <path d="M31 22a19 19 0 0 1 38 0z" fill="#f2f5f1"/><rect x="30" y="20" width="40" height="5" rx="2.5" fill="#e2e8e0"/>
+          <circle cx="43" cy="30" r="2.6" fill="#2b2b2b"/><circle cx="57" cy="30" r="2.6" fill="#2b2b2b"/>
+          <path d="M44 38q6 5 12 0" stroke="#2b2b2b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span data-i18n="ch_boy">Erkek</span>
+      </button>
+      <button class="introCharBtn" data-gender="kadin">
+        <svg viewBox="0 0 100 130" aria-hidden="true">
+          <ellipse cx="50" cy="120" rx="30" ry="7" fill="#0000002e"/>
+          <rect x="34" y="86" width="12" height="18" rx="5" fill="#b9c6cf"/><rect x="54" y="86" width="12" height="18" rx="5" fill="#b9c6cf"/>
+          <rect x="30" y="100" width="18" height="9" rx="4" fill="#4a4038"/><rect x="52" y="100" width="18" height="9" rx="4" fill="#4a4038"/>
+          <path d="M32 46h36l10 52a4 4 0 0 1-4 5H26a4 4 0 0 1-4-5z" fill="#4a6f8a"/>
+          <rect x="18" y="48" width="11" height="30" rx="5" fill="#4a6f8a"/><rect x="71" y="48" width="11" height="30" rx="5" fill="#4a6f8a"/>
+          <circle cx="50" cy="28" r="20" fill="#d9a878"/>
+          <path d="M50 5a23 23 0 0 1 23 23c0 12-4 18-6 26H33c-2-8-6-14-6-26A23 23 0 0 1 50 5z" fill="#e6dcc8"/>
+          <path d="M35 24a15.5 15.5 0 0 1 30 0v9a15 15 0 0 1-30 0z" fill="#d9a878"/>
+          <circle cx="43" cy="30" r="2.6" fill="#2b2b2b"/><circle cx="57" cy="30" r="2.6" fill="#2b2b2b"/>
+          <path d="M44 38q6 5 12 0" stroke="#2b2b2b" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span data-i18n="ch_girl">Kız</span>
+      </button>
+    </div>
+    <div class="introOr" id="introCharNote" data-i18n="ch_note">Sonradan değiştirilebilir</div>
   </div>
   <div id="introCine" class="introCineOverlay" style="display:none">
     <div class="introCineText" id="introCineText"></div>
@@ -556,7 +598,7 @@ addEventListener('appinstalled', function(){ window.__ihyaPwa.installed = true; 
   </div>
 </div>
 
-<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.18</div>
+<div id="verBadge" style="position:fixed;left:50%;transform:translateX(-50%);bottom:5px;z-index:40;font:700 10px system-ui,sans-serif;color:#8fce58;opacity:.42;pointer-events:none;text-shadow:0 1px 2px #000;letter-spacing:.08em">İhya · Faz 7.19</div>
 <div id="animDbg" style="position:fixed;left:8px;top:120px;z-index:60;max-width:280px;display:none;background:#c0142088;color:#fff;font:700 11px system-ui,monospace;padding:6px 9px;border-radius:8px;pointer-events:none;white-space:pre-line;box-shadow:0 2px 8px #0006"></div>
 
 <div id="prompt"></div>
@@ -1620,6 +1662,7 @@ const UI_STR={ en:{
   pw_other:'Browser menu ⋮ → «Install app» / «Add to home screen».',
   pw_ok_b:'📲 Ihya is in your pocket', pw_ok_t:'Added to your home screen — one tap, and it opens even offline (+10 nur).',
   pw_btn:'Read the signpost',
+  ch_pick:'Choose your character', ch_boy:'Boy', ch_girl:'Girl', ch_note:'You can change this later',
   adab_drink:'🧎 You drank sitting down — «None of you should drink standing.» (Muslim)', adab_eat:'🧎 You ate sitting down — the Prophet ﷺ ate seated, saying «I am but a servant». (Bukhari · Muslim)',
   pr_entered:'🕌 {n} has begun', pr_hint_rug:'(pray with 🧎)', nd_wudu_guide:'Renew Your Wudu',
   // --- Faz 7.17: EN'de eksik kalan anahtarlar ---
@@ -2022,6 +2065,7 @@ ar:{
   pw_other:'قائمة المتصفّح ⋮ ← «تثبيت التطبيق» / «أضِف إلى الشاشة الرئيسة».',
   pw_ok_b:'📲 إحياءُ في جيبك', pw_ok_t:'أُضيف إلى شاشتك الرئيسة — لمسةٌ واحدة، ويُفتَح ولو بلا إنترنت (+١٠ نور).',
   pw_btn:'اقرأ اللوحة',
+  ch_pick:'اختَر شخصيّتك', ch_boy:'فتى', ch_girl:'فتاة', ch_note:'يمكن تغييرها لاحقًا',
   adab_drink:'🧎 شربتَ جالسًا — «لا يشربنَّ أحدٌ منكم قائمًا.» (مسلم)', adab_eat:'🧎 أكلتَ جالسًا — كان النبي ﷺ يأكل جالسًا ويقول: «إنما أنا عبد.» (البخاري · مسلم)',
   pr_entered:'🕌 دخل وقتُ {n}', pr_hint_rug:'(صلِّ بـ 🧎)', nd_wudu_guide:'جدِّد وضوءك',
   // --- Faz 7.17: AR'da eksik kalan anahtarlar ---
@@ -3911,11 +3955,50 @@ function finishHacNamaz(){ const P=hacState; hacPraying=false; hacPrayHold=false
 let beardMesh=null, BEARD_POS=[0.795,0.36];   // sakal konumu (localH oranı, localD oranı) — cihazda setBeardPos ile ayarlanabilir
 function applyPlayerScale(){ if(!player) return; const c=S.charCustom||{};
   player.scale.set(1.95*(c.kiloK||1), 1.95*(c.boyK||1), 1.95*(c.kiloK||1)); }   // boy=Y, kilo=X/Z (ölçülü aralıklar)
+/* 👧 KIZ KARAKTER (Faz 7.19) — ayrı bir GLB yok; mevcut iskeletli modele başörtüsü + uzun elbise
+   PROSEDÜREL olarak eklenir. Parçalar KEMİĞE bağlanır (head / hips) → baş dönünce örtü döner,
+   gövde eğilince elbise onunla gider. Kemik dünya ölçeği 1.95 (boy/kilo ayarıyla değişebilir) →
+   ters-ölçekli "taşıyıcı" grup kullanılır, böylece ölçüler DÜNYA biriminde yazılabilir. */
+// CİHAZDA İNCE AYAR (setBeardPos deseni): __ihya3d.setScarf(r,y,z) · setDress(rTop,rBot,h,y)
+let FEM_SCARF=[0.31,0.17,0.01];        // [yarıçap, y, z]
+let FEM_DRAPE=[0.28,0.33,0.42,-0.10];  // [üstR, altR, yükseklik, y]
+let FEM_DRESS=[0.30,0.42,0.52,-0.26];  // [üstR, altR, yükseklik, y]
+let femaleParts=null;
+function clearFemale(){ if(!femaleParts) return; for(const m of femaleParts){ if(m.parent) m.parent.remove(m); } femaleParts=null; }
+function boneOf(nm){ let b=null; if(player) player.traverse(o=>{ if(!b && o.isBone && o.name===nm) b=o; }); return b; }
+function boneHolder(bone){
+  const h=new THREE.Group(); const ws=new THREE.Vector3(); bone.getWorldScale(ws);
+  h.scale.set(1/(ws.x||1), 1/(ws.y||1), 1/(ws.z||1)); bone.add(h); return h;
+}
+function buildFemale(){
+  clearFemale();
+  if(!player || isMale()) return;
+  const head=boneOf('head'), hips=boneOf('hips');
+  if(!head || !hips) return;                      // iskelet yoksa (prosedürel fallback) sessizce atla
+  player.updateMatrixWorld(true);
+  const parts=[];
+  const scarf=new THREE.MeshStandardMaterial({color:0xe6dcc8,roughness:0.92});   // krem başörtüsü
+  const dress=new THREE.MeshStandardMaterial({color:0x4a6f8a,roughness:0.9});    // dingin mavi elbise
+  const hH=boneHolder(head), hP=boneHolder(hips);
+  // ÖRTÜ: başı üstten/yanlardan/arkadan saran küre kabuğu; ÖN (+z) yüz için AÇIK bırakılır
+  const cap=new THREE.Mesh(new THREE.SphereGeometry(FEM_SCARF[0],18,12, Math.PI*0.5+0.78, Math.PI*2-1.56, 0, Math.PI*0.62), scarf);
+  cap.position.set(0,FEM_SCARF[1],FEM_SCARF[2]); cap.frustumCulled=false; hH.add(cap); parts.push(cap);
+  // ARKA/OMUZ ŞALI: enseden sırta iner (hafif konik)
+  const drape=new THREE.Mesh(new THREE.CylinderGeometry(FEM_DRAPE[0],FEM_DRAPE[1],FEM_DRAPE[2],14,1,true), scarf);
+  drape.position.set(0,FEM_DRAPE[3],-0.05); drape.frustumCulled=false; hH.add(drape); parts.push(drape);
+  // UZUN ELBİSE: kalçadan ayak bileğine inen konik etek (uçları açık — kapak görünmez)
+  const skirt=new THREE.Mesh(new THREE.CylinderGeometry(FEM_DRESS[0],FEM_DRESS[1],FEM_DRESS[2],16,1,true), dress);
+  skirt.position.set(0,FEM_DRESS[3],0); skirt.frustumCulled=false; hP.add(skirt); parts.push(skirt);
+  femaleParts=parts.concat([hH,hP]);
+}
 function applyCharCustom(){ if(!player) return; const c=S.charCustom||{};
   const shaved=!!S.hairShaved, h=c.hair||'normal';   // Hac tıraşı HER ZAMAN öncelikli (3 Cuma uzar)
+  const fem=!isMale();
   player.traverse(o=>{ if(!o.isMesh||!o.name) return;
-    if(/^Hair_/.test(o.name)) o.visible = !shaved && h!=='tiras';
-    if(/^Bang_/.test(o.name)) o.visible = !shaved && h==='normal'; });   // kısa: perçemsiz · tıraşlı: saçsız
+    if(/^Hair_/.test(o.name)) o.visible = !fem && !shaved && h!=='tiras';
+    if(/^Bang_/.test(o.name)) o.visible = !fem && !shaved && h==='normal';   // kısa: perçemsiz · tıraşlı: saçsız
+    if(/^Cap/.test(o.name)) o.visible = !fem; });                            // takke erkeğe mahsus; kızda başörtüsü var
+  buildFemale();   // 👧 örtü + elbise (erkekte parçaları temizler)
   // SAKAL + BIYIK — yalnız YETİŞKİN ERKEK profili (çocukta/kadında yok; "yaşına göre, abartmadan"); seçim ANINDA karakterde görünür
   if(beardMesh){ player.remove(beardMesh); beardMesh=null; }
   const wantB=(isAdult()&&isMale())?(+c.beard||0):0, wantM=(isAdult()&&isMale())?(+c.mustache||0):0;
@@ -5685,7 +5768,7 @@ let NAMAZ_FOLD=1.35;   // teşehhüd/secde diz kırma miktarı (intro oturma leg
    Profil YOKKEN (Bölüm 1) her şey varsayılan (yetişkin gibi) çalışır. */
 function isChild(){ return S.profile.set && S.profile.ageGroup==='cocuk'; }
 function isAdult(){ return !S.profile.set || S.profile.ageGroup==='yetiskin'; }
-function isMale(){ return !S.profile.set || S.profile.gender==='erkek'; }
+function isMale(){ return S.profile.gender ? S.profile.gender==='erkek' : !S.profile.set; }   // intro'da seçilen cinsiyet profil tamamlanmadan da geçerli
 function cumaActive(){ return !S.profile.set || (isAdult() && isMale()); }     // Cuma erkeğe farz
 function zekatMukellef(){ return !S.profile.set || S.profile.ageGroup!=='cocuk'; }  // çocuk zekâtla mükellef değil
 const PROFILE_Q=[
@@ -5708,7 +5791,9 @@ const PROFILE_Q_AR={
 function profQ(q){ const L=S.lang; if(L==='ar'&&PROFILE_Q_AR[q.key]) return PROFILE_Q_AR[q.key].q; if(L==='en'&&PROFILE_Q_EN[q.key]) return PROFILE_Q_EN[q.key].q; return q.q; }
 function profOpt(q,o){ const L=S.lang; if(L==='ar'&&PROFILE_Q_AR[q.key]) return PROFILE_Q_AR[q.key].opts[o.v]; if(L==='en'&&PROFILE_Q_EN[q.key]) return PROFILE_Q_EN[q.key].opts[o.v]; return o.l; }
 let profSel={};
-function openProfile(){ profSel = S.profile.set ? {ageGroup:S.profile.ageGroup,gender:S.profile.gender,quran:S.profile.quran} : {}; renderProfile(); document.getElementById('profile').classList.add('show'); }
+function openProfile(){ profSel = S.profile.set ? {ageGroup:S.profile.ageGroup,gender:S.profile.gender,quran:S.profile.quran} : {};
+  // intro'da karakter seçildiyse cinsiyet HAZIR işaretli gelsin (aynı soru iki kez sorulmuş gibi olmasın)
+  if(!S.profile.set && S.charPicked && S.profile.gender) profSel.gender=S.profile.gender; renderProfile(); document.getElementById('profile').classList.add('show'); }
 function renderProfile(){
   const w=document.getElementById('profQuestions'); w.innerHTML='';
   for(const q of PROFILE_Q){
@@ -8075,6 +8160,9 @@ function buildWorld(){
   if(!RIG) PP={ legL:prig('Pant_L','Shoe_L','Sole_L'), legR:prig('Pant_R','Shoe_R','Sole_R'),
        armL:prig('Sleeve_L','Hand_L'), armR:prig('Sleeve_R','Hand_R'), boy:true };
   console.log('[İhya] karakter rig:', RIG?'🦴 boy_rig (iskelet+klip)':'PP prosedürel (boy_takke)');
+  // 👧 KIZ GÖRÜNÜMÜ: örtü/elbise KEMİĞE bağlanır → oyuncu+iskelet KURULDUKTAN SONRA uygulanmalı.
+  // (boot'ta updatePlayerHair burdan ÖNCE çağrılıyor; o an henüz player/kemik yok → sessizce atlanıyordu.)
+  try{ applyCharCustom(); }catch(e){}
   buildScenarios();     // senaryo kümeleri (barıştırma/adalet/emanet/dilenci/sebil) — player kurulduktan sonra (emanet kesesi ele takılır)
 }
 
@@ -9534,10 +9622,20 @@ function startIntro(){
   document.body.classList.add('intro'); r.style.display='block';
   document.getElementById('introLang').style.display='flex';
   document.getElementById('introCine').style.display='none';
-  document.querySelectorAll('.introLangBtn').forEach(b=>{ b.onclick=()=>{ try{audio();}catch(e){} S.lang=b.dataset.lang; applyLang(); save(); startCine(); }; });
+  document.querySelectorAll('.introLangBtn').forEach(b=>{ b.onclick=()=>{ try{audio();}catch(e){} S.lang=b.dataset.lang; applyLang(); save(); startCharPick(); }; });
+  document.querySelectorAll('.introCharBtn').forEach(b=>{ b.onclick=()=>{ try{audio();}catch(e){}
+    S.profile=S.profile||{}; S.profile.gender=b.dataset.gender; S.charPicked=1; save();
+    try{ applyCharCustom(); }catch(e){}          // seçim ANINDA karaktere yansır (sinematikte de görünür)
+    document.getElementById('introChar').style.display='none'; startCine(); }; });
+}
+function startCharPick(){                      // 👧🧒 dil seçildi → "kendini seç" (kız/erkek). Zorunlu ama tek dokunuş.
+  document.getElementById('introLang').style.display='none';
+  const el=document.getElementById('introChar'); if(!el){ startCine(); return; }
+  el.style.display='flex'; applyLang();
 }
 function startCine(){
   document.getElementById('introLang').style.display='none';
+  { const ec=document.getElementById('introChar'); if(ec) ec.style.display='none'; }
   const cine=document.getElementById('introCine'); cine.style.display='flex'; cine.style.opacity='1';
   const txt=document.getElementById('introCineText');
   introMode=true; introT=0; introLit=false; cineStart=performance.now();
@@ -9706,6 +9804,10 @@ console.log('%cİHYA sürüm: Faz 11.30 — SENARYO MEKANİĞİ: 13 model diyalo
     // 🏙️ Şehir hayatı iyilik olayları debug
     cityEvent:()=>cityEvent?{id:cityEvent.ev.id, pos:[Math.round(cityEvent.rec.g.position.x),Math.round(cityEvent.rec.g.position.z)]}:null,
     spawnCity:(id)=>{ if(cityEvent) despawnCityEvent(); S.cityCd=0; if(id){ const i=CITY_EVENTS.findIndex(e=>e.id===id); if(i>=0) S.cityIdx=i; } spawnCityEvent(); return cityEvent?cityEvent.ev.id:null; },
+    setScarf:(r,y,z)=>{ FEM_SCARF=[r,y,z]; applyCharCustom(); return FEM_SCARF; },   // 👧 cihazda örtü ayarı
+    setDress:(a,b2,h,y)=>{ FEM_DRESS=[a,b2,h,y]; applyCharCustom(); return FEM_DRESS; },
+    setDrape:(a,b2,h,y)=>{ FEM_DRAPE=[a,b2,h,y]; applyCharCustom(); return FEM_DRAPE; },
+    setGender:(g)=>{ S.profile=S.profile||{}; S.profile.gender=g; save(); applyCharCustom(); return S.profile.gender; },
     cityList:()=>CITY_EVENTS.map(e=>e.id),
     cityState:()=>cityEvent?{id:cityEvent.ev.id, t:+cityEvent.t.toFixed(2), thankT:+cityEvent.thankT.toFixed(2),
       bags:cityEvent.bags.length, npc:!!cityEvent.npcG,
